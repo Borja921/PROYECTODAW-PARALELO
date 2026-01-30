@@ -14,7 +14,7 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('registro.store') }}">
+    <form id="registroForm" method="POST" action="{{ route('registro.store') }}">
         @csrf
 
         <div class="form-group">
@@ -30,11 +30,19 @@
         <div class="form-group">
             <label for="email">Correo electrónico</label>
             <input id="email" name="email" type="email" class="form-control" required value="{{ old('email') }}">
+            @error('email')
+                <div class="text-danger">{{ $message }}</div>
+            @enderror
+            <div id="emailError" style="display:none;color:#dc3545;font-size:0.9rem;"></div>
         </div>
 
         <div class="form-group">
             <label for="fecha_nacimiento">Fecha de nacimiento</label>
             <input id="fecha_nacimiento" name="fecha_nacimiento" type="date" class="form-control" required value="{{ old('fecha_nacimiento') }}">
+            @error('fecha_nacimiento')
+                <div class="text-danger">{{ $message }}</div>
+            @enderror
+            <div id="fechaError" style="display:none;color:#dc3545;font-size:0.9rem;"></div>
         </div>
 
         <div class="form-group">
@@ -52,3 +60,4 @@
 </div>
 @endsection
 
+<script src="{{ asset('js/registro.js') }}" defer></script>

@@ -474,16 +474,37 @@ const destinos = {
  */
 function filtrarDestinos() {
     const provincia = document.getElementById('provincia').value;
-    const dias = document.getElementById('dias').value;
+    const startDate = document.getElementById('start_date') ? document.getElementById('start_date').value : '';
+    const endDate = document.getElementById('end_date') ? document.getElementById('end_date').value : '';
     const resultados = document.getElementById('resultados');
 
     // Limpiar resultados previos
     resultados.innerHTML = '';
 
-    // Validar selección
-    if (!provincia || !dias) {
-        resultados.innerHTML = '<p class="placeholder-text">Por favor, selecciona una provincia y una duración</p>';
+    // Validar selección: se requiere provincia y un rango de fechas completo
+    if (!provincia || !(startDate && endDate)) {
+        resultados.innerHTML = '<p class="placeholder-text">Por favor, selecciona una provincia y un rango de fechas (inicio y fin)</p>';
         return;
+    }
+
+    if ((startDate && !endDate) || (!startDate && endDate)) {
+        resultados.innerHTML = '<p class="placeholder-text">Si seleccionas fechas, debes indicar fecha de inicio y fin.</p>';
+        return;
+    }
+
+    let computedDays = null;
+    if (startDate && endDate) {
+        const s = new Date(startDate);
+        const e = new Date(endDate);
+        if (isNaN(s.getTime()) || isNaN(e.getTime())) {
+            resultados.innerHTML = '<p class="placeholder-text">Formato de fecha inválido.</p>';
+            return;
+        }
+        if (s > e) {
+            resultados.innerHTML = '<p class="placeholder-text">La fecha de inicio no puede ser posterior a la fecha de fin.</p>';
+            return;
+        }
+        computedDays = Math.round((e - s) / (24 * 60 * 60 * 1000)) + 1; // inclusive
     }
 
     // Obtener destinos de la provincia seleccionada
@@ -500,28 +521,28 @@ function filtrarDestinos() {
     // Hoteles
     if (destinosSeleccionados.hoteles && destinosSeleccionados.hoteles.length > 0) {
         destinosSeleccionados.hoteles.forEach(hotel => {
-            fragmento.appendChild(crearTarjetaDestino(hotel, dias));
+            fragmento.appendChild(crearTarjetaDestino(hotel, computedDays));
         });
     }
 
     // Restaurantes
     if (destinosSeleccionados.restaurantes && destinosSeleccionados.restaurantes.length > 0) {
         destinosSeleccionados.restaurantes.forEach(restaurante => {
-            fragmento.appendChild(crearTarjetaDestino(restaurante, dias));
+            fragmento.appendChild(crearTarjetaDestino(restaurante, computedDays));
         });
     }
 
     // Museos
     if (destinosSeleccionados.museos && destinosSeleccionados.museos.length > 0) {
         destinosSeleccionados.museos.forEach(museo => {
-            fragmento.appendChild(crearTarjetaDestino(museo, dias));
+            fragmento.appendChild(crearTarjetaDestino(museo, computedDays));
         });
     }
 
     // Atracciones
     if (destinosSeleccionados.atracciones && destinosSeleccionados.atracciones.length > 0) {
         destinosSeleccionados.atracciones.forEach(atraccion => {
-            fragmento.appendChild(crearTarjetaDestino(atraccion, dias));
+            fragmento.appendChild(crearTarjetaDestino(atraccion, computedDays));
         });
     }
 
@@ -588,12 +609,66 @@ function generarEstrellas(rating) {
 }
 
 /**
- * Agrega un destino al plan (simulado)
+ * Agrega un destino al plan y lo guarda en localStorage
  */
 function agregarAlPlan(nombre, dias) {
-    alert(`✅ "${nombre}" ha sido agregado a tu plan de ${dias} día(s)`);
-    // Aquí se podría guardar en localStorage o enviar a un servidor
+    try {
+        const key = 'current_plan_items_v1';
+        const raw = localStorage.getItem(key);
+        const arr = raw ? JSON.parse(raw) : [];
+        arr.push({ nombre, dias, added_at: new Date().toISOString() });
+        localStorage.setItem(key, JSON.stringify(arr));
+
+        // Notificar al usuario
+        alert(`✅ "${nombre}" ha sido agregado a tu plan. Duración: ${dias} día(s)`);
+
+        // habilitar botón de guardar si procede
+        updateSaveButtonState();
+    } catch (e) {
+        console.warn('Error guardando item en plan:', e);
+        alert('Error al agregar al plan. Inténtalo de nuevo.');
+    }
 }
+
+function updateSaveButtonState() {
+    const btn = document.getElementById('savePlanBtn');
+    const provEl = document.getElementById('provincia');
+    const munEl = document.getElementById('municipio');
+    const start = document.getElementById('start_date') ? document.getElementById('start_date').value : '';
+    const end = document.getElementById('end_date') ? document.getElementById('end_date').value : '';
+    const prov = provEl ? provEl.value : '';
+    const mun = munEl ? munEl.value : '';
+    const items = JSON.parse(localStorage.getItem('current_plan_items_v1') || '[]');
+    if (btn) {
+        btn.disabled = !(prov && mun && start && end && items.length > 0);
+    }
+}
+
+// Al cargar la página, sincronizar estado del botón
+window.addEventListener('DOMContentLoaded', function () {
+    updateSaveButtonState();
+
+    const saveForm = document.getElementById('savePlanForm');
+    if (saveForm) {
+        saveForm.addEventListener('submit', function (e) {
+            // Rellenar inputs hidden antes de enviar
+            const prov = document.getElementById('provincia') ? document.getElementById('provincia').value : '';
+            const mun = document.getElementById('municipio') ? document.getElementById('municipio').value : '';
+            const start = document.getElementById('start_date') ? document.getElementById('start_date').value : '';
+            const end = document.getElementById('end_date') ? document.getElementById('end_date').value : '';
+            const items = localStorage.getItem('current_plan_items_v1') || '[]';
+
+            document.getElementById('form_provincia').value = prov;
+            document.getElementById('form_municipio').value = mun;
+            document.getElementById('form_start_date').value = start;
+            document.getElementById('form_end_date').value = end;
+            document.getElementById('form_items').value = items;
+
+            // limpiar cache local (opc.) -> dejar a decisión del servidor
+            localStorage.removeItem('current_plan_items_v1');
+        });
+    }
+});
 
 /**
  * Maneja el envío del formulario de registro

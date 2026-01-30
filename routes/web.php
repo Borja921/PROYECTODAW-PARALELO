@@ -7,6 +7,7 @@ use App\Http\Controllers\RestaurantsController;
 use App\Http\Controllers\FestivalsController;
 use App\Http\Controllers\RegistroController;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\MunicipioController;
 
 Route::get('/', function () {
     return view('index');
@@ -16,9 +17,8 @@ Route::get('/destinos', function () {
     return view('destinos');
 })->name('destinos');
 
-Route::get('/planes', function () {
-    return view('planes');
-})->name('planes');
+Route::get('/planes', [App\Http\Controllers\PlanesController::class, 'index'])->name('planes');
+Route::post('/planes', [App\Http\Controllers\PlanesController::class, 'store'])->name('planes.store');
 
 Route::get('/mis-planes', function () {
     return view('mis-planes');
@@ -63,3 +63,8 @@ Route::get('/restaurantes/filtrar/{locality}', [RestaurantsController::class, 'f
 
 Route::get('/fiestas', [FestivalsController::class, 'index'])->name('fiestas');
 Route::get('/fiestas/filtrar/{locality}', [FestivalsController::class, 'filterByLocality'])->name('festivals.filter');
+
+// API: municipios (usa cache en el servidor)
+Route::get('/api/municipios', [MunicipioController::class, 'index'])->name('api.municipios');
+// Forzar refresco/import (POST) - recomendable proteger con middleware auth en producción
+Route::post('/api/municipios/refresh', [MunicipioController::class, 'refresh'])->name('api.municipios.refresh');
