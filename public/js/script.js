@@ -708,6 +708,9 @@ window.addEventListener('DOMContentLoaded', function () {
             const start = startEl ? startEl.value : '';
             const end = endEl ? endEl.value : '';
 
+            // Logging/debug (visible alerta para facilitar depuración en entorno local)
+            console.log('Wizard submit attempt', { prov, mun, start, end });
+
             // Validación cliente mínima
             if (!prov || !mun || !start || !end) {
                 e.preventDefault();
@@ -723,6 +726,33 @@ window.addEventListener('DOMContentLoaded', function () {
 
             // El envío procederá al endpoint protegido por auth (redirigirá a login si procede)
         });
+
+        // Además, escuchar click en el botón para depuración/forzar submit
+        if (wizardBtn) {
+            wizardBtn.addEventListener('click', function (e) {
+                const prov = provEl ? provEl.value : '';
+                const mun = munEl ? munEl.value : '';
+                const start = startEl ? startEl.value : '';
+                const end = endEl ? endEl.value : '';
+                console.log('Wizard button clicked', { prov, mun, start, end, disabled: wizardBtn.disabled });
+                if (wizardBtn.disabled) {
+                    e.preventDefault();
+                    alert('Botón deshabilitado. Rellena provincia, municipio y fecha inicio/fin.\n' +
+                          `provincia=${prov}\nmunicipio=${mun}\nstart=${start}\nend=${end}`);
+                } else {
+                    // Forzar envío como fallback (algunos navegadores podrían bloquear submit si JS previene)
+                    // Aquí no prevenimos y dejamos que el formulario se envíe normalmente.
+                    // Pero añadimos un pequeño timeout para asegurar que los valores hidden se hayan copiado.
+                    setTimeout(() => {
+                        try {
+                            wizardForm.submit();
+                        } catch (err) {
+                            console.warn('Error al forzar submit del wizard:', err);
+                        }
+                    }, 50);
+                }
+            });
+        }
     }
                 return;
             }
