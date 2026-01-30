@@ -79,9 +79,19 @@ Route::middleware('auth')->prefix('plan/wizard')->name('plan.wizard.')->group(fu
     Route::get('/hoteles', [PlanWizardController::class, 'hoteles'])->name('hoteles');
     Route::post('/hoteles', [PlanWizardController::class, 'saveHotel'])->name('hoteles.save');
 
-    // Restaurantes (stubs para seguir la secuencia)
+    // Restaurantes
     Route::get('/restaurantes', [PlanWizardController::class, 'restaurantes'])->name('restaurantes');
     Route::post('/restaurantes', [PlanWizardController::class, 'saveRestaurante'])->name('restaurantes.save');
 
-    // (museos, fiestas y resumen se añadirán en siguientes pasos)
+    // Museos
+    Route::get('/museos', [PlanWizardController::class, 'museos'])->name('museos');
+    Route::post('/museos', [PlanWizardController::class, 'saveMuseo'])->name('museos.save');
+
+    // Fiestas
+    Route::get('/fiestas', [PlanWizardController::class, 'fiestas'])->name('fiestas');
+    Route::post('/fiestas', [PlanWizardController::class, 'saveFiesta'])->name('fiestas.save');
+
+    // Resumen y finalizar
+    Route::get('/summary', [PlanWizardController::class, 'summary'])->name('summary');
+    Route::post('/finalize', [PlanWizardController::class, 'finalize'])->name('finalize');
 });

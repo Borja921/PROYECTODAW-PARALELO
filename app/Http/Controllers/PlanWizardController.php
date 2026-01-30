@@ -90,26 +90,149 @@ class PlanWizardController extends Controller
             return redirect()->route('planes')->with('error', 'Por favor selecciona provincia, municipio y fechas antes de continuar.');
         }
 
-        // Por ahora mostramos una vista sencilla que permitirá continuar el wizard en próximas tareas
-        return view('plan-wizard.restaurantes', ['draft' => $draft]);
+        // Buscar restaurantes por provincia/locality
+        $restaurants = \App\Models\PublicRestaurant::where('province', $draft['provincia'])
+            ->where('locality', $draft['municipio'])
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
+        return view('plan-wizard.restaurantes', ['draft' => $draft, 'restaurants' => $restaurants]);
     }
 
     public function saveRestaurante(Request $request)
     {
-        // Implementación posterior
         $data = $request->validate([
             'restaurante_id' => 'nullable|exists:public_restaurants,id',
         ]);
 
         $draft = Session::get('draft_plan', []);
         if (!empty($data['restaurante_id'])) {
-            $draft['restaurante'] = ['id' => $data['restaurante_id']];
+            $restaurant = \App\Models\PublicRestaurant::find($data['restaurante_id']);
+            if ($restaurant) {
+                $draft['restaurante'] = ['id' => $restaurant->id, 'name' => $restaurant->name];
+            }
         } else {
             unset($draft['restaurante']);
         }
         Session::put('draft_plan', $draft);
 
         return redirect()->route('plan.wizard.museos');
+    }
+
+    public function museos()
+    {
+        $draft = Session::get('draft_plan');
+        if (!$draft) {
+            return redirect()->route('planes')->with('error', 'Por favor selecciona provincia, municipio y fechas antes de continuar.');
+        }
+
+        $museums = \App\Models\PublicMuseum::where('province', $draft['provincia'])
+            ->where('locality', $draft['municipio'])
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
+        return view('plan-wizard.museos', ['draft' => $draft, 'museums' => $museums]);
+    }
+
+    public function saveMuseo(Request $request)
+    {
+        $data = $request->validate([
+            'museo_id' => 'nullable|exists:public_museums,id',
+        ]);
+
+        $draft = Session::get('draft_plan', []);
+        if (!empty($data['museo_id'])) {
+            $m = \App\Models\PublicMuseum::find($data['museo_id']);
+            if ($m) {
+                $draft['museo'] = ['id' => $m->id, 'name' => $m->name];
+            }
+        } else {
+            unset($draft['museo']);
+        }
+        Session::put('draft_plan', $draft);
+
+        return redirect()->route('plan.wizard.fiestas');
+    }
+
+    public function fiestas()
+    {
+        $draft = Session::get('draft_plan');
+        if (!$draft) {
+            return redirect()->route('planes')->with('error', 'Por favor selecciona provincia, municipio y fechas antes de continuar.');
+        }
+
+        $festivals = \App\Models\PublicFestival::where('province', $draft['provincia'])
+            ->where('locality', $draft['municipio'])
+            ->where('is_active', true)
+            ->orderBy('start_date', 'desc')
+            ->get();
+
+        return view('plan-wizard.fiestas', ['draft' => $draft, 'festivals' => $festivals]);
+    }
+
+    public function saveFiesta(Request $request)
+    {
+        $data = $request->validate([
+            'fiesta_id' => 'nullable|exists:public_festivals,id',
+        ]);
+
+        $draft = Session::get('draft_plan', []);
+        if (!empty($data['fiesta_id'])) {
+            $f = \App\Models\PublicFestival::find($data['fiesta_id']);
+            if ($f) {
+                $draft['fiesta'] = ['id' => $f->id, 'name' => $f->name, 'date' => $f->start_date];
+            }
+        } else {
+            unset($draft['fiesta']);
+        }
+        Session::put('draft_plan', $draft);
+
+        return redirect()->route('plan.wizard.summary');
+    }
+
+    public function summary()
+    {
+        $draft = Session::get('draft_plan');
+        if (!$draft) {
+            return redirect()->route('planes')->with('error', 'No hay un plan en progreso.');
+        }
+
+        return view('plan-wizard.summary', ['draft' => $draft]);
+    }
+
+    public function finalize(Request $request)
+    {
+        $draft = Session::get('draft_plan');
+        if (!$draft) {
+            return redirect()->route('planes')->with('error', 'No hay un plan en progreso.');
+        }
+
+        // Calcular días
+        $start = \Carbon\Carbon::createFromFormat('Y-m-d', $draft['start_date']);
+        $end = \Carbon\Carbon::createFromFormat('Y-m-d', $draft['end_date']);
+        $days = $start->diffInDays($end) + 1;
+
+        $plan = \App\Models\Plan::create([
+            'user_id' => auth()->id(),
+            'provincia' => $draft['provincia'],
+            'municipio' => $draft['municipio'],
+            'start_date' => $draft['start_date'],
+            'end_date' => $draft['end_date'],
+            'days' => $days,
+            'items' => [
+                'hotel' => $draft['hotel'] ?? null,
+                'restaurante' => $draft['restaurante'] ?? null,
+                'museo' => $draft['museo'] ?? null,
+                'fiesta' => $draft['fiesta'] ?? null,
+            ],
+        ]);
+
+        // Limpiar draft
+        Session::forget('draft_plan');
+
+        return redirect()->route('mis-planes')->with('success', 'Plan finalizado y guardado correctamente.');
     }
 
     // métodos para museos, fiestas, summary se añadirán en siguientes pasos
