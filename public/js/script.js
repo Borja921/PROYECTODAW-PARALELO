@@ -632,6 +632,7 @@ function agregarAlPlan(nombre, dias) {
 
 function updateSaveButtonState() {
     const btn = document.getElementById('savePlanBtn');
+    const wizardBtn = document.getElementById('wizardNextBtn');
     const provEl = document.getElementById('provincia');
     const munEl = document.getElementById('municipio');
     const start = document.getElementById('start_date') ? document.getElementById('start_date').value : '';
@@ -641,6 +642,10 @@ function updateSaveButtonState() {
     const items = JSON.parse(localStorage.getItem('current_plan_items_v1') || '[]');
     if (btn) {
         btn.disabled = !(prov && mun && start && end && items.length > 0);
+    }
+    if (wizardBtn) {
+        // Para avanzar en el wizard solo necesitamos tener provincia/municipio y fechas
+        wizardBtn.disabled = !(prov && mun && start && end);
     }
 }
 
@@ -668,29 +673,33 @@ window.addEventListener('DOMContentLoaded', function () {
             localStorage.removeItem('current_plan_items_v1');
         });
     }
-});
 
-/**
- * Maneja el envío del formulario de registro
- */
-document.addEventListener('DOMContentLoaded', function() {
-    const formulario = document.getElementById('registroForm');
-    const contactForm = document.getElementById('contactForm');
-    
-    if (formulario) {
-        formulario.addEventListener('submit', function(e) {
-            e.preventDefault();
+    // Manejo del wizard: rellenar y enviar paso1 (Siguiente)
+    const wizardForm = document.getElementById('wizardStep1Form');
+    const wizardBtn = document.getElementById('wizardNextBtn');
+    if (wizardForm) {
+        wizardForm.addEventListener('submit', function (e) {
+            const prov = document.getElementById('provincia') ? document.getElementById('provincia').value : '';
+            const mun = document.getElementById('municipio') ? document.getElementById('municipio').value : '';
+            const start = document.getElementById('start_date') ? document.getElementById('start_date').value : '';
+            const end = document.getElementById('end_date') ? document.getElementById('end_date').value : '';
 
-            // Validaciones
-            const nombre = document.getElementById('nombre').value;
-            const email = document.getElementById('email').value;
-            const contraseña = document.getElementById('contraseña').value;
-            const confirmar = document.getElementById('confirmar').value;
-            const provincia = document.getElementById('provincia').value;
+            // Validación cliente mínima
+            if (!prov || !mun || !start || !end) {
+                e.preventDefault();
+                alert('Completa provincia, municipio y rango de fechas antes de continuar.');
+                return false;
+            }
 
-            // Validar contraseña
-            if (contraseña.length < 8) {
-                alert('⚠️ La contraseña debe tener al menos 8 caracteres');
+            // Poner valores en inputs hidden
+            document.getElementById('wizard_provincia').value = prov;
+            document.getElementById('wizard_municipio').value = mun;
+            document.getElementById('wizard_start_date').value = start;
+            document.getElementById('wizard_end_date').value = end;
+
+            // El envío procederá al endpoint protegido por auth (redirigirá a login si procede)
+        });
+    }
                 return;
             }
 
@@ -716,10 +725,10 @@ document.addEventListener('DOMContentLoaded', function() {
     if (contactForm) {
         contactForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            
+
             const nombre = document.getElementById('nombre').value;
             const asunto = document.getElementById('asunto').value;
-            
+
             alert(`✅ Mensaje enviado correctamente, ${nombre}!\n\nNos pondremos en contacto pronto.`);
             contactForm.reset();
         });
@@ -731,7 +740,7 @@ document.addEventListener('DOMContentLoaded', function() {
         question.addEventListener('click', function() {
             const answer = this.nextElementSibling;
             const toggle = this.querySelector('.faq-toggle');
-            
+
             answer.classList.toggle('active');
             toggle.textContent = answer.classList.contains('active') ? '−' : '+';
         });
@@ -752,7 +761,7 @@ function filtrarPorEstado(estado) {
     const buttons = document.querySelectorAll('.tab-button');
     buttons.forEach(btn => btn.classList.remove('active'));
     event.target.classList.add('active');
-    
+
     alert(`Filtrando planes por estado: ${estado}`);
 }
 

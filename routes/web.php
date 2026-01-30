@@ -8,6 +8,7 @@ use App\Http\Controllers\FestivalsController;
 use App\Http\Controllers\RegistroController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\MunicipioController;
+use App\Http\Controllers\PlanWizardController;
 
 Route::get('/', function () {
     return view('index');
@@ -68,3 +69,19 @@ Route::get('/fiestas/filtrar/{locality}', [FestivalsController::class, 'filterBy
 Route::get('/api/municipios', [MunicipioController::class, 'index'])->name('api.municipios');
 // Forzar refresco/import (POST) - recomendable proteger con middleware auth en producción
 Route::post('/api/municipios/refresh', [MunicipioController::class, 'refresh'])->name('api.municipios.refresh');
+
+// Wizard: creación paso a paso de un plan (protegido: requiere login)
+Route::middleware('auth')->prefix('plan/wizard')->name('plan.wizard.')->group(function () {
+    // Paso 1: guardar provincia/municipio/fechas
+    Route::post('/step1', [PlanWizardController::class, 'saveStep1'])->name('step1.save');
+
+    // Hoteles (lista y selección)
+    Route::get('/hoteles', [PlanWizardController::class, 'hoteles'])->name('hoteles');
+    Route::post('/hoteles', [PlanWizardController::class, 'saveHotel'])->name('hoteles.save');
+
+    // Restaurantes (stubs para seguir la secuencia)
+    Route::get('/restaurantes', [PlanWizardController::class, 'restaurantes'])->name('restaurantes');
+    Route::post('/restaurantes', [PlanWizardController::class, 'saveRestaurante'])->name('restaurantes.save');
+
+    // (museos, fiestas y resumen se añadirán en siguientes pasos)
+});

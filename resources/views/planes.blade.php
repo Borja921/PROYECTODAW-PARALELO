@@ -28,6 +28,9 @@
             @if(session('success'))
                 <div class="alert alert-success" style="margin-bottom:12px;padding:10px;border-radius:6px;background:#d4edda;color:#155724;">{{ session('success') }}</div>
             @endif
+            @if(session('error'))
+                <div class="alert alert-danger" style="margin-bottom:12px;padding:10px;border-radius:6px;background:#f8d7da;color:#721c24;">{{ session('error') }}</div>
+            @endif
 
             <div class="filters-box">
                 <div class="filter-group">
@@ -74,6 +77,16 @@
                     <input type="hidden" name="end_date" id="form_end_date">
                     <input type="hidden" name="items" id="form_items">
                     <button id="savePlanBtn" type="submit" class="btn-secondary" disabled>Guardar Plan</button>
+                </form>
+
+                <!-- Form para avanzar en el wizard (protegido por login) -->
+                <form id="wizardStep1Form" method="POST" action="{{ route('plan.wizard.step1.save') }}" style="display:inline;margin-left:8px;">
+                    @csrf
+                    <input type="hidden" name="provincia" id="wizard_provincia">
+                    <input type="hidden" name="municipio" id="wizard_municipio">
+                    <input type="hidden" name="start_date" id="wizard_start_date">
+                    <input type="hidden" name="end_date" id="wizard_end_date">
+                    <button id="wizardNextBtn" type="submit" class="btn-primary" disabled>Siguiente</button>
                 </form>
 
                 <button class="btn-primary" onclick="filtrarDestinos()">Buscar</button>
