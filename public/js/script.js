@@ -473,10 +473,14 @@ const destinos = {
  * Filtra y muestra los destinos según la provincia y duración seleccionadas
  */
 function filtrarDestinos() {
-    const provincia = document.getElementById('provincia').value;
+    const provinciaEl = document.getElementById('provincia');
+    const provincia = provinciaEl ? provinciaEl.value : '';
     const startDate = document.getElementById('start_date') ? document.getElementById('start_date').value : '';
     const endDate = document.getElementById('end_date') ? document.getElementById('end_date').value : '';
     const resultados = document.getElementById('resultados');
+
+    // Si la vista no tiene el contenedor de resultados o el select de provincia, salir silenciosamente
+    if (!resultados || !provinciaEl) return;
 
     // Limpiar resultados previos
     resultados.innerHTML = '';
