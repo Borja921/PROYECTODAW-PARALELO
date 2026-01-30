@@ -210,6 +210,8 @@
         const qprov = urlParams.get('provincia') || dataSelected;
         if (qprov && mapping[qprov]) {
             provinciaSelect.value = qprov;
+            // Disparar change para que listeners externos (p.e. habilitar botones) se actualicen
+            provinciaSelect.dispatchEvent(new Event('change'));
         }
     }
 
@@ -242,6 +244,8 @@
         if (dataSelected) {
             if (Array.from(municipioSelect.options).some(o => o.value === dataSelected)) {
                 municipioSelect.value = dataSelected;
+                // Disparar change para que listeners externos (p.e. habilitar botones) se actualicen
+                municipioSelect.dispatchEvent(new Event('change'));
             }
         }
     }

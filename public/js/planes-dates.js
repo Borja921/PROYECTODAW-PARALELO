@@ -70,6 +70,9 @@ document.addEventListener('DOMContentLoaded', function () {
             // pequeña demora para permitir que los selects se actualicen visualmente
             setTimeout(() => window.filtrarDestinos(), 100);
         }
+
+        // Actualizar estado de botones del wizard (si existe)
+        try { if (typeof updateSaveButtonState === 'function') updateSaveButtonState(); } catch (e) { }
     }
 
 });

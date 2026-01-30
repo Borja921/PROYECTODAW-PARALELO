@@ -677,12 +677,36 @@ window.addEventListener('DOMContentLoaded', function () {
     // Manejo del wizard: rellenar y enviar paso1 (Siguiente)
     const wizardForm = document.getElementById('wizardStep1Form');
     const wizardBtn = document.getElementById('wizardNextBtn');
+
+    // Watch inputs and update the save/wizard buttons when they change
+    const provEl = document.getElementById('provincia');
+    const munEl = document.getElementById('municipio');
+    const startEl = document.getElementById('start_date');
+    const endEl = document.getElementById('end_date');
+
+    const watchAndUpdate = () => {
+        try { updateSaveButtonState(); } catch (e) { /* noop */ }
+        // enable/disable wizard button explicitly
+        if (wizardBtn) {
+            const prov = provEl ? provEl.value : '';
+            const mun = munEl ? munEl.value : '';
+            const start = startEl ? startEl.value : '';
+            const end = endEl ? endEl.value : '';
+            wizardBtn.disabled = !(prov && mun && start && end);
+        }
+    };
+
+    if (provEl) provEl.addEventListener('change', watchAndUpdate);
+    if (munEl) munEl.addEventListener('change', watchAndUpdate);
+    if (startEl) startEl.addEventListener('change', watchAndUpdate);
+    if (endEl) endEl.addEventListener('change', watchAndUpdate);
+
     if (wizardForm) {
         wizardForm.addEventListener('submit', function (e) {
-            const prov = document.getElementById('provincia') ? document.getElementById('provincia').value : '';
-            const mun = document.getElementById('municipio') ? document.getElementById('municipio').value : '';
-            const start = document.getElementById('start_date') ? document.getElementById('start_date').value : '';
-            const end = document.getElementById('end_date') ? document.getElementById('end_date').value : '';
+            const prov = provEl ? provEl.value : '';
+            const mun = munEl ? munEl.value : '';
+            const start = startEl ? startEl.value : '';
+            const end = endEl ? endEl.value : '';
 
             // Validación cliente mínima
             if (!prov || !mun || !start || !end) {
