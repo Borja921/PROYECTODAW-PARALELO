@@ -68,7 +68,13 @@ document.addEventListener('DOMContentLoaded', function () {
         // si hay una función de filtrado global, actualizar automáticamente
         if (typeof window.filtrarDestinos === 'function') {
             // pequeña demora para permitir que los selects se actualicen visualmente
-            setTimeout(() => window.filtrarDestinos(), 100);
+            try {
+                setTimeout(() => {
+                    try { window.filtrarDestinos(); } catch (err) { console.warn('Error en filtrarDestinos (timeout):', err); }
+                }, 100);
+            } catch (err) {
+                console.warn('No se pudo agendar filtrarDestinos:', err);
+            }
         }
 
         // Actualizar estado de botones del wizard (si existe)

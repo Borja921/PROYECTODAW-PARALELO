@@ -522,6 +522,9 @@ function filtrarDestinos() {
     // Crear tarjetas para cada tipo de atracción
     const fragmento = document.createDocumentFragment();
 
+    // Wrap defensivo para evitar que un error no capturado bloquee la página
+    // (Adicionalmente, al final del archivo envolvemos la función para capturar excepciones no previstas.)
+
     // Hoteles
     if (destinosSeleccionados.hoteles && destinosSeleccionados.hoteles.length > 0) {
         destinosSeleccionados.hoteles.forEach(hotel => {
@@ -602,6 +605,23 @@ function getIconoTipo(tipo) {
         'Atracción': '🎪'
     };
     return iconos[tipo] || '📍';
+}
+
+// Wrapper defensivo para filtrarDestinos: captura excepciones y evita que errores no controlados rompan la UX
+if (typeof filtrarDestinos === 'function') {
+    const _origFiltrar = filtrarDestinos;
+    window.filtrarDestinos = function () {
+        try {
+            return _origFiltrar.apply(this, arguments);
+        } catch (err) {
+            console.warn('filtrarDestinos fallo capturado:', err);
+            const resultados = document.getElementById('resultados');
+            if (resultados) {
+                resultados.innerHTML = '<p class="placeholder-text">No se han podido cargar los destinos en este momento. Intenta recargar la página.</p>';
+            }
+            return null;
+        }
+    };
 }
 
 /**
