@@ -21,9 +21,13 @@ Route::get('/destinos', function () {
 Route::get('/planes', [App\Http\Controllers\PlanesController::class, 'index'])->name('planes');
 Route::post('/planes', [App\Http\Controllers\PlanesController::class, 'store'])->name('planes.store');
 
-Route::get('/mis-planes', function () {
-    return view('mis-planes');
-})->name('mis-planes');
+Route::get('/mis-planes', [App\Http\Controllers\PlanesController::class, 'myPlans'])->name('mis-planes')->middleware('auth');
+
+// Detalle de plan (ver en perfil)
+Route::get('/mis-planes/{id}', [App\Http\Controllers\PlanesController::class, 'show'])->name('mis-planes.show')->middleware('auth');
+
+// Legacy route for plan detail (kept for backward compatibility)
+Route::get('/planes/{id}', [App\Http\Controllers\PlanesController::class, 'show'])->name('detalle-plan');
 
 Route::get('/perfil', function () {
     return view('perfil');

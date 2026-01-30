@@ -48,4 +48,30 @@ class PlanesController extends Controller
 
         return redirect()->route('planes')->with('success', 'Plan guardado correctamente.');
     }
+
+    /**
+     * Mostrar los planes del usuario autenticado
+     */
+    public function myPlans()
+    {
+        $userId = auth()->id();
+        $plans = \App\Models\Plan::where('user_id', $userId)->orderBy('created_at', 'desc')->get();
+
+        return view('mis-planes', ['plans' => $plans]);
+    }
+
+    /**
+     * Mostrar detalle de un plan (solo si pertenece al usuario o si es público)
+     */
+    public function show($id)
+    {
+        $plan = \App\Models\Plan::findOrFail($id);
+
+        // Autorizar: solo el propietario puede ver su plan
+        if ($plan->user_id !== auth()->id()) {
+            abort(403, 'No tienes permiso para ver este plan.');
+        }
+
+        return view('detalle-plan', ['plan' => $plan]);
+    }
 }
