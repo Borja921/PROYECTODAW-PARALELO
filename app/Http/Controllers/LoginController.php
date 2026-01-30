@@ -28,15 +28,18 @@ class LoginController extends Controller
             return back()->withErrors(['login' => 'Credenciales inválidas'])->withInput();
         }
 
-        // Guardar en sesión el id del usuario
-        session()->put('usuario_id', $user->id);
+        // Autenticar usando el sistema de Laravel y opcionalmente 'remember'
+        $remember = $request->filled('remember');
+        auth()->login($user, $remember);
 
         return redirect()->route('index')->with('success', 'Has iniciado sesión');
     }
 
     public function logout()
     {
-        session()->forget('usuario_id');
+        auth()->logout();
+        request()->session()->invalidate();
+        request()->session()->regenerateToken();
         return redirect()->route('index')->with('success', 'Sesión cerrada');
     }
 }

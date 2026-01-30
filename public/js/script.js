@@ -778,27 +778,6 @@ window.addEventListener('DOMContentLoaded', function () {
             });
         }
     }
-                return;
-            }
-
-            // Validar coincidencia de contraseñas
-            if (contraseña !== confirmar) {
-                alert('⚠️ Las contraseñas no coinciden');
-                return;
-            }
-
-            // Mostrar mensaje de éxito
-            alert(`✅ ¡Bienvenido ${nombre}! Tu cuenta ha sido creada exitosamente.\n\nAhora puedes comenzar a planear tus viajes.`);
-
-            // Limpiar formulario
-            formulario.reset();
-
-            // Redirigir a página de planes después de 1 segundo
-            setTimeout(() => {
-                window.location.href = 'planes.html';
-            }, 1500);
-        });
-    }
 
     if (contactForm) {
         contactForm.addEventListener('submit', function(e) {

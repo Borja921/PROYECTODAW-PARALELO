@@ -18,12 +18,12 @@ try {
     $ctrl = new LoginController();
     $resp = $ctrl->login($req);
 
-    // comprueba si la sesión contiene usuario_id
-    $uid = session()->get('usuario_id');
+    // comprueba si la sesión está autenticada mediante el guard de Laravel
+    $uid = auth()->id();
     if ($uid) {
-        echo "Login OK, usuario_id={$uid}\n";
+        echo "Login OK, user_id={$uid}\n";
     } else {
-        echo "Login fallido, no hay usuario en sesión.\n";
+        echo "Login fallido, no hay usuario autenticado.\n";
     }
 } catch (Exception $e) {
     echo "Error: " . $e->getMessage() . "\n";

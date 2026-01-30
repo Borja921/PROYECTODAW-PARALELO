@@ -49,9 +49,17 @@ class PlanWizardController extends Controller
             ->orderBy('name')
             ->get();
 
+        // Lista de provincias disponibles para el selector (puede limitarse a todas las provincias activas)
+        $provinces = PublicHotel::where('is_active', true)
+            ->pluck('province')
+            ->unique()
+            ->sort()
+            ->values();
+
         return view('plan-wizard.hoteles', [
             'draft' => $draft,
             'hotels' => $hotels,
+            'provinces' => $provinces,
         ]);
     }
 

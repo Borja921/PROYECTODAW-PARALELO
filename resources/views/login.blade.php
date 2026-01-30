@@ -27,6 +27,10 @@
             <input id="password" name="password" type="password" class="form-control" required>
         </div>
 
+        <div class="form-group">
+            <label><input type="checkbox" name="remember" {{ old('remember') ? 'checked' : '' }}> Recuérdame</label>
+        </div>
+
         <button type="submit" class="btn btn-primary">Entrar</button>
     </form>
 
