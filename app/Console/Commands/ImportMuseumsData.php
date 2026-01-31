@@ -18,8 +18,8 @@ class ImportMuseumsData extends Command
 
         try {
             // Descargar el CSV con SSL verify deshabilitado
-            $csvUrl = 'https://datosabiertos.jcyl.es/web/jcyl/risp/es/cultura-ocio/museos/1284197401971.csv';
-            
+            $csvUrl = 'https://datosabiertos.jcyl.es/web/jcyl/risp/es/cultura-ocio/museos/1284197401971.csv'; // Actualizado según la nueva API
+
             $response = Http::timeout(30)->withoutVerifying()->get($csvUrl);
 
             if (!$response->successful()) {
@@ -30,12 +30,12 @@ class ImportMuseumsData extends Command
             // Guardar temporalmente y fijar encoding
             $tempFile = storage_path('temp_museums.csv');
             $content = $response->body();
-            
+
             // Eliminar BOM UTF-8 si existe
             if (substr($content, 0, 3) === "\xEF\xBB\xBF") {
                 $content = substr($content, 3);
             }
-            
+
             // Fijar codificación
             $content = mb_convert_encoding($content, 'UTF-8', 'UTF-8');
             file_put_contents($tempFile, $content);
@@ -44,7 +44,7 @@ class ImportMuseumsData extends Command
             $csv = Reader::createFromPath($tempFile, 'r');
             $csv->setDelimiter(';');
             $csv->setEnclosure('"');
-            
+
             $records = $csv->getRecords();
             $imported = 0;
             $errors = 0;
@@ -140,26 +140,26 @@ class ImportMuseumsData extends Command
             'oropesa' => 'Ávila',
             'piedrahita' => 'Ávila',
             'navaluenga' => 'Ávila',
-            
+
             // Burgos
             'burgos' => 'Burgos',
             'aranda de duero' => 'Burgos',
             'miranda de ebro' => 'Burgos',
             'briviesca' => 'Burgos',
             'castrojeriz' => 'Burgos',
-            
+
             // Cuenca
             'cuenca' => 'Cuenca',
             'tarancón' => 'Cuenca',
             'serranía de cuenca' => 'Cuenca',
             'huete' => 'Cuenca',
-            
+
             // Guadalajara
             'guadalajara' => 'Guadalajara',
             'azuqueca de henares' => 'Guadalajara',
             'alcalá de henares' => 'Guadalajara',
             'molina de aragón' => 'Guadalajara',
-            
+
             // León
             'león' => 'León',
             'ponferrada' => 'León',
@@ -167,33 +167,33 @@ class ImportMuseumsData extends Command
             'la bañeza' => 'León',
             'bembibre' => 'León',
             'san andrés del rabanedo' => 'León',
-            
+
             // Palencia
             'palencia' => 'Palencia',
             'cervera de pisuerga' => 'Palencia',
             'dueñas' => 'Palencia',
             'aguilar de campoo' => 'Palencia',
-            
+
             // Salamanca
             'salamanca' => 'Salamanca',
             'ciudad rodrigo' => 'Salamanca',
             'alba de tormes' => 'Salamanca',
             'béjar' => 'Salamanca',
             'peñaranda de bracamonte' => 'Salamanca',
-            
+
             // Segovia
             'segovia' => 'Segovia',
             'sepúlveda' => 'Segovia',
             'pedraza' => 'Segovia',
             'santa maría la real de nieva' => 'Segovia',
             'cuéllar' => 'Segovia',
-            
+
             // Soria
             'soria' => 'Soria',
             'medinaceli' => 'Soria',
             'almazán' => 'Soria',
             'osma' => 'Soria',
-            
+
             // Valladolid
             'valladolid' => 'Valladolid',
             'medina del campo' => 'Valladolid',
@@ -201,7 +201,7 @@ class ImportMuseumsData extends Command
             'tordesillas' => 'Valladolid',
             'olmedo' => 'Valladolid',
             'peñafiel' => 'Valladolid',
-            
+
             // Zamora
             'zamora' => 'Zamora',
             'toro' => 'Zamora',
@@ -211,7 +211,7 @@ class ImportMuseumsData extends Command
 
         // Buscar la localidad en el mapa (case-insensitive)
         $localityLower = strtolower(trim($locality));
-        
+
         foreach ($localityMap as $key => $province) {
             if (strpos($localityLower, $key) !== false || $key === $localityLower) {
                 return $province;
@@ -229,9 +229,9 @@ class ImportMuseumsData extends Command
         // Buscar palabras clave específicas del encabezado de museos
         $headerKeywords = ['NombreEntidad', 'DescripcionBlob', 'Localidad', 'Horario'];
         $firstVal = $record[0] ?? '';
-        
+
         // Si contiene "DescripcionBlob" en la primera columna, es el encabezado real
-        if (strpos($firstVal, 'DescripcionBlob') !== false || 
+        if (strpos($firstVal, 'DescripcionBlob') !== false ||
             strpos($firstVal, 'Fichero actualizado') !== false ||
             strpos($firstVal, 'Nombre') !== false) {
             return true;
@@ -255,7 +255,7 @@ class ImportMuseumsData extends Command
         // Mapeo según estructura real del CSV de museos:
         // [0] DescripcionBlob, [1] NombreEntidad, [5] Localidad, [8] Tipo de Gestión
         // [9] Horario de apertura, [12] Servicios, [13] Información adicional, [19] Enlace
-        
+
         // Asegurarse de que tenemos al menos nombre y localidad
         $name = trim($record[1] ?? $record[0] ?? '');
         $locality = trim($record[5] ?? $record[6] ?? '');
@@ -272,7 +272,7 @@ class ImportMuseumsData extends Command
             'name' => $name,
             'locality' => $locality,
             'province' => 'Castilla y León', // Por defecto
-            'address' => '', 
+            'address' => '',
             'postal_code' => '',
             'phone' => '',
             'email' => '',

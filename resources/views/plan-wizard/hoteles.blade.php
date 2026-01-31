@@ -1,6 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
+<style>
+    .btn-quitar-hotel {
+        background: #e74c3c !important;
+        color: #fff !important;
+        border: none;
+    }
+</style>
 <div class="hotels-section">
     <div class="hotels-container">
         <div class="hotels-header">
@@ -9,21 +16,9 @@
         </div>
 
         <div class="hotels-filters">
-            <div class="filter-group">
-                <label for="province-select">Selecciona una Provincia</label>
-                <select id="province-select" class="filter-select" onchange="filtrarPorProvincia()">
-                    <option value="">-- Todas las provincias --</option>
-                    @foreach($provinces as $province)
-                        <option value="{{ $province }}">{{ $province }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div class="filter-group">
-                <label for="locality-select">Selecciona una Localidad</label>
-                <select id="locality-select" class="filter-select" onchange="filtrarHotelesPorLocalidad()" disabled>
-                    <option value="">-- Todas las localidades --</option>
-                </select>
+            <div class="filter-group" style="width:100%;display:flex;flex-direction:column;align-items:center;gap:8px;">
+                <a href="/plan/wizard/museos" class="btn-primary" style="width:auto;">Seleccionar museos</a>
+                <a class="btn-secondary" href="{{ route('planes') }}" style="width:auto;">Atrás</a>
             </div>
         </div>
 
@@ -42,12 +37,7 @@
         </div>
 
         <div style="margin-top:16px;display:flex;gap:8px;">
-            <a class="btn-secondary" href="{{ route('planes') }}">Atrás</a>
-            <form method="POST" action="{{ route('plan.wizard.hoteles.save') }}" id="selectHotelForm">
-                @csrf
-                <input type="hidden" name="hotel_id" id="selected_hotel_id" value="{{ $draft['hotel']['id'] ?? '' }}">
-                <button type="submit" class="btn-primary">Siguiente</button>
-            </form>
+            <!-- Botones de navegación eliminados -->
         </div>
     </div>
 </div>
@@ -114,8 +104,8 @@
         }
 
         // Filtrar por provincia Y localidad
-        const hotelesFiltrados = todosHoteles.filter(hotel => 
-            hotel.province === provinciaSeleccionada && 
+        const hotelesFiltrados = todosHoteles.filter(hotel =>
+            hotel.province === provinciaSeleccionada &&
             hotel.locality === localidadSeleccionada
         );
 
@@ -133,7 +123,7 @@
     function mostrarTodos() {
         const hotelsGrid = document.getElementById('hotels-grid');
         const noResults = document.getElementById('no-results');
-        
+
         if (todosHoteles.length === 0) {
             hotelsGrid.innerHTML = '<div class="placeholder-container"><p class="placeholder-text">No hay hoteles disponibles</p></div>';
             noResults.style.display = 'none';
@@ -147,7 +137,7 @@
     function mostrarHoteles(hoteles) {
         const hotelsGrid = document.getElementById('hotels-grid');
         const noResults = document.getElementById('no-results');
-        
+
         if (hoteles.length === 0) {
             hotelsGrid.innerHTML = '<div class="placeholder-container"><p class="placeholder-text">No hay hoteles disponibles para los filtros seleccionados</p></div>';
             noResults.style.display = 'none';
@@ -193,7 +183,7 @@
                             ${hotel.rating ? `<span class="rating-stars">⭐ ${hotel.rating}/5.0</span>` : ''}
                             ${hotel.reviews_count > 0 ? `<span class="reviews-count">(${hotel.reviews_count} reseñas)</span>` : ''}
                         </div>
-                        ${hotel.website ? `<a href="${hotel.website}" class="btn-small" target="_blank">📅 Reservar</a>` : `<button class="btn-small" disabled>Sin datos</button>`}
+                        <button class="btn-small btn-guardar-hotel" data-hotel-id="${hotel.id}">Guardar</button>
                     </div>
                 </div>
             `;
@@ -203,13 +193,27 @@
 
         // After rendering, attach click handlers to hotel cards to select
         document.querySelectorAll('.hotel-card').forEach((card, idx) => {
-            card.addEventListener('click', function() {
-                // clear previous selection
+            card.addEventListener('click', function(e) {
+                // Si se hace click en el botón guardar/quitar, no seleccionar la tarjeta
+                if (e.target.classList.contains('btn-guardar-hotel')) return;
                 document.querySelectorAll('.hotel-card.selected').forEach(c => c.classList.remove('selected'));
                 card.classList.add('selected');
-                // set hidden input
                 const hotelId = hoteles[idx].id;
                 document.getElementById('selected_hotel_id').value = hotelId;
+            });
+        });
+
+        // Botón guardar/quitar
+        document.querySelectorAll('.btn-guardar-hotel').forEach((btn, idx) => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (btn.textContent === 'Guardar') {
+                    btn.textContent = 'Quitar';
+                    btn.classList.add('btn-quitar-hotel');
+                } else {
+                    btn.textContent = 'Guardar';
+                    btn.classList.remove('btn-quitar-hotel');
+                }
             });
         });
     }
