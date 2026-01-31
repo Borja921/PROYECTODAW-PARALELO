@@ -45,7 +45,7 @@
             <div class="feature-card">
                 <span class="feature-icon">🏨</span>
                 <h3>Hoteles</h3>
-                <p>Encuentra los mejores hospedajes en cualquier destino</p>
+                <p>Encuentra los mejores alojamientos en cualquier destino</p>
             </div>
             <div class="feature-card">
                 <span class="feature-icon">🍽️</span>
@@ -59,8 +59,8 @@
             </div>
             <div class="feature-card">
                 <span class="feature-icon">🎪</span>
-                <h3>Atracciones</h3>
-                <p>Actividades y entretenimiento para todos</p>
+                <h3>Eventos y fiestas</h3>
+                <p>Eventos culturales y festividades</p>
             </div>
         </div>
     </section>
@@ -75,7 +75,7 @@
         <div class="modal-content">
             <span class="close" onclick="closeLoginModal()">&times;</span>
             <h2>Iniciar Sesión</h2>
-            
+
             @if(session('showLoginModal'))
                 <div class="alert alert-info" style="background-color: #d1ecf1; color: #0c5460; padding: 10px; margin: 10px 0; border: 1px solid #bee5eb; border-radius: 4px;">
                     Debes iniciar sesión para acceder a tu perfil
@@ -104,7 +104,7 @@
                 </div>
                 <button type="submit" class="btn btn-primary">Entrar</button>
             </form>
-            
+
             <p style="margin-top: 15px;">¿No tienes cuenta? <a href="#" onclick="switchToRegister()">Regístrate aquí</a></p>
         </div>
     </div>
@@ -114,7 +114,7 @@
         <div class="modal-content">
             <span class="close" onclick="closeRegisterModal()">&times;</span>
             <h2>Registrarse</h2>
-            
+
             @if($errors->any())
                 <div class="alert alert-danger" style="background-color: #f8d7da; color: #721c24; padding: 10px; margin: 10px 0; border: 1px solid #f5c6cb; border-radius: 4px;">
                     <ul style="margin: 0; padding-left: 20px;">
@@ -124,7 +124,7 @@
                     </ul>
                 </div>
             @endif
-            
+
             <form method="POST" action="{{ route('registro.store') }}" id="registerForm">
                 @csrf
                 <div class="form-group">
@@ -153,13 +153,13 @@
                 </div>
                 <button type="submit" class="btn btn-primary">Registrarse</button>
             </form>
-            
+
             <p style="margin-top: 15px;">¿Ya tienes cuenta? <a href="#" onclick="switchToLogin()">Inicia sesión aquí</a></p>
         </div>
     </div>
 
     <script src="{{ asset('js/script.js') }}"></script>
-    
+
     <style>
         .modal {
             display: none;
@@ -172,7 +172,7 @@
             overflow: auto;
             background-color: rgba(0,0,0,0.4);
         }
-        
+
         .modal-content {
             background-color: #fefefe;
             margin: 5% auto;
@@ -185,12 +185,12 @@
             position: relative;
             animation: modalFadeIn 0.3s;
         }
-        
+
         @keyframes modalFadeIn {
             from { transform: translateY(-40px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
-        
+
         .close {
             color: #aaa;
             float: right;
@@ -201,23 +201,23 @@
             right: 20px;
             cursor: pointer;
         }
-        
+
         .close:hover,
         .close:focus {
             color: #000;
             text-decoration: none;
         }
-        
+
         .form-group {
             margin-bottom: 15px;
         }
-        
+
         .form-group label {
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
         }
-        
+
         .form-control {
             width: 100%;
             padding: 10px;
@@ -226,7 +226,7 @@
             font-size: 14px;
             box-sizing: border-box;
         }
-        
+
         .btn {
             padding: 10px 20px;
             border: none;
@@ -236,70 +236,70 @@
             text-decoration: none;
             display: inline-block;
         }
-        
+
         .btn-primary {
             background-color: #007bff;
             color: white;
             width: 100%;
         }
-        
+
         .btn-primary:hover {
             background-color: #0056b3;
         }
-        
+
         .alert {
             padding: 10px;
             margin: 10px 0;
             border-radius: 4px;
         }
-        
+
         .alert-info {
             background-color: #d1ecf1;
             color: #0c5460;
             border: 1px solid #bee5eb;
         }
-        
+
         .alert-danger {
             background-color: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
     </style>
-    
+
     <script>
         function showLoginModal(redirectTo = '') {
             document.getElementById('loginModal').style.display = 'block';
             document.getElementById('redirect_to').value = redirectTo;
         }
-        
+
         function closeLoginModal() {
             document.getElementById('loginModal').style.display = 'none';
             document.getElementById('redirect_to').value = '';
         }
-        
+
         function showRegisterModal() {
             document.getElementById('registerModal').style.display = 'block';
         }
-        
+
         function closeRegisterModal() {
             document.getElementById('registerModal').style.display = 'none';
         }
-        
+
         function switchToRegister() {
             closeLoginModal();
             showRegisterModal();
         }
-        
+
         function switchToLogin() {
             closeRegisterModal();
             showLoginModal();
         }
-        
+
         // Cerrar modal al hacer click fuera del contenido
         window.onclick = function(event) {
             var loginModal = document.getElementById('loginModal');
             var registerModal = document.getElementById('registerModal');
-            
+
             if (event.target === loginModal) {
                 closeLoginModal();
             }
@@ -307,7 +307,7 @@
                 closeRegisterModal();
             }
         }
-        
+
         // Mostrar modal de login automáticamente si viene de perfil sin autenticar
         @if(session('showLoginModal'))
             document.addEventListener('DOMContentLoaded', function() {
