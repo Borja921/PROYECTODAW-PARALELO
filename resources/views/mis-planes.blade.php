@@ -28,8 +28,7 @@
             </div>
 
             <div class="filter-tabs">
-                <button class="tab-button active" onclick="filtrarPorEstado('todos')">Todos (5)</button>
-                <button class="tab-button" onclick="filtrarPorEstado('planificando')">Planificando (2)</button>
+                <button class="tab-button active" onclick="filtrarPorEstado('todos')">Todos (3)</button>
                 <button class="tab-button" onclick="filtrarPorEstado('confirmado')">Confirmado (2)</button>
                 <button class="tab-button" onclick="filtrarPorEstado('completado')">Completado (1)</button>
             </div>

@@ -29,9 +29,12 @@ Route::get('/mis-planes/{id}', [App\Http\Controllers\PlanesController::class, 's
 // Legacy route for plan detail (kept for backward compatibility)
 Route::get('/planes/{id}', [App\Http\Controllers\PlanesController::class, 'show'])->name('detalle-plan');
 
+use Illuminate\Support\Facades\Auth;
+
 Route::get('/perfil', function () {
-    return view('perfil');
-})->name('perfil');
+    $user = Auth::user();
+    return view('perfil', compact('user'));
+})->middleware('auth')->name('perfil');
 
 Route::get('/contacto', function () {
     return view('contacto');

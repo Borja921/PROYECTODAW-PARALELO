@@ -27,126 +27,69 @@
         </div>
 
         <div class="explore-filters">
-            <input type="text" placeholder="🔍 Buscar destino..." class="search-input">
-            <select class="filter-select">
-                <option>Todas las provincias</option>
-                <option>Madrid</option>
-                <option>Barcelona</option>
-                <option>Valencia</option>
-                <option>Sevilla</option>
-                <option>Bilbao</option>
-                <option>Málaga</option>
-            </select>
-            <select class="filter-select">
-                <option>Cualquier clima</option>
-                <option>Playa</option>
-                <option>Montaña</option>
-                <option>Ciudad</option>
+            <select class="filter-select" id="selector-provincias">
+                <option value="">Todas las provincias</option>
             </select>
         </div>
 
         <div class="destinations-grid">
-            <!-- Destino 1 -->
-            <div class="destination-card">
-                <div class="destination-image" style="background: linear-gradient(135deg, #A89B9B, #9D8B7E);">
-                    🏛️
-                </div>
-                <div class="destination-content">
-                    <h3>Madrid</h3>
-                    <p class="destination-subtitle">Comunidad de Madrid</p>
-                    <p class="destination-desc">Capital cultural con museos de clase mundial y vida nocturna vibrante</p>
-                    <div class="destination-meta">
-                        <span>⭐ 4.8</span>
-                        <span>👥 15.2k visitantes</span>
-                    </div>
-                    <a href="{{ route('planes') }}?provincia=Madrid" class="btn-small">Explorar</a>
-                </div>
-            </div>
-
-            <!-- Destino 2 -->
-            <div class="destination-card">
-                <div class="destination-image" style="background: linear-gradient(135deg, #9D8B7E, #8B7B7B);">
-                    🏰
-                </div>
-                <div class="destination-content">
-                    <h3>Barcelona</h3>
-                    <p class="destination-subtitle">Cataluña</p>
-                    <p class="destination-desc">Ciudad de arquitectura modernista, playas y energía mediterránea</p>
-                    <div class="destination-meta">
-                        <span>⭐ 4.9</span>
-                        <span>👥 18.5k visitantes</span>
-                    </div>
-                    <a href="{{ route('planes') }}?provincia=Barcelona" class="btn-small">Explorar</a>
-                </div>
-            </div>
-
-            <!-- Destino 3 -->
-            <div class="destination-card">
-                <div class="destination-image" style="background: linear-gradient(135deg, #C0B5AA, #A89B9B);">
-                    🌊
-                </div>
-                <div class="destination-content">
-                    <h3>Valencia</h3>
-                    <p class="destination-subtitle">Comunidad Valenciana</p>
-                    <p class="destination-desc">Innovación futurista, tradiciones milenarias y deliciosa gastronomía</p>
-                    <div class="destination-meta">
-                        <span>⭐ 4.7</span>
-                        <span>👥 12.3k visitantes</span>
-                    </div>
-                    <a href="{{ route('planes') }}?provincia=Valencia" class="btn-small">Explorar</a>
-                </div>
-            </div>
-
-            <!-- Destino 4 -->
-            <div class="destination-card">
-                <div class="destination-image" style="background: linear-gradient(135deg, #8B7B7B, #D4CCC4);">
-                    🎭
-                </div>
-                <div class="destination-content">
-                    <h3>Sevilla</h3>
-                    <p class="destination-subtitle">Andalucía</p>
-                    <p class="destination-desc">Flamenco, pasión andaluza y monumentos históricos impresionantes</p>
-                    <div class="destination-meta">
-                        <span>⭐ 4.8</span>
-                        <span>👥 14.7k visitantes</span>
-                    </div>
-                    <a href="{{ route('planes') }}?provincia=Sevilla" class="btn-small">Explorar</a>
-                </div>
-            </div>
-
-            <!-- Destino 5 -->
-            <div class="destination-card">
-                <div class="destination-image" style="background: linear-gradient(135deg, #A89B9B, #C0B5AA);">
-                    🎨
-                </div>
-                <div class="destination-content">
-                    <h3>Bilbao</h3>
-                    <p class="destination-subtitle">País Vasco</p>
-                    <p class="destination-desc">Fusión de arte moderno, tradición vasca y gastronomía de lujo</p>
-                    <div class="destination-meta">
-                        <span>⭐ 4.7</span>
-                        <span>👥 10.9k visitantes</span>
-                    </div>
-                    <a href="{{ route('planes') }}?provincia=Bilbao" class="btn-small">Explorar</a>
-                </div>
-            </div>
-
-            <!-- Destino 6 -->
-            <div class="destination-card">
-                <div class="destination-image" style="background: linear-gradient(135deg, #9D8B7E, #A89B9B);">
-                    🏖️
-                </div>
-                <div class="destination-content">
-                    <h3>Málaga</h3>
-                    <p class="destination-subtitle">Andalucía</p>
-                    <p class="destination-desc">Costa del Sol, playas doradas y clima mediterráneo envidiable</p>
-                    <div class="destination-meta">
-                        <span>⭐ 4.9</span>
-                        <span>👥 22.1k visitantes</span>
-                    </div>
-                    <a href="{{ route('planes') }}?provincia=Málaga" class="btn-small">Explorar</a>
-                </div>
-            </div>
+            <!-- Provincias de Castilla y León desde la API -->
+            <div id="provincias-cyl-grid" class="destinations-grid"></div>
+            <script>
+            document.addEventListener('DOMContentLoaded', async function() {
+                const grid = document.getElementById('provincias-cyl-grid');
+                const selector = document.getElementById('selector-provincias');
+                let provincias = [];
+                const colores = [
+                    '#A89B9B', '#9D8B7E', '#C0B5AA', '#8B7B7B', '#D4CCC4', '#B7A99A', '#B2A59B', '#C7B7A3', '#A89B7B'
+                ];
+                try {
+                    const res = await fetch('/api/municipios');
+                    const data = await res.json();
+                    provincias = Object.keys(data).sort();
+                    // Rellenar selector de provincias
+                    provincias.forEach(prov => {
+                        const opt = document.createElement('option');
+                        opt.value = prov;
+                        opt.textContent = prov;
+                        selector.appendChild(opt);
+                    });
+                    renderProvincias(provincias);
+                } catch (e) {
+                    grid.innerHTML = '<p style="color:red">No se pudieron cargar las provincias de Castilla y León.</p>';
+                }
+                selector.addEventListener('change', function() {
+                    if (!selector.value) {
+                        renderProvincias(provincias);
+                    } else {
+                        renderProvincias([selector.value]);
+                    }
+                });
+                function renderProvincias(lista) {
+                    let html = '';
+                    lista.forEach((prov, idx) => {
+                        html += `
+                        <div class="destination-card">
+                            <div class="destination-image" style="background: linear-gradient(135deg, ${colores[idx%colores.length]}, #9D8B7E);">
+                                🏞️
+                            </div>
+                            <div class="destination-content">
+                                <h3>${prov}</h3>
+                                <p class="destination-subtitle">Castilla y León</p>
+                                <p class="destination-desc">Descubre los mejores destinos de la provincia de ${prov}.</p>
+                                <div class="destination-meta">
+                                    <span>⭐ 4.8</span>
+                                    <span>👥 +1000 visitantes</span>
+                                </div>
+                                <a href="{{ route('planes') }}?provincia=${encodeURIComponent(prov)}" class="btn-small">Explorar</a>
+                            </div>
+                        </div>
+                        `;
+                    });
+                    grid.innerHTML = html;
+                }
+            });
+            </script>
         </div>
 
         <div class="featured-section">
