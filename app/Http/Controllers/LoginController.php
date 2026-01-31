@@ -8,11 +8,6 @@ use Illuminate\Support\Facades\Hash;
 
 class LoginController extends Controller
 {
-    public function showForm()
-    {
-        return view('login');
-    }
-
     public function login(Request $request)
     {
         $data = $request->validate([
@@ -32,6 +27,19 @@ class LoginController extends Controller
         $remember = $request->filled('remember');
         auth()->login($user, $remember);
 
+        // Manejar redirección específica
+        if ($request->filled('redirect_to')) {
+            $redirectTo = $request->input('redirect_to');
+            if ($redirectTo === 'planes') {
+                return redirect()->route('planes')->with('success', 'Has iniciado sesión correctamente');
+            }
+        }
+
+        // Si viene del modal (referrer es index), redirigir al perfil
+        if ($request->header('referer') && str_contains($request->header('referer'), route('index'))) {
+            return redirect()->route('perfil')->with('success', 'Has iniciado sesión correctamente');
+        }
+
         return redirect()->route('index')->with('success', 'Has iniciado sesión');
     }
 
@@ -40,6 +48,6 @@ class LoginController extends Controller
         auth()->logout();
         request()->session()->invalidate();
         request()->session()->regenerateToken();
-        return redirect()->route('index')->with('success', 'Sesión cerrada');
+        return redirect()->route('index')->with('success', 'Sesión cerrada correctamente');
     }
 }

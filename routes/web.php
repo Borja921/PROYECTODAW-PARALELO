@@ -32,9 +32,12 @@ Route::get('/planes/{id}', [App\Http\Controllers\PlanesController::class, 'show'
 use Illuminate\Support\Facades\Auth;
 
 Route::get('/perfil', function () {
+    if (!Auth::check()) {
+        return view('index')->with('showLoginModal', true);
+    }
     $user = Auth::user();
     return view('perfil', compact('user'));
-})->middleware('auth')->name('perfil');
+})->name('perfil');
 
 Route::get('/contacto', function () {
     return view('contacto');
@@ -48,10 +51,14 @@ Route::get('/preguntas-frecuentes', function () {
     return view('preguntas-frecuentes');
 })->name('preguntas-frecuentes');
 
-Route::get('/registro', [RegistroController::class, 'showForm'])->name('registro');
+Route::get('/registro', function() {
+    return redirect()->route('index')->with('showRegisterModal', true);
+})->name('registro');
 Route::post('/registro', [RegistroController::class, 'register'])->name('registro.store');
 
-Route::get('/login', [LoginController::class, 'showForm'])->name('login');
+Route::get('/login', function() {
+    return redirect()->route('index')->with('showLoginModal', true);
+})->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
 

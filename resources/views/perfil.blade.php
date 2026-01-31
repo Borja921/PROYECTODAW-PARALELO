@@ -12,10 +12,16 @@
             <div class="logo">✈️ TravelPlus</div>
             <ul class="nav-links">
                 <li><a href="{{ route('index') }}">Inicio</a></li>
-                <li><a href="{{ route('destinos') }}">Destinos</a></li>
-                <li><a href="{{ route('planes') }}">Crear Plan</a></li>
-                <li><a href="{{ route('mis-planes') }}">Mis Planes</a></li>
-                <li><a href="{{ route('perfil') }}" class="active">Perfil</a></li>
+                @auth
+                    <li><a href="{{ route('destinos') }}">Destinos</a></li>
+                    <li><a href="{{ route('planes') }}">Crear Plan</a></li>
+                    <li><a href="{{ route('mis-planes') }}">Mis Planes</a></li>
+                    <li><a href="{{ route('perfil') }}" class="active">Perfil</a></li>
+                    <li><a href="{{ route('logout') }}">Cerrar Sesión</a></li>
+                @else
+                    <li><a href="#" onclick="showLoginModal()">Iniciar Sesión</a></li>
+                    <li><a href="#" onclick="showRegisterModal()">Registrarse</a></li>
+                @endauth
             </ul>
         </div>
     </nav>
@@ -38,26 +44,7 @@
                     @endif
                 </div>
                 <button class="btn-primary" onclick="mostrarModalConfiguracion()">Editar Perfil</button>
-                <button class="btn-danger" style="background-color:#6c757d; color:white; margin-left:10px; border:none; padding:10px 18px; border-radius:5px; cursor:pointer;" type="button">Cerrar cuenta</button>
-            </div>
-
-            <div class="profile-stats">
-                <div class="stat-card">
-                    <div class="stat-number">7</div>
-                    <div class="stat-label">Viajes Completados</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">12</div>
-                    <div class="stat-label">Planes Guardados</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">28</div>
-                    <div class="stat-label">Sitios Visitados</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">4.8</div>
-                    <div class="stat-label">Calificación</div>
-                </div>
+                <a href="{{ route('logout') }}" class="btn-danger" style="background-color:#6c757d; color:white; margin-left:10px; border:none; padding:10px 18px; border-radius:5px; cursor:pointer; text-decoration:none; display:inline-block;">Cerrar Sesión</a>
             </div>
 
             <div class="profile-content">
@@ -95,32 +82,6 @@
                     <h2>Preferencias de Viaje</h2>
                     <div class="preferences-list">
                         <div class="preference-item">
-                            <span class="pref-icon">🏨</span>
-                            <div>
-                                <h4>Hospedaje Favorito</h4>
-                                <p>Hoteles de lujo con servicios completos</p>
-                            </div>
-                        </div>
-                        <div class="preference-item">
-                            <span class="pref-icon">🍽️</span>
-                            <div>
-                                <h4>Tipo de Comida</h4>
-                                <p>Gastronomía local y tradicional</p>
-                            </div>
-                        </div>
-                        <div class="preference-item">
-                            <span class="pref-icon">🎨</span>
-                            <div>
-                                <h4>Actividades</h4>
-                                <p>Museos, arte y cultura</p>
-                            </div>
-                        </div>
-                        <div class="preference-item">
-                            <span class="pref-icon">🏖️</span>
-                            <div>
-                                <h4>Tipo de Viaje</h4>
-                                <p>Playa y naturaleza</p>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -129,20 +90,6 @@
                     <h2>Mis Reseñas Recientes</h2>
                     <div class="reviews-list">
                         <div class="review-item">
-                            <div class="review-header">
-                                <h4>Hotel Real Elegance - Madrid</h4>
-                                <span class="review-rating">⭐⭐⭐⭐⭐ 5.0</span>
-                            </div>
-                            <p>"Experiencia increíble, personal muy atento y habitaciones impecables"</p>
-                            <small>Hace 2 semanas</small>
-                        </div>
-                        <div class="review-item">
-                            <div class="review-header">
-                                <h4>Restaurante El Jardín Gourmet</h4>
-                                <span class="review-rating">⭐⭐⭐⭐ 4.7</span>
-                            </div>
-                            <p>"Excelente comida y presentación. El servicio fue muy profesional."</p>
-                            <small>Hace 1 mes</small>
                         </div>
                     </div>
                 </div>

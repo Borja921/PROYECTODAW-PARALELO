@@ -10,11 +10,6 @@ use Illuminate\Support\Facades\Validator;
 
 class RegistroController extends Controller
 {
-    public function showForm()
-    {
-        return view('registro');
-    }
-
     public function register(Request $request)
     {
         $rules = [
@@ -61,6 +56,9 @@ class RegistroController extends Controller
             'password' => Hash::make($data['password']),
         ]);
 
-        return redirect()->route('index')->with('success', 'Registro completado');
+        // Autenticar automáticamente al usuario después del registro
+        auth()->login($usuario);
+
+        return redirect()->route('perfil')->with('success', 'Registro completado correctamente. ¡Bienvenido!');
     }
 }
