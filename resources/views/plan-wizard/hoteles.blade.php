@@ -1,6 +1,25 @@
-@extends('layouts.app')
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alojamientos Hoteleros - TravelPlus</title>
+    <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="logo">✈️ TravelPlus</div>
+            <ul class="nav-links">
+                <li><a href="{{ route('index') }}">Inicio</a></li>
+                <li><a href="{{ route('destinos') }}">Destinos</a></li>
+                <li><a href="{{ route('planes') }}" class="active">Crear Plan</a></li>
+                <li><a href="{{ route('mis-planes') }}">Mis Planes</a></li>
+                <li><a href="{{ route('perfil') }}">Perfil</a></li>
+            </ul>
+        </div>
+    </nav>
 
-@section('content')
 <style>
     .btn-quitar-hotel {
         background: #e74c3c !important;
@@ -257,4 +276,10 @@
     });
 </script>
 
-@endsection
+    <footer>
+        <p>&copy; 2026 TravelPlus - Todos los derechos reservados</p>
+    </footer>
+
+    <script src="{{ asset('js/script.js') }}"></script>
+</body>
+</html>

@@ -17,7 +17,6 @@
                     <li><a href="{{ route('planes') }}">Crear Plan</a></li>
                     <li><a href="{{ route('mis-planes') }}">Mis Planes</a></li>
                     <li><a href="{{ route('perfil') }}" class="active">Perfil</a></li>
-                    <li><a href="{{ route('logout') }}">Cerrar Sesión</a></li>
                 @else
                     <li><a href="#" onclick="showLoginModal()">Iniciar Sesión</a></li>
                     <li><a href="#" onclick="showRegisterModal()">Registrarse</a></li>
