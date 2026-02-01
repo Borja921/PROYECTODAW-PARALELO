@@ -73,6 +73,10 @@
         noResults.style.display = 'none';
         let html = '';
         museos.forEach(museo => {
+            const phoneLink = museo.phone ? `<p><strong>📞 Teléfono:</strong> <a href="tel:${museo.phone}">${museo.phone}</a></p>` : '';
+            const emailLink = museo.email ? `<p><strong>📧 Email:</strong> <a href="mailto:${museo.email}">${museo.email}</a></p>` : '';
+            const website = museo.website ? `<p><strong>🌐 Sitio Web:</strong> <a href="${museo.website}" target="_blank">Visitar web</a></p>` : '';
+
             html += `
                 <div class="hotel-card">
                     <div class="hotel-header">
@@ -83,6 +87,13 @@
                     </div>
                     <div class="hotel-body">
                         ${museo.address ? `<p class="hotel-address"><strong>Dirección:</strong> ${museo.address}</p>` : ''}
+                        
+                        <div class="hotel-contact">
+                            ${phoneLink}
+                            ${emailLink}
+                            ${website}
+                        </div>
+
                         ${museo.description ? `<p class="hotel-description">${museo.description}</p>` : ''}
                     </div>
                     <div class="hotel-footer">
@@ -104,12 +115,22 @@
         document.querySelectorAll('.btn-guardar-museo').forEach((btn, idx) => {
             btn.addEventListener('click', function(e) {
                 e.stopPropagation();
+                const museo = todosMuseos[idx];
+                
                 if (btn.textContent === 'Guardar') {
                     btn.textContent = 'Quitar';
                     btn.classList.add('btn-quitar-museo');
+                    // Guardar en sessionStorage
+                    let savedMuseos = JSON.parse(sessionStorage.getItem('savedMuseos') || '[]');
+                    savedMuseos.push(museo);
+                    sessionStorage.setItem('savedMuseos', JSON.stringify(savedMuseos));
                 } else {
                     btn.textContent = 'Guardar';
                     btn.classList.remove('btn-quitar-museo');
+                    // Quitar de sessionStorage
+                    let savedMuseos = JSON.parse(sessionStorage.getItem('savedMuseos') || '[]');
+                    savedMuseos = savedMuseos.filter(m => m.id !== museo.id);
+                    sessionStorage.setItem('savedMuseos', JSON.stringify(savedMuseos));
                 }
             });
         });
@@ -127,6 +148,19 @@
                 });
             }, 50);
         @endif
+
+        // Marcar museos previamente guardados
+        setTimeout(() => {
+            const savedMuseos = JSON.parse(sessionStorage.getItem('savedMuseos') || '[]');
+            document.querySelectorAll('.btn-guardar-museo').forEach(btn => {
+                const museoId = btn.getAttribute('data-museo-id');
+                const isGuardado = savedMuseos.some(m => m.id == museoId);
+                if (isGuardado) {
+                    btn.textContent = 'Quitar';
+                    btn.classList.add('btn-quitar-museo');
+                }
+            });
+        }, 100);
     });
 </script>
 

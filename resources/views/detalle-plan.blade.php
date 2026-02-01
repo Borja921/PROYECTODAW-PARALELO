@@ -70,7 +70,7 @@
                 <div class="detail-column">
                     <h2>Metadatos</h2>
                     <p><strong>ID:</strong> {{ $plan->id }}</p>
-                    <p><strong>Usuario:</strong> {{ $plan->user_id ? 'Usuario #' . $plan->user_id : 'Anónimo' }}</p>
+                    <p><strong>Usuario:</strong> {{ $plan->usuario_id ? 'Usuario #' . $plan->usuario_id : 'Anónimo' }}</p>
                 </div>
             </div>
         </div>

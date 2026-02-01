@@ -37,7 +37,8 @@ class PlanesController extends Controller
         $days = $start->diffInDays($end) + 1;
 
         $plan = \App\Models\Plan::create([
-            'user_id' => auth()->id(),
+            'nombre_plan' => $data['nombre_plan'] ?? 'Plan de ' . $data['municipio'],
+            'usuario_id' => auth()->id(),
             'provincia' => $data['provincia'],
             'municipio' => $data['municipio'],
             'start_date' => $data['start_date'],
@@ -55,7 +56,7 @@ class PlanesController extends Controller
     public function myPlans()
     {
         $userId = auth()->id();
-        $plans = \App\Models\Plan::where('user_id', $userId)->orderBy('created_at', 'desc')->get();
+        $plans = \App\Models\Plan::where('usuario_id', $userId)->orderBy('created_at', 'desc')->get();
 
         return view('mis-planes', ['plans' => $plans]);
     }
@@ -63,12 +64,12 @@ class PlanesController extends Controller
     /**
      * Mostrar detalle de un plan (solo si pertenece al usuario o si es público)
      */
-    public function show($id)
+    public function show($numero_plan)
     {
-        $plan = \App\Models\Plan::findOrFail($id);
+        $plan = \App\Models\Plan::where('numero_plan', $numero_plan)->firstOrFail();
 
         // Autorizar: solo el propietario puede ver su plan
-        if ($plan->user_id !== auth()->id()) {
+        if ($plan->usuario_id !== auth()->id()) {
             abort(403, 'No tienes permiso para ver este plan.');
         }
 

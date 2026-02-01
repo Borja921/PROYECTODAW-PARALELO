@@ -104,12 +104,22 @@
         document.querySelectorAll('.btn-guardar-fiesta').forEach((btn, idx) => {
             btn.addEventListener('click', function(e) {
                 e.stopPropagation();
+                const fiesta = todasFiestas[idx];
+                
                 if (btn.textContent === 'Guardar') {
                     btn.textContent = 'Quitar';
                     btn.classList.add('btn-quitar-fiesta');
+                    // Guardar en sessionStorage
+                    let savedFiestas = JSON.parse(sessionStorage.getItem('savedFiestas') || '[]');
+                    savedFiestas.push(fiesta);
+                    sessionStorage.setItem('savedFiestas', JSON.stringify(savedFiestas));
                 } else {
                     btn.textContent = 'Guardar';
                     btn.classList.remove('btn-quitar-fiesta');
+                    // Quitar de sessionStorage
+                    let savedFiestas = JSON.parse(sessionStorage.getItem('savedFiestas') || '[]');
+                    savedFiestas = savedFiestas.filter(f => f.id !== fiesta.id);
+                    sessionStorage.setItem('savedFiestas', JSON.stringify(savedFiestas));
                 }
             });
         });
@@ -127,6 +137,19 @@
                 });
             }, 50);
         @endif
+
+        // Marcar fiestas previamente guardadas
+        setTimeout(() => {
+            const savedFiestas = JSON.parse(sessionStorage.getItem('savedFiestas') || '[]');
+            document.querySelectorAll('.btn-guardar-fiesta').forEach(btn => {
+                const fiestaId = btn.getAttribute('data-fiesta-id');
+                const isGuardado = savedFiestas.some(f => f.id == fiestaId);
+                if (isGuardado) {
+                    btn.textContent = 'Quitar';
+                    btn.classList.add('btn-quitar-fiesta');
+                }
+            });
+        }, 100);
     });
 </script>
 

@@ -167,7 +167,6 @@
         let html = '';
 
         hoteles.forEach(hotel => {
-            const estrellas = '⭐'.repeat(hotel.stars || 0);
             const phoneLink = hotel.phone ? `<p><strong>📞 Teléfono:</strong> <a href="tel:${hotel.phone}">${hotel.phone}</a></p>` : '';
             const emailLink = hotel.email ? `<p><strong>📧 Email:</strong> <a href="mailto:${hotel.email}">${hotel.email}</a></p>` : '';
             const website = hotel.website ? `<p><strong>🌐 Sitio Web:</strong> <a href="${hotel.website}" target="_blank">Visitar web</a></p>` : '';
@@ -179,29 +178,21 @@
                             <h3>${hotel.name}</h3>
                             <p class="hotel-location">📍 ${hotel.locality}, ${hotel.province}</p>
                         </div>
-                        ${hotel.stars ? `<div class="hotel-stars">${estrellas}</div>` : ''}
                     </div>
 
                     <div class="hotel-body">
                         ${hotel.classification ? `<p class="hotel-classification"><strong>Clasificación:</strong> ${hotel.classification}</p>` : ''}
                         ${hotel.address ? `<p class="hotel-address"><strong>Dirección:</strong> ${hotel.address}</p>` : ''}
                         ${hotel.postal_code ? `<p class="hotel-postal"><strong>Código Postal:</strong> ${hotel.postal_code}</p>` : ''}
-                        ${hotel.num_rooms ? `<p class="hotel-rooms"><strong>Habitaciones:</strong> ${hotel.num_rooms}</p>` : ''}
 
                         <div class="hotel-contact">
                             ${phoneLink}
                             ${emailLink}
                             ${website}
                         </div>
-
-                        ${hotel.description ? `<p class="hotel-description">${hotel.description}</p>` : ''}
                     </div>
 
                     <div class="hotel-footer">
-                        <div class="hotel-rating">
-                            ${hotel.rating ? `<span class="rating-stars">⭐ ${hotel.rating}/5.0</span>` : ''}
-                            ${hotel.reviews_count > 0 ? `<span class="reviews-count">(${hotel.reviews_count} reseñas)</span>` : ''}
-                        </div>
                         <button class="btn-small btn-guardar-hotel" data-hotel-id="${hotel.id}">Guardar</button>
                     </div>
                 </div>
@@ -226,12 +217,22 @@
         document.querySelectorAll('.btn-guardar-hotel').forEach((btn, idx) => {
             btn.addEventListener('click', function(e) {
                 e.stopPropagation();
+                const hotel = hoteles[idx];
+                
                 if (btn.textContent === 'Guardar') {
                     btn.textContent = 'Quitar';
                     btn.classList.add('btn-quitar-hotel');
+                    // Guardar en sessionStorage
+                    let savedHotels = JSON.parse(sessionStorage.getItem('savedHotels') || '[]');
+                    savedHotels.push(hotel);
+                    sessionStorage.setItem('savedHotels', JSON.stringify(savedHotels));
                 } else {
                     btn.textContent = 'Guardar';
                     btn.classList.remove('btn-quitar-hotel');
+                    // Quitar de sessionStorage
+                    let savedHotels = JSON.parse(sessionStorage.getItem('savedHotels') || '[]');
+                    savedHotels = savedHotels.filter(h => h.id !== hotel.id);
+                    sessionStorage.setItem('savedHotels', JSON.stringify(savedHotels));
                 }
             });
         });
@@ -254,7 +255,7 @@
             if (draftMunicipio) {
                 // Esperar pequeño tick para que opciones se carguen
                 setTimeout(() => {
-                    localitySelect.value = draftMunicipio;
+                    localitySelect.value = draftMicipio;
                     filtrarHotelesPorLocalidad();
                 }, 10);
             }
@@ -273,6 +274,19 @@
                 });
             }, 50);
         @endif
+
+        // Marcar hoteles previamente guardados
+        setTimeout(() => {
+            const savedHotels = JSON.parse(sessionStorage.getItem('savedHotels') || '[]');
+            document.querySelectorAll('.btn-guardar-hotel').forEach(btn => {
+                const hotelId = btn.getAttribute('data-hotel-id');
+                const isGuardado = savedHotels.some(h => h.id == hotelId);
+                if (isGuardado) {
+                    btn.textContent = 'Quitar';
+                    btn.classList.add('btn-quitar-hotel');
+                }
+            });
+        }, 100);
     });
 </script>
 

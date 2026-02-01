@@ -73,6 +73,10 @@
         noResults.style.display = 'none';
         let html = '';
         restaurantes.forEach(restaurante => {
+            const phoneLink = restaurante.phone ? `<p><strong>📞 Teléfono:</strong> <a href="tel:${restaurante.phone}">${restaurante.phone}</a></p>` : '';
+            const emailLink = restaurante.email ? `<p><strong>📧 Email:</strong> <a href="mailto:${restaurante.email}">${restaurante.email}</a></p>` : '';
+            const website = restaurante.website ? `<p><strong>🌐 Sitio Web:</strong> <a href="${restaurante.website}" target="_blank">Visitar web</a></p>` : '';
+
             html += `
                 <div class="hotel-card">
                     <div class="hotel-header">
@@ -83,6 +87,13 @@
                     </div>
                     <div class="hotel-body">
                         ${restaurante.address ? `<p class="hotel-address"><strong>Dirección:</strong> ${restaurante.address}</p>` : ''}
+                        
+                        <div class="hotel-contact">
+                            ${phoneLink}
+                            ${emailLink}
+                            ${website}
+                        </div>
+
                         ${restaurante.description ? `<p class="hotel-description">${restaurante.description}</p>` : ''}
                     </div>
                     <div class="hotel-footer">
@@ -104,12 +115,22 @@
         document.querySelectorAll('.btn-guardar-restaurante').forEach((btn, idx) => {
             btn.addEventListener('click', function(e) {
                 e.stopPropagation();
+                const restaurante = todosRestaurantes[idx];
+                
                 if (btn.textContent === 'Guardar') {
                     btn.textContent = 'Quitar';
                     btn.classList.add('btn-quitar-restaurante');
+                    // Guardar en sessionStorage
+                    let savedRestaurantes = JSON.parse(sessionStorage.getItem('savedRestaurantes') || '[]');
+                    savedRestaurantes.push(restaurante);
+                    sessionStorage.setItem('savedRestaurantes', JSON.stringify(savedRestaurantes));
                 } else {
                     btn.textContent = 'Guardar';
                     btn.classList.remove('btn-quitar-restaurante');
+                    // Quitar de sessionStorage
+                    let savedRestaurantes = JSON.parse(sessionStorage.getItem('savedRestaurantes') || '[]');
+                    savedRestaurantes = savedRestaurantes.filter(r => r.id !== restaurante.id);
+                    sessionStorage.setItem('savedRestaurantes', JSON.stringify(savedRestaurantes));
                 }
             });
         });
@@ -127,6 +148,19 @@
                 });
             }, 50);
         @endif
+
+        // Marcar restaurantes previamente guardados
+        setTimeout(() => {
+            const savedRestaurantes = JSON.parse(sessionStorage.getItem('savedRestaurantes') || '[]');
+            document.querySelectorAll('.btn-guardar-restaurante').forEach(btn => {
+                const restauranteId = btn.getAttribute('data-restaurante-id');
+                const isGuardado = savedRestaurantes.some(r => r.id == restauranteId);
+                if (isGuardado) {
+                    btn.textContent = 'Quitar';
+                    btn.classList.add('btn-quitar-restaurante');
+                }
+            });
+        }, 100);
     });
 </script>
 

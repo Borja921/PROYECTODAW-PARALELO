@@ -217,13 +217,30 @@ class PlanWizardController extends Controller
             return redirect()->route('planes')->with('error', 'No hay un plan en progreso.');
         }
 
+        // Validar los datos del formulario
+        $data = $request->validate([
+            'nombre_plan' => 'required|string|max:100',
+            'listado_hoteles' => 'nullable|json',
+            'listado_museos' => 'nullable|json',
+            'listado_restaurantes' => 'nullable|json',
+            'listado_fiestas' => 'nullable|json',
+        ]);
+
         // Calcular días
         $start = \Carbon\Carbon::createFromFormat('Y-m-d', $draft['start_date']);
         $end = \Carbon\Carbon::createFromFormat('Y-m-d', $draft['end_date']);
         $days = $start->diffInDays($end) + 1;
 
+        // Decodificar los JSON de los listados
+        $listadoHoteles = !empty($data['listado_hoteles']) ? json_decode($data['listado_hoteles'], true) : [];
+        $listadoMuseos = !empty($data['listado_museos']) ? json_decode($data['listado_museos'], true) : [];
+        $listadoRestaurantes = !empty($data['listado_restaurantes']) ? json_decode($data['listado_restaurantes'], true) : [];
+        $listadoFiestas = !empty($data['listado_fiestas']) ? json_decode($data['listado_fiestas'], true) : [];
+
+        // Crear el plan con la nueva estructura
         $plan = \App\Models\Plan::create([
-            'user_id' => auth()->id(),
+            'nombre_plan' => $data['nombre_plan'],
+            'usuario_id' => auth()->id(),
             'provincia' => $draft['provincia'],
             'municipio' => $draft['municipio'],
             'start_date' => $draft['start_date'],
@@ -235,12 +252,16 @@ class PlanWizardController extends Controller
                 'museo' => $draft['museo'] ?? null,
                 'fiesta' => $draft['fiesta'] ?? null,
             ],
+            'listado_hoteles' => $listadoHoteles,
+            'listado_museos' => $listadoMuseos,
+            'listado_restaurantes' => $listadoRestaurantes,
+            'listado_fiestas' => $listadoFiestas,
         ]);
 
-        // Limpiar draft
+        // Limpiar draft y sessionStorage (mediante JavaScript en la respuesta)
         Session::forget('draft_plan');
 
-        return redirect()->route('mis-planes')->with('success', 'Plan finalizado y guardado correctamente.');
+        return redirect()->route('mis-planes')->with('success', "Plan '{$data['nombre_plan']}' creado y guardado correctamente con {$plan->numero_plan} elementos.");
     }
 
     // métodos para museos, fiestas, summary se añadirán en siguientes pasos

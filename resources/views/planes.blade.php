@@ -68,17 +68,6 @@
                     <div id="dateWarning" style="display:none;color:#856404;background:#fff3cd;border-radius:4px;padding:6px;font-size:0.85rem;margin-top:6px;"></div>
                 </div>
 
-                <!-- Form para guardar plan -->
-                <form id="savePlanForm" method="POST" action="{{ route('planes.store') }}" style="margin-top:12px;">
-                    @csrf
-                    <input type="hidden" name="provincia" id="form_provincia">
-                    <input type="hidden" name="municipio" id="form_municipio">
-                    <input type="hidden" name="start_date" id="form_start_date">
-                    <input type="hidden" name="end_date" id="form_end_date">
-                    <input type="hidden" name="items" id="form_items">
-                    <button id="savePlanBtn" type="submit" class="btn-secondary" disabled>Guardar Plan</button>
-                </form>
-
                 <!-- Form para avanzar en el wizard (protegido por login) -->
                 <form id="wizardStep1Form" method="POST" action="{{ route('plan.wizard.step1.save') }}" style="display:inline;margin-left:8px;">
                     @csrf
@@ -86,10 +75,8 @@
                     <input type="hidden" name="municipio" id="wizard_municipio">
                     <input type="hidden" name="start_date" id="wizard_start_date">
                     <input type="hidden" name="end_date" id="wizard_end_date">
-                    <button id="wizardNextBtn" type="submit" class="btn-primary" disabled>Siguiente</button>
+                    <button id="wizardNextBtn" type="submit" class="btn-primary" disabled>Buscar</button>
                 </form>
-
-                <button class="btn-primary" onclick="filtrarDestinos()">Buscar</button>
 
                 <!-- include flatpickr and date helper -->
                 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
