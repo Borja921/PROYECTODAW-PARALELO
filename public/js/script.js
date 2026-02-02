@@ -820,11 +820,11 @@ function filtrarPorEstado(estado) {
     event.target.classList.add('active');
 
     const cards = document.querySelectorAll('.plan-card');
-    
+
     cards.forEach(card => {
         let mostrar = false;
         const cardEstado = card.getAttribute('data-status') || 'planificando';
-        
+
         if (estado === 'todos') {
             mostrar = true;
         } else if (estado === 'finalizados') {
@@ -832,7 +832,7 @@ function filtrarPorEstado(estado) {
         } else if (estado === 'sinFinalizar') {
             mostrar = cardEstado !== 'completado';
         }
-        
+
         if (mostrar) {
             card.style.display = '';
         } else {
@@ -901,21 +901,21 @@ function switchTab(tabName) {
     contents.forEach(content => {
         content.classList.remove('active');
     });
-    
+
     // Desactivar todos los botones de tabs
     const tabs = document.querySelectorAll('.auth-tab');
     tabs.forEach(tab => {
         tab.classList.remove('active');
     });
-    
+
     // Activar el tab seleccionado
     const selectedContent = document.getElementById(tabName + 'Form');
     const selectedTab = event.target;
-    
+
     if (selectedContent) {
         selectedContent.classList.add('active');
     }
-    
+
     if (selectedTab) {
         selectedTab.classList.add('active');
     }

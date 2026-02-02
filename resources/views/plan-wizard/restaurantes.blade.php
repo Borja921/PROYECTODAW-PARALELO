@@ -6,17 +6,17 @@
         border: 2px solid #4CAF50;
         box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
     }
-    
+
     .btn-selected {
         background-color: #4CAF50 !important;
         color: white !important;
         cursor: default !important;
     }
-    
+
     .btn-selected:hover {
         background-color: #45a049 !important;
     }
-    
+
     .btn-small, .btn-select-restaurant {
         min-height: 36px;
         padding: 8px 16px;
@@ -24,7 +24,7 @@
         align-items: center;
         justify-content: center;
     }
-    
+
     .btn-primary, .btn-secondary {
         min-height: 42px;
         height: 42px;
@@ -47,7 +47,7 @@
         <div class="hotels-header">
             <h1>Restaurantes</h1>
             <p class="subtitle">Explora los restaurantes cerca de {{ $draft['municipio'] }}, {{ $draft['provincia'] }}</p>
-            
+
             <div style="margin-top:20px;display:flex;gap:8px;">
                 <a class="btn-secondary" href="{{ route('plan.wizard.hoteles') }}">Atrás</a>
                 <form method="POST" action="{{ route('plan.wizard.restaurantes.save') }}" id="selectRestaurantForm" style="display:inline;">
@@ -80,7 +80,7 @@
     function mostrarRestaurantes(restaurantes) {
         const restaurantsGrid = document.getElementById('restaurants-grid');
         const noResults = document.getElementById('no-results');
-        
+
         if (restaurantes.length === 0) {
             restaurantsGrid.innerHTML = '<div class="placeholder-container"><p class="placeholder-text">No hay restaurantes disponibles para los filtros seleccionados</p></div>';
             noResults.style.display = 'none';
@@ -132,10 +132,10 @@
         document.querySelectorAll('.btn-select-restaurant').forEach((btn) => {
             btn.addEventListener('click', function(e) {
                 e.stopPropagation();
-                
+
                 const restaurantId = this.getAttribute('data-restaurant-id');
                 const card = this.closest('.restaurant-card');
-                
+
                 // Toggle selección
                 if (card.classList.contains('selected')) {
                     card.classList.remove('selected');
@@ -146,7 +146,7 @@
                     this.textContent = '✓ Seleccionado';
                     this.classList.add('btn-selected');
                 }
-                
+
                 // Actualizar inputs hidden
                 updateSelectedRestaurants();
             });
@@ -160,7 +160,7 @@
             const restaurantId = btn.getAttribute('data-restaurant-id');
             selectedIds.push(restaurantId);
         });
-        
+
         const container = document.getElementById('selected_restaurants_container');
         container.innerHTML = '';
         selectedIds.forEach(id => {

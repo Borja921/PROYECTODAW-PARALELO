@@ -6,17 +6,17 @@
         border: 2px solid #4CAF50;
         box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
     }
-    
+
     .btn-selected {
         background-color: #4CAF50 !important;
         color: white !important;
         cursor: default !important;
     }
-    
+
     .btn-selected:hover {
         background-color: #45a049 !important;
     }
-    
+
     .btn-small, .btn-select-museum {
         min-height: 36px;
         padding: 8px 16px;
@@ -24,7 +24,7 @@
         align-items: center;
         justify-content: center;
     }
-    
+
     .btn-primary, .btn-secondary {
         min-height: 42px;
         height: 42px;
@@ -47,7 +47,7 @@
         <div class="hotels-header">
             <h1>Museos</h1>
             <p class="subtitle">Explora los museos cerca de {{ $draft['municipio'] }}, {{ $draft['provincia'] }}</p>
-            
+
             <div style="margin-top:20px;display:flex;gap:8px;">
                 <a class="btn-secondary" href="{{ route('plan.wizard.restaurantes') }}">Atrás</a>
                 <form method="POST" action="{{ route('plan.wizard.museos.save') }}" id="selectMuseumForm" style="display:inline;">
@@ -80,7 +80,7 @@
     function mostrarMuseos(museos) {
         const museumsGrid = document.getElementById('museums-grid');
         const noResults = document.getElementById('no-results');
-        
+
         if (museos.length === 0) {
             museumsGrid.innerHTML = '<div class="placeholder-container"><p class="placeholder-text">No hay museos disponibles para los filtros seleccionados</p></div>';
             noResults.style.display = 'none';
@@ -130,10 +130,10 @@
         document.querySelectorAll('.btn-select-museum').forEach((btn) => {
             btn.addEventListener('click', function(e) {
                 e.stopPropagation();
-                
+
                 const museumId = this.getAttribute('data-museum-id');
                 const card = this.closest('.museum-card');
-                
+
                 // Toggle selección
                 if (card.classList.contains('selected')) {
                     card.classList.remove('selected');
@@ -144,7 +144,7 @@
                     this.textContent = '✓ Seleccionado';
                     this.classList.add('btn-selected');
                 }
-                
+
                 // Actualizar inputs hidden
                 updateSelectedMuseums();
             });
@@ -158,7 +158,7 @@
             const museumId = btn.getAttribute('data-museum-id');
             selectedIds.push(museumId);
         });
-        
+
         const container = document.getElementById('selected_museums_container');
         container.innerHTML = '';
         selectedIds.forEach(id => {
