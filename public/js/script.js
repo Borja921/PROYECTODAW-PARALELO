@@ -819,7 +819,26 @@ function filtrarPorEstado(estado) {
     buttons.forEach(btn => btn.classList.remove('active'));
     event.target.classList.add('active');
 
-    alert(`Filtrando planes por estado: ${estado}`);
+    const cards = document.querySelectorAll('.plan-card');
+    
+    cards.forEach(card => {
+        let mostrar = false;
+        const cardEstado = card.getAttribute('data-status') || 'planificando';
+        
+        if (estado === 'todos') {
+            mostrar = true;
+        } else if (estado === 'finalizados') {
+            mostrar = cardEstado === 'completado';
+        } else if (estado === 'sinFinalizar') {
+            mostrar = cardEstado !== 'completado';
+        }
+        
+        if (mostrar) {
+            card.style.display = '';
+        } else {
+            card.style.display = 'none';
+        }
+    });
 }
 
 /**
@@ -849,3 +868,71 @@ function compartirPlan() {
 function descargarPlan() {
     alert('📥 Descargando plan en formato PDF...');
 }
+
+/**
+ * Abre el modal de login
+ */
+function openLoginModal(event) {
+    event.preventDefault();
+    const modal = document.getElementById('loginModal');
+    if (modal) {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+/**
+ * Cierra el modal de login
+ */
+function closeLoginModal() {
+    const modal = document.getElementById('loginModal');
+    if (modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = 'auto';
+    }
+}
+
+/**
+ * Cambia entre los tabs de login y registro
+ */
+function switchTab(tabName) {
+    // Ocultar todos los contenidos de tabs
+    const contents = document.querySelectorAll('.auth-tab-content');
+    contents.forEach(content => {
+        content.classList.remove('active');
+    });
+    
+    // Desactivar todos los botones de tabs
+    const tabs = document.querySelectorAll('.auth-tab');
+    tabs.forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // Activar el tab seleccionado
+    const selectedContent = document.getElementById(tabName + 'Form');
+    const selectedTab = event.target;
+    
+    if (selectedContent) {
+        selectedContent.classList.add('active');
+    }
+    
+    if (selectedTab) {
+        selectedTab.classList.add('active');
+    }
+}
+
+// Cerrar modal al hacer clic fuera del contenido
+document.addEventListener('click', function(event) {
+    const modal = document.getElementById('loginModal');
+    if (modal && event.target === modal) {
+        closeLoginModal();
+    }
+});
+
+// Cerrar modal con la tecla ESC
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeLoginModal();
+    }
+});
+

@@ -185,7 +185,7 @@ class ImportFestivalsData extends Command
         $festivalData = [
             'name' => $name,
             'locality' => $locality,
-            'province' => $province,
+            'province' => $this->normalizeProvince($province),
             'start_date' => $startDate,
             'end_date' => null, // No disponible en CSV
             'festival_type' => 'Fiesta Local', // Genérico
@@ -203,5 +203,19 @@ class ImportFestivalsData extends Command
         ];
 
         return $festivalData;
+    }
+
+    /**
+     * Normaliza nombres de provincias corrigiendo caracteres mal codificados
+     */
+    private function normalizeProvince(string $province): string
+    {
+        // Correcciones para provincias con caracteres mal codificados
+        $corrections = [
+            '?vila' => 'Ávila',
+            'Le?n' => 'León',
+        ];
+
+        return $corrections[$province] ?? $province;
     }
 }

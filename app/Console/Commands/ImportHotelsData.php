@@ -70,7 +70,7 @@ class ImportHotelsData extends Command
                     $hotelData = [
                         'name' => trim($record[4] ?? ''),
                         'locality' => trim($record[8] ?? ''),
-                        'province' => trim($record[7] ?? ''),
+                        'province' => $this->normalizeProvince(trim($record[7] ?? '')),
                         'address' => trim($record[5] ?? ''),
                         'postal_code' => trim($record[6] ?? ''),
                         'phone' => trim($record[9] ?? ''),
@@ -122,5 +122,19 @@ class ImportHotelsData extends Command
             $this->error('Error durante la importación: ' . $e->getMessage());
             return 1;
         }
+    }
+
+    /**
+     * Normaliza nombres de provincias corrigiendo caracteres mal codificados
+     */
+    private function normalizeProvince(string $province): string
+    {
+        // Correcciones para provincias con caracteres mal codificados
+        $corrections = [
+            '?vila' => 'Ávila',
+            'Le?n' => 'León',
+        ];
+
+        return $corrections[$province] ?? $province;
     }
 }

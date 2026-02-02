@@ -9,122 +9,142 @@ use League\Csv\Reader;
 
 class ImportMuseumsData extends Command
 {
-    protected $signature = 'museums:import';
+    protected $signature = 'museums:import {--local : Usar archivo CSV local descargado manualmente}';
     protected $description = 'Importa datos de museos desde el CSV oficial';
 
     public function handle()
     {
-        $this->info('Descargando datos de museos...');
-
-        try {
-            // Descargar el CSV con SSL verify deshabilitado
-            $csvUrl = 'https://datosabiertos.jcyl.es/web/jcyl/risp/es/cultura-ocio/museos/1284197401971.csv';
-            
-            $response = Http::timeout(30)->withoutVerifying()->get($csvUrl);
-
-            if (!$response->successful()) {
-                $this->error('No se pudo descargar el archivo CSV');
+        $tempFile = storage_path('temp_museums.csv');
+        
+        // Si se usa opción --local, buscar archivo ya descargado
+        if ($this->option('local')) {
+            if (!file_exists($tempFile)) {
+                $this->error("Archivo no encontrado en: $tempFile");
+                $this->info("Por favor, descarga el CSV desde:");
+                $this->info("https://datosabiertos.jcyl.es/web/jcyl/risp/es/cultura-ocio/museos/1284197401971.csv");
+                $this->info("Y guárdalo en: $tempFile");
                 return 1;
             }
-
-            // Guardar temporalmente y fijar encoding
-            $tempFile = storage_path('temp_museums.csv');
-            $content = $response->body();
+            $this->info('Usando archivo local...');
+            $content = file_get_contents($tempFile);
+        } else {
+            $this->info('Descargando datos de museos...');
             
-            // Eliminar BOM UTF-8 si existe
-            if (substr($content, 0, 3) === "\xEF\xBB\xBF") {
-                $content = substr($content, 3);
+            try {
+                // Descargar el CSV con SSL verify deshabilitado
+                $csvUrl = 'https://datosabiertos.jcyl.es/web/jcyl/risp/es/cultura-ocio/museos/1284197401971.csv';
+                
+                $response = Http::timeout(120)->retry(3, 100)->withoutVerifying()->get($csvUrl);
+
+                if (!$response->successful()) {
+                    $this->error('No se pudo descargar el archivo CSV');
+                    $this->info("\nPrueba descargarlo manualmente y ejecuta:");
+                    $this->info("php artisan museums:import --local");
+                    return 1;
+                }
+
+                $content = $response->body();
+                file_put_contents($tempFile, $content);
+            } catch (\Exception $e) {
+                $this->error('Error durante la descarga: ' . $e->getMessage());
+                $this->info("\nPrueba descargarlo manualmente desde:");
+                $this->info("https://datosabiertos.jcyl.es/web/jcyl/risp/es/cultura-ocio/museos/1284197401971.csv");
+                $this->info("Guárdalo en: $tempFile");
+                $this->info("Y ejecuta: php artisan museums:import --local");
+                return 1;
             }
-            
-            // Fijar codificación
-            $content = mb_convert_encoding($content, 'UTF-8', 'UTF-8');
-            file_put_contents($tempFile, $content);
+        }
+        
+        // Eliminar BOM UTF-8 si existe
+        if (substr($content, 0, 3) === "\xEF\xBB\xBF") {
+            $content = substr($content, 3);
+        }
+        
+        // Fijar codificación
+        $content = mb_convert_encoding($content, 'UTF-8', 'UTF-8');
+        file_put_contents($tempFile, $content);
 
-            // Procesar CSV
-            $csv = Reader::createFromPath($tempFile, 'r');
-            $csv->setDelimiter(';');
-            $csv->setEnclosure('"');
-            
-            $records = $csv->getRecords();
-            $imported = 0;
-            $errors = 0;
-            $rowNum = 0;
-            $skipHeader = true;
-            $showStructure = true;
+        // Procesar CSV
+        $csv = Reader::createFromPath($tempFile, 'r');
+        $csv->setDelimiter(';');
+        $csv->setEnclosure('"');
+        
+        $records = $csv->getRecords();
+        $imported = 0;
+        $errors = 0;
+        $rowNum = 0;
+        $skipHeader = true;
+        $showStructure = true;
 
-            foreach ($records as $record) {
-                try {
-                    $rowNum++;
+        foreach ($records as $record) {
+            try {
+                $rowNum++;
 
-                    // Detectar y saltar encabezado
-                    if ($skipHeader && isset($record[0])) {
-                        if ($this->isHeader($record)) {
-                            $this->info("✓ Encabezado detectado: " . count($record) . " columnas");
-                            $this->line("Estructura completa:");
-                            foreach ($record as $i => $col) {
-                                $this->line("  [$i] $col");
-                            }
-                            $skipHeader = false;
-                            $showStructure = false;
-                            continue;
+                // Detectar y saltar encabezado
+                if ($skipHeader && isset($record[0])) {
+                    if ($this->isHeader($record)) {
+                        $this->info("✓ Encabezado detectado: " . count($record) . " columnas");
+                        $this->line("Estructura completa:");
+                        foreach ($record as $i => $col) {
+                            $this->line("  [$i] $col");
                         }
-                    }
-                    $skipHeader = false;
-
-                    // Mostrar primeros registros para debugging
-                    if ($showStructure && $rowNum < 3) {
-                        $this->error("\nPrimer registro (fila $rowNum):");
-                        foreach ($record as $i => $val) {
-                            $this->line("  [$i] " . substr($val, 0, 50));
-                        }
-                    }
-
-                    // Mapear registro
-                    $museumData = $this->mapRecord($record);
-
-                    if (!$museumData) {
-                        $errors++;
-                        if ($errors <= 3) {
-                            $this->warn("Registro $rowNum descartado - datos insuficientes");
-                        }
+                        $skipHeader = false;
+                        $showStructure = false;
                         continue;
                     }
+                }
+                $skipHeader = false;
 
-                    // Crear o actualizar
-                    PublicMuseum::updateOrCreate(
-                        ['name' => $museumData['name'], 'locality' => $museumData['locality']],
-                        $museumData
-                    );
-
-                    $imported++;
-
-                    if ($imported % 50 === 0) {
-                        $this->line("✓ Importados: $imported registros...");
-                    }
-                } catch (\Exception $e) {
-                    $errors++;
-                    if ($errors <= 3) {
-                        $this->error("Error en fila $rowNum: " . $e->getMessage());
+                // Mostrar primeros registros para debugging
+                if ($showStructure && $rowNum < 3) {
+                    $this->error("\nPrimer registro (fila $rowNum):");
+                    foreach ($record as $i => $val) {
+                        $this->line("  [$i] " . substr($val, 0, 50));
                     }
                 }
+
+                // Mapear registro
+                $museumData = $this->mapRecord($record);
+
+                if (!$museumData) {
+                    $errors++;
+                    if ($errors <= 3) {
+                        $this->warn("Registro $rowNum descartado - datos insuficientes");
+                    }
+                    continue;
+                }
+
+                // Crear o actualizar
+                PublicMuseum::updateOrCreate(
+                    ['name' => $museumData['name'], 'locality' => $museumData['locality']],
+                    $museumData
+                );
+
+                $imported++;
+
+                if ($imported % 50 === 0) {
+                    $this->line("✓ Importados: $imported registros...");
+                }
+            } catch (\Exception $e) {
+                $errors++;
+                if ($errors <= 3) {
+                    $this->error("Error en fila $rowNum: " . $e->getMessage());
+                }
             }
-
-            // Limpiar archivo temporal
-            @unlink($tempFile);
-
-            $this->info("\n✅ Importación completada!");
-            $this->info("📊 Registros importados: $imported");
-            if ($errors > 0) {
-                $this->warn("⚠️ Registros con error: $errors");
-            }
-
-            return 0;
-        } catch (\Exception $e) {
-            $this->error('Error durante la importación: ' . $e->getMessage());
-            return 1;
         }
-    }
 
+        // Limpiar archivo temporal
+        @unlink($tempFile);
+
+        $this->info("\n✅ Importación completada!");
+        $this->info("📊 Registros importados: $imported");
+        if ($errors > 0) {
+            $this->warn("⚠️ Registros con error: $errors");
+        }
+
+        return 0;
+    }
+    
     /**
      * Obtener provincia basada en localidad
      */
@@ -271,7 +291,7 @@ class ImportMuseumsData extends Command
         $museumData = [
             'name' => $name,
             'locality' => $locality,
-            'province' => 'Castilla y León', // Por defecto
+            'province' => $this->normalizeProvince('Castilla y León'), // Por defecto
             'address' => '', 
             'postal_code' => '',
             'phone' => '',
@@ -287,5 +307,19 @@ class ImportMuseumsData extends Command
         ];
 
         return $museumData;
+    }
+
+    /**
+     * Normaliza nombres de provincias corrigiendo caracteres mal codificados
+     */
+    private function normalizeProvince(string $province): string
+    {
+        // Correcciones para provincias con caracteres mal codificados
+        $corrections = [
+            '?vila' => 'Ávila',
+            'Le?n' => 'León',
+        ];
+
+        return $corrections[$province] ?? $province;
     }
 }

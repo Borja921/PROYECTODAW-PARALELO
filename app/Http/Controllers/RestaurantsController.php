@@ -17,9 +17,18 @@ class RestaurantsController extends Controller
         // Obtener todas las localidades agrupadas por nombre
         $localities = PublicRestaurant::getLocalitiesWithCount();
         
+        // Obtener parámetro de provincia si existe
+        $selectedProvince = request()->get('provincia');
+        
         // Obtener todos los restaurantes activos
-        $restaurants = PublicRestaurant::where('is_active', true)
-            ->orderBy('province')
+        $query = PublicRestaurant::where('is_active', true);
+        
+        // Filtrar por provincia si se proporciona
+        if ($selectedProvince) {
+            $query->where('province', $selectedProvince);
+        }
+        
+        $restaurants = $query->orderBy('province')
             ->orderBy('locality')
             ->orderBy('name')
             ->get();
@@ -27,7 +36,8 @@ class RestaurantsController extends Controller
         return view('restaurantes', [
             'provinces' => $provinces,
             'localities' => $localities,
-            'restaurants' => $restaurants
+            'restaurants' => $restaurants,
+            'selectedProvince' => $selectedProvince
         ]);
     }
 

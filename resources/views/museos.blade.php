@@ -13,13 +13,17 @@
             <ul class="nav-links">
                 <li><a href="{{ route('index') }}">Inicio</a></li>
                 <li><a href="{{ route('destinos') }}">Destinos</a></li>
-                <li><a href="{{ route('hoteles') }}">Hoteles</a></li>
-                <li><a href="{{ route('museos') }}">Museos</a></li>
-                <li><a href="{{ route('restaurantes') }}">Restaurantes</a></li>
-                <li><a href="{{ route('fiestas') }}">Fiestas</a></li>
-                <li><a href="{{ route('planes') }}">Crear Plan</a></li>
-                <li><a href="{{ route('mis-planes') }}">Mis Planes</a></li>
-                <li><a href="{{ route('perfil') }}">Perfil</a></li>
+                @auth
+                    <li><a href="{{ route('planes') }}">Crear Plan</a></li>
+                    <li><a href="{{ route('mis-planes') }}">Mis Planes</a></li>
+                    <li><a href="{{ route('perfil') }}">Perfil</a></li>
+                    <li><a href="{{ route('perfil') }}">Hola, {{ Auth::user()->nombre_apellidos }}</a></li>
+                @else
+                    <li><a href="#" onclick="openLoginModal(event)">Crear Plan</a></li>
+                    <li><a href="#" onclick="openLoginModal(event)">Mis Planes</a></li>
+                    <li><a href="#" onclick="openLoginModal(event)">Perfil</a></li>
+                    <li><a href="#" onclick="openLoginModal(event)">Iniciar Sesión</a></li>
+                @endauth
             </ul>
         </div>
     </nav>
@@ -32,15 +36,6 @@
             </div>
 
             <div class="hotels-filters">
-                <div class="filter-group">
-                    <label for="locality-select">Selecciona una Localidad</label>
-                    <select id="locality-select" class="filter-select" onchange="filtrarPorLocalidad()">
-                        <option value="">-- Todas las localidades --</option>
-                        @foreach($localities as $locality)
-                            <option value="{{ $locality->locality }}">{{ $locality->locality }} ({{ $locality->count }})</option>
-                        @endforeach
-                    </select>
-                </div>
             </div>
 
             <div id="museums-grid" class="hotels-grid">

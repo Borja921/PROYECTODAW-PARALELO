@@ -17,9 +17,18 @@ class MuseumsController extends Controller
         // Obtener todas las localidades agrupadas por nombre
         $localities = PublicMuseum::getLocalitiesWithCount();
         
+        // Obtener parámetro de provincia si existe
+        $selectedProvince = request()->get('provincia');
+        
         // Obtener todos los museos activos
-        $museums = PublicMuseum::where('is_active', true)
-            ->orderBy('province')
+        $query = PublicMuseum::where('is_active', true);
+        
+        // Filtrar por provincia si se proporciona
+        if ($selectedProvince) {
+            $query->where('province', $selectedProvince);
+        }
+        
+        $museums = $query->orderBy('province')
             ->orderBy('locality')
             ->orderBy('name')
             ->get();
@@ -27,7 +36,8 @@ class MuseumsController extends Controller
         return view('museos', [
             'provinces' => $provinces,
             'localities' => $localities,
-            'museums' => $museums
+            'museums' => $museums,
+            'selectedProvince' => $selectedProvince
         ]);
     }
 

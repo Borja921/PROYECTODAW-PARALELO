@@ -1,33 +1,64 @@
 @extends('layouts.app')
 
 @section('content')
+<style>
+    .hotel-card.selected {
+        border: 2px solid #4CAF50;
+        box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+    }
+    
+    .btn-selected {
+        background-color: #4CAF50 !important;
+        color: white !important;
+        cursor: default !important;
+    }
+    
+    .btn-selected:hover {
+        background-color: #45a049 !important;
+    }
+    
+    .btn-small, .btn-select-hotel {
+        min-height: 36px;
+        padding: 8px 16px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .btn-primary, .btn-secondary {
+        min-height: 42px;
+        height: 42px;
+        padding: 0 20px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        box-sizing: border-box;
+        line-height: 1;
+        font-size: 14px;
+        font-weight: 500;
+        border: none;
+        cursor: pointer;
+    }
+</style>
+
 <div class="hotels-section">
     <div class="hotels-container">
         <div class="hotels-header">
             <h1>Alojamientos Hoteleros</h1>
             <p class="subtitle">Explora los hoteles cerca de {{ $draft['municipio'] }}, {{ $draft['provincia'] }}</p>
-        </div>
-
-        <div class="hotels-filters">
-            <div class="filter-group">
-                <label for="province-select">Selecciona una Provincia</label>
-                <select id="province-select" class="filter-select" onchange="filtrarPorProvincia()">
-                    <option value="">-- Todas las provincias --</option>
-                    @foreach($provinces as $province)
-                        <option value="{{ $province }}">{{ $province }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div class="filter-group">
-                <label for="locality-select">Selecciona una Localidad</label>
-                <select id="locality-select" class="filter-select" onchange="filtrarHotelesPorLocalidad()" disabled>
-                    <option value="">-- Todas las localidades --</option>
-                </select>
+            
+            <div style="margin-top:20px;display:flex;gap:8px;">
+                <a class="btn-secondary" href="{{ route('planes') }}">Atrás</a>
+                <form method="POST" action="{{ route('plan.wizard.hoteles.save') }}" id="selectHotelForm" style="display:inline;">
+                    @csrf
+                    <input type="hidden" name="hotel_id" id="selected_hotel_id" value="{{ $draft['hotel']['id'] ?? '' }}">
+                    <button type="submit" class="btn-primary">Siguiente</button>
+                </form>
             </div>
         </div>
 
-        <div id="hotels-grid" class="hotels-grid">
+        <div id="hotels-grid" class="hotels-grid" style="margin-top:20px;">
             @if($hotels->isEmpty())
                 <div class="placeholder-container">
                     <p class="placeholder-text">No se han encontrado alojamientos para la localidad seleccionada.</p>
@@ -39,15 +70,6 @@
 
         <div id="no-results" class="no-results-message" style="display: none;">
             <p>No se encontraron alojamientos para la localidad seleccionada.</p>
-        </div>
-
-        <div style="margin-top:16px;display:flex;gap:8px;">
-            <a class="btn-secondary" href="{{ route('planes') }}">Atrás</a>
-            <form method="POST" action="{{ route('plan.wizard.hoteles.save') }}" id="selectHotelForm">
-                @csrf
-                <input type="hidden" name="hotel_id" id="selected_hotel_id" value="{{ $draft['hotel']['id'] ?? '' }}">
-                <button type="submit" class="btn-primary">Siguiente</button>
-            </form>
         </div>
     </div>
 </div>
@@ -158,7 +180,6 @@
         let html = '';
 
         hoteles.forEach(hotel => {
-            const estrellas = '⭐'.repeat(hotel.stars || 0);
             const phoneLink = hotel.phone ? `<p><strong>📞 Teléfono:</strong> <a href="tel:${hotel.phone}">${hotel.phone}</a></p>` : '';
             const emailLink = hotel.email ? `<p><strong>📧 Email:</strong> <a href="mailto:${hotel.email}">${hotel.email}</a></p>` : '';
             const website = hotel.website ? `<p><strong>🌐 Sitio Web:</strong> <a href="${hotel.website}" target="_blank">Visitar web</a></p>` : '';
@@ -170,7 +191,6 @@
                             <h3>${hotel.name}</h3>
                             <p class="hotel-location">📍 ${hotel.locality}, ${hotel.province}</p>
                         </div>
-                        ${hotel.stars ? `<div class="hotel-stars">${estrellas}</div>` : ''}
                     </div>
 
                     <div class="hotel-body">
@@ -193,7 +213,7 @@
                             ${hotel.rating ? `<span class="rating-stars">⭐ ${hotel.rating}/5.0</span>` : ''}
                             ${hotel.reviews_count > 0 ? `<span class="reviews-count">(${hotel.reviews_count} reseñas)</span>` : ''}
                         </div>
-                        ${hotel.website ? `<a href="${hotel.website}" class="btn-small" target="_blank">📅 Reservar</a>` : `<button class="btn-small" disabled>Sin datos</button>`}
+                        <button class="btn-small btn-select-hotel" data-hotel-id="${hotel.id}">Seleccionar</button>
                     </div>
                 </div>
             `;
@@ -201,54 +221,52 @@
 
         hotelsGrid.innerHTML = html;
 
-        // After rendering, attach click handlers to hotel cards to select
-        document.querySelectorAll('.hotel-card').forEach((card, idx) => {
-            card.addEventListener('click', function() {
-                // clear previous selection
-                document.querySelectorAll('.hotel-card.selected').forEach(c => c.classList.remove('selected'));
+        // After rendering, attach click handlers to select buttons
+        document.querySelectorAll('.btn-select-hotel').forEach((btn) => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation(); // Evitar que se dispare el click en la tarjeta
+                
+                const hotelId = this.getAttribute('data-hotel-id');
+                const card = this.closest('.hotel-card');
+                
+                // Limpiar selecciones previas
+                document.querySelectorAll('.hotel-card.selected').forEach(c => {
+                    c.classList.remove('selected');
+                    c.querySelector('.btn-select-hotel').textContent = 'Seleccionar';
+                    c.querySelector('.btn-select-hotel').classList.remove('btn-selected');
+                });
+                
+                // Marcar como seleccionado
                 card.classList.add('selected');
-                // set hidden input
-                const hotelId = hoteles[idx].id;
+                this.textContent = '✓ Seleccionado';
+                this.classList.add('btn-selected');
+                
+                // Guardar ID en el input hidden
                 document.getElementById('selected_hotel_id').value = hotelId;
+                
+                // El botón ya está visible, solo scroll si es necesario
+                const nextBtn = document.querySelector('#selectHotelForm button[type="submit"]');
+                nextBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             });
         });
     }
 
-    // Inicializar en carga: preseleccionar los valores del draft
+    // Inicializar en carga: mostrar hoteles directamente
     document.addEventListener('DOMContentLoaded', function() {
-        // Mostrar todos inicialmente y luego filtrar por la provincia del draft
-        mostrarTodos();
-
-        const provinceSelect = document.getElementById('province-select');
-        const localitySelect = document.getElementById('locality-select');
-
-        if (provinceSelect) {
-            provinceSelect.value = '{{ $draft['provincia'] }}';
-            filtrarPorProvincia();
-
-            // Si hay un municipio en el draft, seleccionar
-            const draftMunicipio = '{{ $draft['municipio'] }}';
-            if (draftMunicipio) {
-                // Esperar pequeño tick para que opciones se carguen
-                setTimeout(() => {
-                    localitySelect.value = draftMunicipio;
-                    filtrarHotelesPorLocalidad();
-                }, 10);
-            }
-        }
+        // Mostrar los hoteles ya filtrados por el servidor
+        mostrarHoteles(todosHoteles);
 
         // Si hay hotel seleccionado en draft, marcarlo
         @if(isset($draft['hotel']) && $draft['hotel']['id'])
             setTimeout(() => {
-                const id = '{{ $draft['hotel']['id'] }}';
-                // find hotel in rendered list and mark selected
-                document.querySelectorAll('.hotel-card').forEach(card => {
-                    if (card.innerHTML.includes(id)) {
+                const id = {{ $draft['hotel']['id'] }};
+                document.querySelectorAll('.hotel-card').forEach((card, idx) => {
+                    if (todosHoteles[idx].id == id) {
                         card.classList.add('selected');
                         document.getElementById('selected_hotel_id').value = id;
                     }
                 });
-            }, 50);
+            }, 200);
         @endif
     });
 </script>

@@ -176,7 +176,7 @@ class ImportRestaurantsData extends Command
         $restaurantData = [
             'name' => $name,
             'locality' => $locality,
-            'province' => !empty($province) ? $province : 'Castilla y León',
+            'province' => !empty($province) ? $this->normalizeProvince($province) : 'Castilla y León',
             'address' => trim($record[5] ?? ''),
             'postal_code' => trim($record[6] ?? ''),
             'phone' => trim($record[11] ?? ''),
@@ -192,5 +192,19 @@ class ImportRestaurantsData extends Command
         ];
 
         return $restaurantData;
+    }
+
+    /**
+     * Normaliza nombres de provincias corrigiendo caracteres mal codificados
+     */
+    private function normalizeProvince(string $province): string
+    {
+        // Correcciones para provincias con caracteres mal codificados
+        $corrections = [
+            '?vila' => 'Ávila',
+            'Le?n' => 'León',
+        ];
+
+        return $corrections[$province] ?? $province;
     }
 }

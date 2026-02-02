@@ -9,6 +9,7 @@ use App\Http\Controllers\RegistroController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\MunicipioController;
 use App\Http\Controllers\PlanWizardController;
+use App\Http\Controllers\PerfilController;
 
 Route::get('/', function () {
     return view('index');
@@ -26,12 +27,15 @@ Route::get('/mis-planes', [App\Http\Controllers\PlanesController::class, 'myPlan
 // Detalle de plan (ver en perfil)
 Route::get('/mis-planes/{id}', [App\Http\Controllers\PlanesController::class, 'show'])->name('mis-planes.show')->middleware('auth');
 
+// Finalizar plan
+Route::post('/mis-planes/{id}/finalizar', [App\Http\Controllers\PlanesController::class, 'finalize'])->name('mis-planes.finalize')->middleware('auth');
+
 // Legacy route for plan detail (kept for backward compatibility)
 Route::get('/planes/{id}', [App\Http\Controllers\PlanesController::class, 'show'])->name('detalle-plan');
 
-Route::get('/perfil', function () {
-    return view('perfil');
-})->name('perfil');
+Route::get('/perfil', [App\Http\Controllers\PerfilController::class, 'index'])->name('perfil')->middleware('auth');
+Route::get('/perfil/editar', [App\Http\Controllers\PerfilController::class, 'edit'])->name('perfil.edit')->middleware('auth');
+Route::post('/perfil/actualizar', [App\Http\Controllers\PerfilController::class, 'update'])->name('perfil.update')->middleware('auth');
 
 Route::get('/contacto', function () {
     return view('contacto');

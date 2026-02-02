@@ -36,15 +36,23 @@ class PlanesController extends Controller
         $end = \Carbon\Carbon::createFromFormat('Y-m-d', $data['end_date']);
         $days = $start->diffInDays($end) + 1;
 
-        $plan = \App\Models\Plan::create([
-            'user_id' => auth()->id(),
+        $userColumn = \App\Models\Plan::userColumn();
+        $planData = [
             'provincia' => $data['provincia'],
             'municipio' => $data['municipio'],
             'start_date' => $data['start_date'],
             'end_date' => $data['end_date'],
             'days' => $days,
             'items' => isset($data['items']) ? json_decode($data['items'], true) : null,
-        ]);
+        ];
+        $userId = auth()->id();
+        $planData[$userColumn] = $userId;
+
+        if ($userColumn === 'id_user' && \Illuminate\Support\Facades\Schema::hasColumn((new \App\Models\Plan())->getTable(), 'user_id')) {
+            $planData['user_id'] = null;
+        }
+
+        $plan = \App\Models\Plan::create($planData);
 
         return redirect()->route('planes')->with('success', 'Plan guardado correctamente.');
     }
@@ -55,9 +63,20 @@ class PlanesController extends Controller
     public function myPlans()
     {
         $userId = auth()->id();
-        $plans = \App\Models\Plan::where('user_id', $userId)->orderBy('created_at', 'desc')->get();
+        $userColumn = \App\Models\Plan::userColumn();
+        $plans = \App\Models\Plan::where($userColumn, $userId)->orderBy('created_at', 'desc')->get();
 
-        return view('mis-planes', ['plans' => $plans]);
+        // Contar planes por estado
+        $totalPlans = $plans->count();
+        $finalizados = $plans->where('status', 'completado')->count();
+        $sinFinalizar = $plans->where('status', '!=', 'completado')->count();
+
+        return view('mis-planes', [
+            'plans' => $plans,
+            'totalPlans' => $totalPlans,
+            'finalizados' => $finalizados,
+            'sinFinalizar' => $sinFinalizar
+        ]);
     }
 
     /**
@@ -66,12 +85,33 @@ class PlanesController extends Controller
     public function show($id)
     {
         $plan = \App\Models\Plan::findOrFail($id);
+        $userColumn = \App\Models\Plan::userColumn();
 
         // Autorizar: solo el propietario puede ver su plan
-        if ($plan->user_id !== auth()->id()) {
+        if ($plan->{$userColumn} !== auth()->id()) {
             abort(403, 'No tienes permiso para ver este plan.');
         }
 
         return view('detalle-plan', ['plan' => $plan]);
+    }
+
+    /**
+     * Finalizar un plan (cambiar estado a completado)
+     */
+    public function finalize($id)
+    {
+        $plan = \App\Models\Plan::findOrFail($id);
+        $userColumn = \App\Models\Plan::userColumn();
+
+        // Autorizar: solo el propietario puede finalizar su plan
+        if ($plan->{$userColumn} !== auth()->id()) {
+            abort(403, 'No tienes permiso para finalizar este plan.');
+        }
+
+        $plan->status = 'completado';
+        $plan->save();
+
+        return redirect()->route('mis-planes.show', $plan->id)
+            ->with('success', 'Plan finalizado correctamente.');
     }
 }

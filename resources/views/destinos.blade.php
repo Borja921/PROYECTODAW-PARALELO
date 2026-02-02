@@ -13,12 +13,113 @@
             <ul class="nav-links">
                 <li><a href="{{ route('index') }}">Inicio</a></li>
                 <li><a href="{{ route('destinos') }}" class="active">Destinos</a></li>
-                <li><a href="{{ route('planes') }}">Crear Plan</a></li>
-                <li><a href="{{ route('mis-planes') }}">Mis Planes</a></li>
-                <li><a href="{{ route('perfil') }}">Perfil</a></li>
+                @auth
+                    <li><a href="{{ route('planes') }}">Crear Plan</a></li>
+                    <li><a href="{{ route('mis-planes') }}">Mis Planes</a></li>
+                    <li><a href="{{ route('perfil') }}">Perfil</a></li>
+                    <li><a href="{{ route('perfil') }}">Hola, {{ Auth::user()->nombre_apellidos }}</a></li>
+                @else
+                    <li><a href="#" onclick="openLoginModal(event)">Crear Plan</a></li>
+                    <li><a href="#" onclick="openLoginModal(event)">Mis Planes</a></li>
+                    <li><a href="#" onclick="openLoginModal(event)">Perfil</a></li>
+                    <li><a href="#" onclick="openLoginModal(event)">Iniciar Sesión</a></li>
+                @endauth
             </ul>
         </div>
     </nav>
+
+    <!-- Modal de Login -->
+    @guest
+    <div id="loginModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeLoginModal()">&times;</button>
+            
+            <!-- Tabs -->
+            <div class="auth-tabs">
+                <button class="auth-tab active" onclick="switchTab('login')">Iniciar Sesión</button>
+                <button class="auth-tab" onclick="switchTab('registro')">Registrarse</button>
+            </div>
+
+            <!-- Formulario de Login -->
+            <div id="loginForm" class="auth-tab-content active">
+                <h2>Bienvenido</h2>
+                <p class="auth-subtitle">Accede a tu cuenta TravelPlus</p>
+
+                @if ($errors->any())
+                    <div class="alert">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                <form method="POST" action="{{ route('login.post') }}" class="auth-form">
+                    @csrf
+
+                    <div class="form-group">
+                        <label for="login">Nombre de usuario o correo</label>
+                        <input id="login" name="login" type="text" required value="{{ old('login') }}" placeholder="usuario@ejemplo.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Contraseña</label>
+                        <input id="password" name="password" type="password" required placeholder="••••••••">
+                    </div>
+
+                    <div class="form-group checkbox">
+                        <label><input type="checkbox" name="remember" {{ old('remember') ? 'checked' : '' }}> Recuérdame</label>
+                    </div>
+
+                    <button type="submit" class="btn-primary">Iniciar Sesión</button>
+                </form>
+            </div>
+
+            <!-- Formulario de Registro -->
+            <div id="registroForm" class="auth-tab-content">
+                <h2>Crear Cuenta</h2>
+                <p class="auth-subtitle">Únete a TravelPlus</p>
+
+                <form method="POST" action="{{ route('registro.store') }}" class="auth-form">
+                    @csrf
+
+                    <div class="form-group">
+                        <label for="nombre_apellidos">Nombre y apellidos</label>
+                        <input id="nombre_apellidos" name="nombre_apellidos" type="text" required value="{{ old('nombre_apellidos') }}" placeholder="Juan García López">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="username">Nombre de usuario</label>
+                        <input id="username" name="username" type="text" required value="{{ old('username') }}" placeholder="juangarcia">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Correo electrónico</label>
+                        <input id="email" name="email" type="email" required value="{{ old('email') }}" placeholder="juan@ejemplo.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fecha_nacimiento">Fecha de nacimiento</label>
+                        <input id="fecha_nacimiento" name="fecha_nacimiento" type="date" required value="{{ old('fecha_nacimiento') }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reg_password">Contraseña</label>
+                        <input id="reg_password" name="password" type="password" required placeholder="••••••••">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password_confirmation">Confirmar contraseña</label>
+                        <input id="password_confirmation" name="password_confirmation" type="password" required placeholder="••••••••">
+                    </div>
+
+                    <button type="submit" class="btn-primary">Crear Cuenta</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    @endguest
 
     <section class="explore-section">
         <div class="explore-header">
@@ -26,148 +127,173 @@
             <p>Descubre lugares increíbles para tus próximas vacaciones</p>
         </div>
 
-        <div class="explore-filters">
-            <input type="text" placeholder="🔍 Buscar destino..." class="search-input">
-            <select class="filter-select">
-                <option>Todas las provincias</option>
-                <option>Madrid</option>
-                <option>Barcelona</option>
-                <option>Valencia</option>
-                <option>Sevilla</option>
-                <option>Bilbao</option>
-                <option>Málaga</option>
-            </select>
-            <select class="filter-select">
-                <option>Cualquier clima</option>
-                <option>Playa</option>
-                <option>Montaña</option>
-                <option>Ciudad</option>
-            </select>
-        </div>
+
 
         <div class="destinations-grid">
-            <!-- Destino 1 -->
+            <!-- Ávila -->
             <div class="destination-card">
                 <div class="destination-image" style="background: linear-gradient(135deg, #A89B9B, #9D8B7E);">
-                    🏛️
-                </div>
-                <div class="destination-content">
-                    <h3>Madrid</h3>
-                    <p class="destination-subtitle">Comunidad de Madrid</p>
-                    <p class="destination-desc">Capital cultural con museos de clase mundial y vida nocturna vibrante</p>
-                    <div class="destination-meta">
-                        <span>⭐ 4.8</span>
-                        <span>👥 15.2k visitantes</span>
-                    </div>
-                    <a href="{{ route('planes') }}?provincia=Madrid" class="btn-small">Explorar</a>
-                </div>
-            </div>
-
-            <!-- Destino 2 -->
-            <div class="destination-card">
-                <div class="destination-image" style="background: linear-gradient(135deg, #9D8B7E, #8B7B7B);">
                     🏰
                 </div>
                 <div class="destination-content">
-                    <h3>Barcelona</h3>
-                    <p class="destination-subtitle">Cataluña</p>
-                    <p class="destination-desc">Ciudad de arquitectura modernista, playas y energía mediterránea</p>
-                    <div class="destination-meta">
-                        <span>⭐ 4.9</span>
-                        <span>👥 18.5k visitantes</span>
+                    <h3>Ávila</h3>
+                    <p class="destination-subtitle">Castilla y León</p>
+                    <p class="destination-desc">Murallas medievales, patrimonio histórico y arquitectura antigua</p>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px;">
+                        <a href="{{ route('hoteles') }}?provincia=Ávila" class="btn-small" style="font-size: 0.8rem; padding: 8px 5px;">Hoteles</a>
+                        <a href="{{ route('restaurantes') }}?provincia=Ávila" class="btn-small" style="font-size: 0.8rem; padding: 8px 5px;">Restaurantes</a>
+                        <a href="{{ route('museos') }}?provincia=Ávila" class="btn-small" style="font-size: 0.8rem; padding: 8px 5px;">Museos</a>
+                        <a href="{{ route('fiestas') }}?provincia=Ávila" class="btn-small" style="font-size: 0.8rem; padding: 8px 5px;">Fiestas</a>
                     </div>
-                    <a href="{{ route('planes') }}?provincia=Barcelona" class="btn-small">Explorar</a>
                 </div>
             </div>
 
-            <!-- Destino 3 -->
+            <!-- Burgos -->
+            <div class="destination-card">
+                <div class="destination-image" style="background: linear-gradient(135deg, #9D8B7E, #8B7B7B);">
+                    ⛪
+                </div>
+                <div class="destination-content">
+                    <h3>Burgos</h3>
+                    <p class="destination-subtitle">Castilla y León</p>
+                    <p class="destination-desc">Catedral gótica, caminos de peregrinación y tradición medieval</p>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px;">
+                        <a href="{{ route('hoteles') }}?provincia=Burgos" class="btn-small" style="font-size: 0.8rem; padding: 8px 5px;">Hoteles</a>
+                        <a href="{{ route('restaurantes') }}?provincia=Burgos" class="btn-small" style="font-size: 0.8rem; padding: 8px 5px;">Restaurantes</a>
+                        <a href="{{ route('museos') }}?provincia=Burgos" class="btn-small" style="font-size: 0.8rem; padding: 8px 5px;">Museos</a>
+                        <a href="{{ route('fiestas') }}?provincia=Burgos" class="btn-small" style="font-size: 0.8rem; padding: 8px 5px;">Fiestas</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- León -->
             <div class="destination-card">
                 <div class="destination-image" style="background: linear-gradient(135deg, #C0B5AA, #A89B9B);">
-                    🌊
+                    👑
                 </div>
                 <div class="destination-content">
-                    <h3>Valencia</h3>
-                    <p class="destination-subtitle">Comunidad Valenciana</p>
-                    <p class="destination-desc">Innovación futurista, tradiciones milenarias y deliciosa gastronomía</p>
-                    <div class="destination-meta">
-                        <span>⭐ 4.7</span>
-                        <span>👥 12.3k visitantes</span>
+                    <h3>León</h3>
+                    <p class="destination-subtitle">Castilla y León</p>
+                    <p class="destination-desc">Camino de Santiago, basílica románica y rica historia medieval</p>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px;">
+                        <a href="{{ route('hoteles') }}?provincia=León" class="btn-small" style="font-size: 0.8rem; padding: 8px 5px;">Hoteles</a>
+                        <a href="{{ route('restaurantes') }}?provincia=León" class="btn-small" style="font-size: 0.8rem; padding: 8px 5px;">Restaurantes</a>
+                        <a href="{{ route('museos') }}?provincia=León" class="btn-small" style="font-size: 0.8rem; padding: 8px 5px;">Museos</a>
+                        <a href="{{ route('fiestas') }}?provincia=León" class="btn-small" style="font-size: 0.8rem; padding: 8px 5px;">Fiestas</a>
                     </div>
-                    <a href="{{ route('planes') }}?provincia=Valencia" class="btn-small">Explorar</a>
                 </div>
             </div>
 
-            <!-- Destino 4 -->
+            <!-- Palencia -->
             <div class="destination-card">
                 <div class="destination-image" style="background: linear-gradient(135deg, #8B7B7B, #D4CCC4);">
-                    🎭
+                    🌾
                 </div>
                 <div class="destination-content">
-                    <h3>Sevilla</h3>
-                    <p class="destination-subtitle">Andalucía</p>
-                    <p class="destination-desc">Flamenco, pasión andaluza y monumentos históricos impresionantes</p>
-                    <div class="destination-meta">
-                        <span>⭐ 4.8</span>
-                        <span>👥 14.7k visitantes</span>
+                    <h3>Palencia</h3>
+                    <p class="destination-subtitle">Castilla y León</p>
+                    <p class="destination-desc">Catedral románica, paisajes rurales y patrimonio agrario</p>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px;">
+                        <a href="{{ route('hoteles') }}?provincia=Palencia" class="btn-small" style="font-size: 0.8rem; padding: 8px 5px;">Hoteles</a>
+                        <a href="{{ route('restaurantes') }}?provincia=Palencia" class="btn-small" style="font-size: 0.8rem; padding: 8px 5px;">Restaurantes</a>
+                        <a href="{{ route('museos') }}?provincia=Palencia" class="btn-small" style="font-size: 0.8rem; padding: 8px 5px;">Museos</a>
+                        <a href="{{ route('fiestas') }}?provincia=Palencia" class="btn-small" style="font-size: 0.8rem; padding: 8px 5px;">Fiestas</a>
                     </div>
-                    <a href="{{ route('planes') }}?provincia=Sevilla" class="btn-small">Explorar</a>
                 </div>
             </div>
 
-            <!-- Destino 5 -->
+            <!-- Segovia -->
             <div class="destination-card">
                 <div class="destination-image" style="background: linear-gradient(135deg, #A89B9B, #C0B5AA);">
-                    🎨
+                    👸
                 </div>
                 <div class="destination-content">
-                    <h3>Bilbao</h3>
-                    <p class="destination-subtitle">País Vasco</p>
-                    <p class="destination-desc">Fusión de arte moderno, tradición vasca y gastronomía de lujo</p>
-                    <div class="destination-meta">
-                        <span>⭐ 4.7</span>
-                        <span>👥 10.9k visitantes</span>
+                    <h3>Segovia</h3>
+                    <p class="destination-subtitle">Castilla y León</p>
+                    <p class="destination-desc">Alcázar de cuento de hadas, acueducto romano y gastronomía</p>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px;">
+                        <a href="{{ route('hoteles') }}?provincia=Segovia" class="btn-small" style="font-size: 0.8rem; padding: 8px 5px;">Hoteles</a>
+                        <a href="{{ route('restaurantes') }}?provincia=Segovia" class="btn-small" style="font-size: 0.8rem; padding: 8px 5px;">Restaurantes</a>
+                        <a href="{{ route('museos') }}?provincia=Segovia" class="btn-small" style="font-size: 0.8rem; padding: 8px 5px;">Museos</a>
+                        <a href="{{ route('fiestas') }}?provincia=Segovia" class="btn-small" style="font-size: 0.8rem; padding: 8px 5px;">Fiestas</a>
                     </div>
-                    <a href="{{ route('planes') }}?provincia=Bilbao" class="btn-small">Explorar</a>
                 </div>
             </div>
 
-            <!-- Destino 6 -->
+            <!-- Soria -->
             <div class="destination-card">
                 <div class="destination-image" style="background: linear-gradient(135deg, #9D8B7E, #A89B9B);">
-                    🏖️
+                    🏞️
                 </div>
                 <div class="destination-content">
-                    <h3>Málaga</h3>
-                    <p class="destination-subtitle">Andalucía</p>
-                    <p class="destination-desc">Costa del Sol, playas doradas y clima mediterráneo envidiable</p>
-                    <div class="destination-meta">
-                        <span>⭐ 4.9</span>
-                        <span>👥 22.1k visitantes</span>
+                    <h3>Soria</h3>
+                    <p class="destination-subtitle">Castilla y León</p>
+                    <p class="destination-desc">Naturaleza salvaje, monasterio de San Juan de Duero</p>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px;">
+                        <a href="{{ route('hoteles') }}?provincia=Soria" class="btn-small" style="font-size: 0.8rem; padding: 8px 5px;">Hoteles</a>
+                        <a href="{{ route('restaurantes') }}?provincia=Soria" class="btn-small" style="font-size: 0.8rem; padding: 8px 5px;">Restaurantes</a>
+                        <a href="{{ route('museos') }}?provincia=Soria" class="btn-small" style="font-size: 0.8rem; padding: 8px 5px;">Museos</a>
+                        <a href="{{ route('fiestas') }}?provincia=Soria" class="btn-small" style="font-size: 0.8rem; padding: 8px 5px;">Fiestas</a>
                     </div>
-                    <a href="{{ route('planes') }}?provincia=Málaga" class="btn-small">Explorar</a>
+                </div>
+            </div>
+
+            <!-- Valladolid -->
+            <div class="destination-card">
+                <div class="destination-image" style="background: linear-gradient(135deg, #C0B5AA, #9D8B7E);">
+                    🎪
+                </div>
+                <div class="destination-content">
+                    <h3>Valladolid</h3>
+                    <p class="destination-subtitle">Castilla y León</p>
+                    <p class="destination-desc">Capital cultural, museos excepcionales y vida urbana moderna</p>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px;">
+                        <a href="{{ route('hoteles') }}?provincia=Valladolid" class="btn-small" style="font-size: 0.8rem; padding: 8px 5px;">Hoteles</a>
+                        <a href="{{ route('restaurantes') }}?provincia=Valladolid" class="btn-small" style="font-size: 0.8rem; padding: 8px 5px;">Restaurantes</a>
+                        <a href="{{ route('museos') }}?provincia=Valladolid" class="btn-small" style="font-size: 0.8rem; padding: 8px 5px;">Museos</a>
+                        <a href="{{ route('fiestas') }}?provincia=Valladolid" class="btn-small" style="font-size: 0.8rem; padding: 8px 5px;">Fiestas</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Zamora -->
+            <div class="destination-card">
+                <div class="destination-image" style="background: linear-gradient(135deg, #8B7B7B, #A89B9B);">
+                    🏛️
+                </div>
+                <div class="destination-content">
+                    <h3>Zamora</h3>
+                    <p class="destination-subtitle">Castilla y León</p>
+                    <p class="destination-desc">Catedral románica, fortaleza histórica y tradición medieval</p>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px;">
+                        <a href="{{ route('hoteles') }}?provincia=Zamora" class="btn-small" style="font-size: 0.8rem; padding: 8px 5px;">Hoteles</a>
+                        <a href="{{ route('restaurantes') }}?provincia=Zamora" class="btn-small" style="font-size: 0.8rem; padding: 8px 5px;">Restaurantes</a>
+                        <a href="{{ route('museos') }}?provincia=Zamora" class="btn-small" style="font-size: 0.8rem; padding: 8px 5px;">Museos</a>
+                        <a href="{{ route('fiestas') }}?provincia=Zamora" class="btn-small" style="font-size: 0.8rem; padding: 8px 5px;">Fiestas</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Salamanca -->
+            <div class="destination-card">
+                <div class="destination-image" style="background: linear-gradient(135deg, #D4CCC4, #A89B9B);">
+                    🎓
+                </div>
+                <div class="destination-content">
+                    <h3>Salamanca</h3>
+                    <p class="destination-subtitle">Castilla y León</p>
+                    <p class="destination-desc">Universidad histórica, Plaza Mayor dorada y arquitectura renacentista</p>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px;">
+                        <a href="{{ route('hoteles') }}?provincia=Salamanca" class="btn-small" style="font-size: 0.8rem; padding: 8px 5px;">Hoteles</a>
+                        <a href="{{ route('restaurantes') }}?provincia=Salamanca" class="btn-small" style="font-size: 0.8rem; padding: 8px 5px;">Restaurantes</a>
+                        <a href="{{ route('museos') }}?provincia=Salamanca" class="btn-small" style="font-size: 0.8rem; padding: 8px 5px;">Museos</a>
+                        <a href="{{ route('fiestas') }}?provincia=Salamanca" class="btn-small" style="font-size: 0.8rem; padding: 8px 5px;">Fiestas</a>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="featured-section">
-            <h2>Destinos Destacados del Mes</h2>
-            <div class="featured-grid">
-                <div class="featured-card">
-                    <div class="featured-badge">🔥 Trending</div>
-                    <h3>Ruta del Modernismo en Barcelona</h3>
-                    <p>Recorre las obras maestras arquitectónicas de Gaudí y sus contemporáneos</p>
-                    <div class="featured-rating">⭐⭐⭐⭐⭐ 5.0 (237 reseñas)</div>
-                    <a href="{{ route('planes') }}?provincia=Barcelona" class="btn-small">Ver Plan</a>
-                </div>
-                <div class="featured-card">
-                    <div class="featured-badge">✨ Nuevo</div>
-                    <h3>Experiencia Gastronómica Vasca</h3>
-                    <p>Déjate seducir por la mejor gastronomía del País Vasco</p>
-                    <div class="featured-rating">⭐⭐⭐⭐⭐ 4.9 (189 reseñas)</div>
-                    <a href="{{ route('planes') }}?provincia=Bilbao" class="btn-small">Ver Plan</a>
-                </div>
-            </div>
-        </div>
+
     </section>
 
     <footer>

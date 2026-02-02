@@ -13,9 +13,17 @@
             <ul class="nav-links">
                 <li><a href="{{ route('index') }}">Inicio</a></li>
                 <li><a href="{{ route('destinos') }}">Destinos</a></li>
-                <li><a href="{{ route('planes') }}">Crear Plan</a></li>
-                <li><a href="{{ route('mis-planes') }}" class="active">Mis Planes</a></li>
-                <li><a href="{{ route('perfil') }}">Perfil</a></li>
+                @auth
+                    <li><a href="{{ route('planes') }}">Crear Plan</a></li>
+                    <li><a href="{{ route('mis-planes') }}" class="active">Mis Planes</a></li>
+                    <li><a href="{{ route('perfil') }}">Perfil</a></li>
+                    <li><a href="{{ route('perfil') }}">Hola, {{ Auth::user()->nombre_apellidos }}</a></li>
+                @else
+                    <li><a href="#" onclick="openLoginModal(event)">Crear Plan</a></li>
+                    <li><a href="#" onclick="openLoginModal(event)">Mis Planes</a></li>
+                    <li><a href="#" onclick="openLoginModal(event)">Perfil</a></li>
+                    <li><a href="#" onclick="openLoginModal(event)">Iniciar Sesión</a></li>
+                @endauth
             </ul>
         </div>
     </nav>
@@ -27,11 +35,16 @@
                 <a href="{{ route('planes') }}" class="btn-primary">+ Nuevo Plan</a>
             </div>
 
+            @if(session('success'))
+                <div class="alert alert-success" style="margin: 12px 0; padding: 10px; border-radius: 6px; background: #d4edda; color: #155724;">
+                    {{ session('success') }}
+                </div>
+            @endif
+
             <div class="filter-tabs">
-                <button class="tab-button active" onclick="filtrarPorEstado('todos')">Todos (5)</button>
-                <button class="tab-button" onclick="filtrarPorEstado('planificando')">Planificando (2)</button>
-                <button class="tab-button" onclick="filtrarPorEstado('confirmado')">Confirmado (2)</button>
-                <button class="tab-button" onclick="filtrarPorEstado('completado')">Completado (1)</button>
+                <button class="tab-button active" onclick="filtrarPorEstado('todos')">Todos ({{ $totalPlans }})</button>
+                <button class="tab-button" onclick="filtrarPorEstado('finalizados')">Finalizados ({{ $finalizados }})</button>
+                <button class="tab-button" onclick="filtrarPorEstado('sinFinalizar')">Sin Finalizar ({{ $sinFinalizar }})</button>
             </div>
 
             <div class="my-plans-grid">
@@ -39,8 +52,7 @@
                     <p>No tienes planes guardados.</p>
                 @else
                     @foreach($plans as $p)
-                        <div class="plan-card">
-                            <div class="plan-status">Guardado</div>
+                        <div class="plan-card" data-status="{{ $p->status ?? 'planificando' }}">
                             <h3>{{ $p->provincia }} — {{ $p->municipio }}</h3>
                             <div class="plan-details">
                                 <p>📍 {{ $p->provincia }}, {{ $p->municipio }}</p>

@@ -17,9 +17,18 @@ class FestivalsController extends Controller
         // Obtener todas las localidades agrupadas por nombre
         $localities = PublicFestival::getLocalitiesWithCount();
         
+        // Obtener parámetro de provincia si existe
+        $selectedProvince = request()->get('provincia');
+        
         // Obtener todos los festivales activos
-        $festivals = PublicFestival::where('is_active', true)
-            ->orderBy('start_date', 'desc')
+        $query = PublicFestival::where('is_active', true);
+        
+        // Filtrar por provincia si se proporciona
+        if ($selectedProvince) {
+            $query->where('province', $selectedProvince);
+        }
+        
+        $festivals = $query->orderBy('start_date', 'desc')
             ->orderBy('province')
             ->orderBy('locality')
             ->orderBy('name')
@@ -28,7 +37,8 @@ class FestivalsController extends Controller
         return view('fiestas', [
             'provinces' => $provinces,
             'localities' => $localities,
-            'festivals' => $festivals
+            'festivals' => $festivals,
+            'selectedProvince' => $selectedProvince
         ]);
     }
 

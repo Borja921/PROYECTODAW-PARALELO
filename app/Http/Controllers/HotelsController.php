@@ -17,9 +17,27 @@ class HotelsController extends Controller
         // Obtener todas las localidades agrupadas por nombre
         $localities = PublicHotel::getLocalitiesWithCount();
         
+        // Obtener parámetro de provincia si existe
+        $selectedProvince = request()->get('provincia');
+        $normalizedSelected = $this->normalizeProvince($selectedProvince);
+        if ($selectedProvince && $normalizedSelected) {
+            $matchedProvince = $provinces->first(function ($prov) use ($normalizedSelected) {
+                return $this->normalizeProvince($prov) === $normalizedSelected;
+            });
+            if ($matchedProvince) {
+                $selectedProvince = $matchedProvince;
+            }
+        }
+        
         // Obtener todos los hoteles activos
-        $hotels = PublicHotel::where('is_active', true)
-            ->orderBy('province')
+        $query = PublicHotel::where('is_active', true);
+        
+        // Filtrar por provincia si se proporciona
+        if ($selectedProvince) {
+            $query->where('province', $selectedProvince);
+        }
+        
+        $hotels = $query->orderBy('province')
             ->orderBy('locality')
             ->orderBy('name')
             ->get();
@@ -27,8 +45,25 @@ class HotelsController extends Controller
         return view('hoteles', [
             'provinces' => $provinces,
             'localities' => $localities,
-            'hotels' => $hotels
+            'hotels' => $hotels,
+            'selectedProvince' => $selectedProvince
         ]);
+    }
+
+    private function normalizeProvince(?string $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+        $value = trim($value);
+        if ($value === '') {
+            return null;
+        }
+        $normalized = iconv('UTF-8', 'ASCII//TRANSLIT', $value);
+        if ($normalized === false) {
+            $normalized = $value;
+        }
+        return strtolower($normalized);
     }
 
     /**

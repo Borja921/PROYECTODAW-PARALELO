@@ -1,35 +1,172 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <h1>Selecciona un museo (opcional)</h1>
+<style>
+    .museum-card.selected {
+        border: 2px solid #4CAF50;
+        box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+    }
+    
+    .btn-selected {
+        background-color: #4CAF50 !important;
+        color: white !important;
+        cursor: default !important;
+    }
+    
+    .btn-selected:hover {
+        background-color: #45a049 !important;
+    }
+    
+    .btn-small, .btn-select-museum {
+        min-height: 36px;
+        padding: 8px 16px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .btn-primary, .btn-secondary {
+        min-height: 42px;
+        height: 42px;
+        padding: 0 20px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        box-sizing: border-box;
+        line-height: 1;
+        font-size: 14px;
+        font-weight: 500;
+        border: none;
+        cursor: pointer;
+    }
+</style>
 
-    <div style="margin-bottom:12px;">
-        <strong>Provincia:</strong> {{ $draft['provincia'] }} — <strong>Municipio:</strong> {{ $draft['municipio'] }}
-        <div><strong>Fechas:</strong> {{ $draft['start_date'] }} → {{ $draft['end_date'] }}</div>
-    </div>
-
-    @if(isset($museums) && $museums->isEmpty())
-        <p>No se han encontrado museos para la provincia/localidad seleccionada.</p>
-    @else
-        <form method="POST" action="{{ route('plan.wizard.museos.save') }}">
-            @csrf
-            <ul style="list-style:none;padding:0;">
-            @foreach($museums as $m)
-                <li style="margin-bottom:10px;padding:8px;border:1px solid #ddd;border-radius:6px;">
-                    <label>
-                        <input type="radio" name="museo_id" value="{{ $m->id }}" {{ (isset($draft['museo']) && $draft['museo']['id']==$m->id) ? 'checked' : '' }}>
-                        <strong>{{ $m->name }}</strong> — {{ $m->address ?? $m->locality }}
-                    </label>
-                </li>
-            @endforeach
-            </ul>
-
-            <div style="display:flex;gap:8px;">
+<div class="hotels-section">
+    <div class="hotels-container">
+        <div class="hotels-header">
+            <h1>Museos</h1>
+            <p class="subtitle">Explora los museos cerca de {{ $draft['municipio'] }}, {{ $draft['provincia'] }}</p>
+            
+            <div style="margin-top:20px;display:flex;gap:8px;">
                 <a class="btn-secondary" href="{{ route('plan.wizard.restaurantes') }}">Atrás</a>
-                <button type="submit" class="btn-primary">Siguiente</button>
+                <form method="POST" action="{{ route('plan.wizard.museos.save') }}" id="selectMuseumForm" style="display:inline;">
+                    @csrf
+                    <input type="hidden" name="museo_id" id="selected_museum_id" value="{{ $draft['museo']['id'] ?? '' }}">
+                    <button type="submit" class="btn-primary">Siguiente</button>
+                </form>
             </div>
-        </form>
-    @endif
+        </div>
+
+        <div id="museums-grid" class="hotels-grid" style="margin-top:20px;">
+            @if($museums->isEmpty())
+                <div class="placeholder-container">
+                    <p class="placeholder-text">No se han encontrado museos para la localidad seleccionada.</p>
+                </div>
+            @else
+                {{-- El JS rellenará las tarjetas dinámicamente usando todosMuseos --}}
+            @endif
+        </div>
+
+        <div id="no-results" class="no-results-message" style="display: none;">
+            <p>No se encontraron museos para la localidad seleccionada.</p>
+        </div>
+    </div>
 </div>
+
+<script>
+    const todosMuseos = @json($museums);
+
+    function mostrarMuseos(museos) {
+        const museumsGrid = document.getElementById('museums-grid');
+        const noResults = document.getElementById('no-results');
+        
+        if (museos.length === 0) {
+            museumsGrid.innerHTML = '<div class="placeholder-container"><p class="placeholder-text">No hay museos disponibles para los filtros seleccionados</p></div>';
+            noResults.style.display = 'none';
+            return;
+        }
+
+        noResults.style.display = 'none';
+        let html = '';
+
+        museos.forEach(museo => {
+            const phoneLink = museo.phone ? `<p><strong>📞 Teléfono:</strong> <a href="tel:${museo.phone}">${museo.phone}</a></p>` : '';
+            const emailLink = museo.email ? `<p><strong>📧 Email:</strong> <a href="mailto:${museo.email}">${museo.email}</a></p>` : '';
+            const website = museo.website ? `<p><strong>🌐 Sitio Web:</strong> <a href="${museo.website}" target="_blank">Visitar web</a></p>` : '';
+
+            html += `
+                <div class="hotel-card museum-card">
+                    <div class="hotel-header">
+                        <div class="hotel-title">
+                            <h3>${museo.name}</h3>
+                            <p class="hotel-location">📍 ${museo.locality}, ${museo.province}</p>
+                        </div>
+                    </div>
+
+                    <div class="hotel-body">
+                        ${museo.classification ? `<p class="hotel-classification"><strong>Tipo:</strong> ${museo.classification}</p>` : ''}
+                        ${museo.address ? `<p class="hotel-address"><strong>Dirección:</strong> ${museo.address}</p>` : ''}
+                        ${museo.postal_code ? `<p class="hotel-postal"><strong>Código Postal:</strong> ${museo.postal_code}</p>` : ''}
+
+                        <div class="hotel-contact">
+                            ${phoneLink}
+                            ${emailLink}
+                            ${website}
+                        </div>
+
+                        ${museo.description ? `<p class="hotel-description">${museo.description}</p>` : ''}
+                    </div>
+
+                    <div class="hotel-footer">
+                        <div class="hotel-rating">
+                            ${museo.rating ? `<span class="rating-stars">⭐ ${museo.rating}/5.0</span>` : ''}
+                            ${museo.reviews_count > 0 ? `<span class="reviews-count">(${museo.reviews_count} reseñas)</span>` : ''}
+                        </div>
+                        <button class="btn-small btn-select-museum" data-museum-id="${museo.id}">Seleccionar</button>
+                    </div>
+                </div>
+            `;
+        });
+
+        museumsGrid.innerHTML = html;
+
+        document.querySelectorAll('.btn-select-museum').forEach((btn) => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                
+                const museumId = this.getAttribute('data-museum-id');
+                const card = this.closest('.museum-card');
+                
+                document.querySelectorAll('.museum-card.selected').forEach(c => {
+                    c.classList.remove('selected');
+                    c.querySelector('.btn-select-museum').textContent = 'Seleccionar';
+                    c.querySelector('.btn-select-museum').classList.remove('btn-selected');
+                });
+                
+                card.classList.add('selected');
+                this.textContent = '✓ Seleccionado';
+                this.classList.add('btn-selected');
+                
+                document.getElementById('selected_museum_id').value = museumId;
+            });
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        mostrarMuseos(todosMuseos);
+
+        @if(isset($draft['museo']) && $draft['museo']['id'])
+            setTimeout(() => {
+                const id = {{ $draft['museo']['id'] }};
+                document.querySelectorAll('.btn-select-museum').forEach((btn) => {
+                    if (btn.getAttribute('data-museum-id') == id) {
+                        btn.click();
+                    }
+                });
+            }, 100);
+        @endif
+    });
+</script>
+
 @endsection
