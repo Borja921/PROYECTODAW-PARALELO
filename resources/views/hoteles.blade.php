@@ -51,13 +51,6 @@
                                     <h3>{{ $hotel->name }}</h3>
                                     <p class="hotel-location">📍 {{ $hotel->locality }}, {{ $hotel->province }}</p>
                                 </div>
-                                @if($hotel->stars)
-                                    <div class="hotel-stars">
-                                        @for($i = 0; $i < $hotel->stars; $i++)
-                                            ⭐
-                                        @endfor
-                                    </div>
-                                @endif
                             </div>
 
                             <div class="hotel-body">
@@ -114,17 +107,6 @@
                             </div>
 
                             <div class="hotel-footer">
-                                <div class="hotel-rating">
-                                    @if($hotel->rating)
-                                        <span class="rating-stars">⭐ {{ $hotel->rating }}/5.0</span>
-                                    @endif
-                                    @if($hotel->reviews_count > 0)
-                                        <span class="reviews-count">({{ $hotel->reviews_count }} reseñas)</span>
-                                    @endif
-                                </div>
-                                <a href="{{ $hotel->website ?? '#' }}" class="btn-small" target="_blank">
-                                    📅 Reservar
-                                </a>
                             </div>
                         </div>
                     @endforeach
@@ -248,7 +230,6 @@
             let html = '';
 
             hoteles.forEach(hotel => {
-                const estrellas = '⭐'.repeat(hotel.stars || 0);
                 const phoneLink = hotel.phone ? `<p><strong>📞 Teléfono:</strong> <a href="tel:${hotel.phone}">${hotel.phone}</a></p>` : '';
                 const emailLink = hotel.email ? `<p><strong>📧 Email:</strong> <a href="mailto:${hotel.email}">${hotel.email}</a></p>` : '';
                 const website = hotel.website ? `<p><strong>🌐 Sitio Web:</strong> <a href="${hotel.website}" target="_blank">Visitar web</a></p>` : '';
@@ -260,7 +241,6 @@
                                 <h3>${hotel.name}</h3>
                                 <p class="hotel-location">📍 ${hotel.locality}, ${hotel.province}</p>
                             </div>
-                            ${hotel.stars ? `<div class="hotel-stars">${estrellas}</div>` : ''}
                         </div>
 
                         <div class="hotel-body">
@@ -276,14 +256,6 @@
                             </div>
 
                             ${hotel.description ? `<p class="hotel-description">${hotel.description}</p>` : ''}
-                        </div>
-
-                        <div class="hotel-footer">
-                            <div class="hotel-rating">
-                                ${hotel.rating ? `<span class="rating-stars">⭐ ${hotel.rating}/5.0</span>` : ''}
-                                ${hotel.reviews_count > 0 ? `<span class="reviews-count">(${hotel.reviews_count} reseñas)</span>` : ''}
-                            </div>
-                            ${hotel.website ? `<a href="${hotel.website}" class="btn-small" target="_blank">📅 Reservar</a>` : `<button class="btn-small" disabled>Sin datos</button>`}
                         </div>
                     </div>
                 `;

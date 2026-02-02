@@ -92,7 +92,36 @@ class PlanesController extends Controller
             abort(403, 'No tienes permiso para ver este plan.');
         }
 
-        return view('detalle-plan', ['plan' => $plan]);
+        $items = $plan->items ?? [];
+
+        $hotelIds = collect($items['hotels'] ?? [])->pluck('id')->filter()->values();
+        $restaurantIds = collect($items['restaurantes'] ?? [])->pluck('id')->filter()->values();
+        $museumIds = collect($items['museos'] ?? [])->pluck('id')->filter()->values();
+        $festivalIds = collect($items['fiestas'] ?? [])->pluck('id')->filter()->values();
+
+        $selectedHotels = $hotelIds->isNotEmpty()
+            ? \App\Models\PublicHotel::whereIn('id', $hotelIds)->get()
+            : collect();
+
+        $selectedRestaurants = $restaurantIds->isNotEmpty()
+            ? \App\Models\PublicRestaurant::whereIn('id', $restaurantIds)->get()
+            : collect();
+
+        $selectedMuseums = $museumIds->isNotEmpty()
+            ? \App\Models\PublicMuseum::whereIn('id', $museumIds)->get()
+            : collect();
+
+        $selectedFestivals = $festivalIds->isNotEmpty()
+            ? \App\Models\PublicFestival::whereIn('id', $festivalIds)->get()
+            : collect();
+
+        return view('detalle-plan', [
+            'plan' => $plan,
+            'selectedHotels' => $selectedHotels,
+            'selectedRestaurants' => $selectedRestaurants,
+            'selectedMuseums' => $selectedMuseums,
+            'selectedFestivals' => $selectedFestivals,
+        ]);
     }
 
     /**

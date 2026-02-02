@@ -28,60 +28,58 @@ const provinciasCoordenadas = {
     'zamora': [41.5034, -5.7467]
 };
 
-// Coordenadas de municipios importantes por provincia
-const municipiosCoordenadas = {
-    'avila': {
-        'avila': [40.6561, -4.6818],
-        'arevalo': [41.0627, -4.7203],
-        'arenas de san pedro': [40.2133, -5.0889]
-    },
-    'burgos': {
-        'burgos': [42.3439, -3.6969],
-        'miranda de ebro': [42.6869, -2.9467],
-        'aranda de duero': [41.6726, -3.6889]
-    },
-    'leon': {
-        'leon': [42.5987, -5.5671],
-        'ponferrada': [42.5500, -6.5833],
-        'san andres del rabanedo': [42.6167, -5.6167]
-    },
-    'palencia': {
-        'palencia': [42.0097, -4.5288],
-        'guardo': [42.7917, -4.8444],
-        'aguilar de campoo': [42.7897, -4.2644]
-    },
-    'salamanca': {
-        'salamanca': [40.9651, -5.6640],
-        'bejar': [40.3856, -5.7611],
-        'ciudad rodrigo': [40.5981, -6.5292]
-    },
-    'segovia': {
-        'segovia': [40.9429, -4.1088],
-        'cuellar': [41.4014, -4.3167],
-        'san ildefonso': [40.9014, -4.0142]
-    },
-    'soria': {
-        'soria': [41.7665, -2.4790],
-        'almazan': [41.4833, -2.5333],
-        'el burgo de osma': [41.5875, -3.0689]
-    },
-    'valladolid': {
-        'valladolid': [41.6523, -4.7245],
-        'medina del campo': [41.3097, -4.9169],
-        'laguna de duero': [41.5928, -4.7217]
-    },
-    'zamora': {
-        'zamora': [41.5034, -5.7467],
-        'benavente': [42.0031, -5.6781],
-        'toro': [41.5197, -5.3986]
+// Cache de coordenadas de municipios obtenidas dinámicamente
+const municipiosCoordenadas = {};
+
+// Función para obtener coordenadas de un municipio usando Nominatim (OpenStreetMap)
+async function getCoordinatesForMunicipio(municipio, provincia) {
+    const cacheKey = `${normalizeKey(provincia)}_${normalizeKey(municipio)}`;
+    
+    // Si ya tenemos las coordenadas en cache, retornarlas
+    if (municipiosCoordenadas[cacheKey]) {
+        return municipiosCoordenadas[cacheKey];
     }
-};
+    
+    try {
+        // Buscar usando Nominatim API
+        const query = `${municipio}, ${provincia}, España`;
+        const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1&countrycodes=es`;
+        
+        console.log('Buscando coordenadas para:', query);
+        
+        const response = await fetch(url, {
+            headers: {
+                'User-Agent': 'TravelPlus App'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error('Error en la búsqueda de coordenadas');
+        }
+        
+        const data = await response.json();
+        
+        if (data && data.length > 0) {
+            const coords = [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+            municipiosCoordenadas[cacheKey] = coords;
+            console.log('Coordenadas encontradas:', municipio, coords);
+            return coords;
+        }
+        
+        console.warn('No se encontraron coordenadas para:', municipio);
+        return null;
+        
+    } catch (error) {
+        console.error('Error obteniendo coordenadas:', error);
+        return null;
+    }
+}
 
 // API Key de OpenWeatherMap - Esta es una clave demo, deberías usar la tuya propia
 const WEATHER_API_KEY = 'f8c5e1a8e8f8e8f8e8f8e8f8e8f8e8f8'; // Reemplaza con tu API key de openweathermap.org
 
 // Inicializar mapa cuando se seleccione provincia y municipio
-function initializeMap(provincia, municipio) {
+async function initializeMap(provincia, municipio) {
     console.log('Inicializando mapa:', provincia, municipio);
     const mapContainer = document.getElementById('mapContainer');
     const mapDiv = document.getElementById('map');
@@ -94,14 +92,21 @@ function initializeMap(provincia, municipio) {
     mapContainer.style.display = 'block';
     
     const provinciaKey = normalizeKey(provincia);
-    const municipioKey = normalizeKey(municipio);
-
-    // Buscar coordenadas del municipio específico o usar las de la provincia
     let coords = provinciasCoordenadas[provinciaKey] || [41.6523, -4.7245];
+    let zoomLevel = 9;
+    let locationName = provincia;
     
-    if (municipioKey && municipiosCoordenadas[provinciaKey] && municipiosCoordenadas[provinciaKey][municipioKey]) {
-        coords = municipiosCoordenadas[provinciaKey][municipioKey];
-        console.log('Coordenadas del municipio:', municipio, coords);
+    // Si hay municipio seleccionado, obtener sus coordenadas
+    if (municipio) {
+        const municipioCoords = await getCoordinatesForMunicipio(municipio, provincia);
+        if (municipioCoords) {
+            coords = municipioCoords;
+            zoomLevel = 13;
+            locationName = municipio;
+            console.log('Usando coordenadas del municipio:', municipio, coords);
+        } else {
+            console.log('Usando coordenadas de la provincia como fallback:', provincia, coords);
+        }
     } else {
         console.log('Usando coordenadas de la provincia:', provincia, coords);
     }
@@ -109,7 +114,7 @@ function initializeMap(provincia, municipio) {
     // Si el mapa no existe, crearlo
     if (!map) {
         console.log('Creando nuevo mapa');
-        map = L.map('map').setView(coords, municipio ? 12 : 9);
+        map = L.map('map').setView(coords, zoomLevel);
         
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors',
@@ -124,9 +129,12 @@ function initializeMap(provincia, municipio) {
             shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png'
         });
     } else {
-        // Si ya existe, solo actualizar vista
-        console.log('Actualizando vista del mapa');
-        map.setView(coords, municipio ? 12 : 9);
+        // Si ya existe, actualizar vista con animación
+        console.log('Actualizando vista del mapa a:', locationName, coords, 'zoom:', zoomLevel);
+        map.setView(coords, zoomLevel, {
+            animate: true,
+            duration: 1
+        });
     }
     
     // Eliminar marcador anterior si existe
@@ -138,7 +146,7 @@ function initializeMap(provincia, municipio) {
     marker = L.marker(coords).addTo(map);
     const popupText = municipio ? `<b>${municipio}</b><br><small>${provincia}</small>` : `<b>${provincia}</b>`;
     marker.bindPopup(popupText).openPopup();
-        console.log('Marcador agregado en:', coords);
+    console.log('Marcador agregado en:', coords);
     
     // Forzar actualización del tamaño del mapa
     setTimeout(() => {

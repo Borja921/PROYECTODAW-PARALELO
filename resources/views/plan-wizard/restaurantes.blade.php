@@ -52,7 +52,7 @@
                 <a class="btn-secondary" href="{{ route('plan.wizard.hoteles') }}">Atrás</a>
                 <form method="POST" action="{{ route('plan.wizard.restaurantes.save') }}" id="selectRestaurantForm" style="display:inline;">
                     @csrf
-                    <input type="hidden" name="restaurante_id" id="selected_restaurant_id" value="{{ $draft['restaurante']['id'] ?? '' }}">
+                    <div id="selected_restaurants_container"></div>
                     <button type="submit" class="btn-primary">Siguiente</button>
                 </form>
             </div>
@@ -120,10 +120,6 @@
                     </div>
 
                     <div class="hotel-footer">
-                        <div class="hotel-rating">
-                            ${restaurant.rating ? `<span class="rating-stars">⭐ ${restaurant.rating}/5.0</span>` : ''}
-                            ${restaurant.reviews_count > 0 ? `<span class="reviews-count">(${restaurant.reviews_count} reseñas)</span>` : ''}
-                        </div>
                         <button class="btn-small btn-select-restaurant" data-restaurant-id="${restaurant.id}">Seleccionar</button>
                     </div>
                 </div>
@@ -140,21 +136,39 @@
                 const restaurantId = this.getAttribute('data-restaurant-id');
                 const card = this.closest('.restaurant-card');
                 
-                // Limpiar selecciones previas
-                document.querySelectorAll('.restaurant-card.selected').forEach(c => {
-                    c.classList.remove('selected');
-                    c.querySelector('.btn-select-restaurant').textContent = 'Seleccionar';
-                    c.querySelector('.btn-select-restaurant').classList.remove('btn-selected');
-                });
+                // Toggle selección
+                if (card.classList.contains('selected')) {
+                    card.classList.remove('selected');
+                    this.textContent = 'Seleccionar';
+                    this.classList.remove('btn-selected');
+                } else {
+                    card.classList.add('selected');
+                    this.textContent = '✓ Seleccionado';
+                    this.classList.add('btn-selected');
+                }
                 
-                // Marcar como seleccionado
-                card.classList.add('selected');
-                this.textContent = '✓ Seleccionado';
-                this.classList.add('btn-selected');
-                
-                // Guardar ID en el input hidden
-                document.getElementById('selected_restaurant_id').value = restaurantId;
+                // Actualizar inputs hidden
+                updateSelectedRestaurants();
             });
+        });
+    }
+
+    function updateSelectedRestaurants() {
+        const selectedIds = [];
+        document.querySelectorAll('.restaurant-card.selected').forEach(card => {
+            const btn = card.querySelector('.btn-select-restaurant');
+            const restaurantId = btn.getAttribute('data-restaurant-id');
+            selectedIds.push(restaurantId);
+        });
+        
+        const container = document.getElementById('selected_restaurants_container');
+        container.innerHTML = '';
+        selectedIds.forEach(id => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'restaurante_ids[]';
+            input.value = id;
+            container.appendChild(input);
         });
     }
 
@@ -163,12 +177,12 @@
         // Mostrar los restaurantes ya filtrados por el servidor
         mostrarRestaurantes(todosRestaurantes);
 
-        // Si hay restaurante seleccionado en draft, marcarlo
-        @if(isset($draft['restaurante']) && $draft['restaurante']['id'])
+        // Si hay restaurantes seleccionados en draft, marcarlos
+        @if(isset($draft['restaurantes']) && is_array($draft['restaurantes']) && count($draft['restaurantes']) > 0)
             setTimeout(() => {
-                const id = {{ $draft['restaurante']['id'] }};
+                const selectedIds = {!! json_encode(array_column($draft['restaurantes'], 'id')) !!};
                 document.querySelectorAll('.btn-select-restaurant').forEach((btn) => {
-                    if (btn.getAttribute('data-restaurant-id') == id) {
+                    if (selectedIds.includes(parseInt(btn.getAttribute('data-restaurant-id')))) {
                         btn.click();
                     }
                 });

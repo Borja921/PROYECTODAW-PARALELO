@@ -54,7 +54,7 @@ Route::post('/registro', [RegistroController::class, 'register'])->name('registr
 
 Route::get('/login', [LoginController::class, 'showForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.post');
-Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::get('/planes/{id}', function ($id) {
     return view('detalle-plan');
@@ -102,4 +102,5 @@ Route::middleware('auth')->prefix('plan/wizard')->name('plan.wizard.')->group(fu
     // Resumen y finalizar
     Route::get('/summary', [PlanWizardController::class, 'summary'])->name('summary');
     Route::post('/finalize', [PlanWizardController::class, 'finalize'])->name('finalize');
+    Route::post('/remove-item', [PlanWizardController::class, 'removeItem'])->name('remove-item');
 });

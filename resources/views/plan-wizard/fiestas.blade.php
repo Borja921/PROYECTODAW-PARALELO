@@ -52,7 +52,7 @@
                 <a class="btn-secondary" href="{{ route('plan.wizard.museos') }}">Atrás</a>
                 <form method="POST" action="{{ route('plan.wizard.fiestas.save') }}" id="selectFestivalForm" style="display:inline;">
                     @csrf
-                    <input type="hidden" name="fiesta_id" id="selected_festival_id" value="{{ $draft['fiesta']['id'] ?? '' }}">
+                    <div id="selected_festivals_container"></div>
                     <button type="submit" class="btn-primary">Siguiente</button>
                 </form>
             </div>
@@ -111,7 +111,6 @@
                     </div>
 
                     <div class="hotel-footer">
-                        <div class="hotel-rating"></div>
                         <button class="btn-small btn-select-festival" data-festival-id="${fiesta.id}">Seleccionar</button>
                     </div>
                 </div>
@@ -127,29 +126,50 @@
                 const festivalId = this.getAttribute('data-festival-id');
                 const card = this.closest('.festival-card');
                 
-                document.querySelectorAll('.festival-card.selected').forEach(c => {
-                    c.classList.remove('selected');
-                    c.querySelector('.btn-select-festival').textContent = 'Seleccionar';
-                    c.querySelector('.btn-select-festival').classList.remove('btn-selected');
-                });
+                // Toggle selección
+                if (card.classList.contains('selected')) {
+                    card.classList.remove('selected');
+                    this.textContent = 'Seleccionar';
+                    this.classList.remove('btn-selected');
+                } else {
+                    card.classList.add('selected');
+                    this.textContent = '✓ Seleccionado';
+                    this.classList.add('btn-selected');
+                }
                 
-                card.classList.add('selected');
-                this.textContent = '✓ Seleccionado';
-                this.classList.add('btn-selected');
-                
-                document.getElementById('selected_festival_id').value = festivalId;
+                // Actualizar inputs hidden
+                updateSelectedFestivals();
             });
+        });
+    }
+
+    function updateSelectedFestivals() {
+        const selectedIds = [];
+        document.querySelectorAll('.festival-card.selected').forEach(card => {
+            const btn = card.querySelector('.btn-select-festival');
+            const festivalId = btn.getAttribute('data-festival-id');
+            selectedIds.push(festivalId);
+        });
+        
+        const container = document.getElementById('selected_festivals_container');
+        container.innerHTML = '';
+        selectedIds.forEach(id => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'fiesta_ids[]';
+            input.value = id;
+            container.appendChild(input);
         });
     }
 
     document.addEventListener('DOMContentLoaded', function() {
         mostrarFiestas(todasFiestas);
 
-        @if(isset($draft['fiesta']) && $draft['fiesta']['id'])
+        @if(isset($draft['fiestas']) && is_array($draft['fiestas']) && count($draft['fiestas']) > 0)
             setTimeout(() => {
-                const id = {{ $draft['fiesta']['id'] }};
+                const selectedIds = {!! json_encode(array_column($draft['fiestas'], 'id')) !!};
                 document.querySelectorAll('.btn-select-festival').forEach((btn) => {
-                    if (btn.getAttribute('data-festival-id') == id) {
+                    if (selectedIds.includes(parseInt(btn.getAttribute('data-festival-id')))) {
                         btn.click();
                     }
                 });

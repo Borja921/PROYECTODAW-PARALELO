@@ -52,7 +52,7 @@
                 <a class="btn-secondary" href="{{ route('plan.wizard.restaurantes') }}">Atrás</a>
                 <form method="POST" action="{{ route('plan.wizard.museos.save') }}" id="selectMuseumForm" style="display:inline;">
                     @csrf
-                    <input type="hidden" name="museo_id" id="selected_museum_id" value="{{ $draft['museo']['id'] ?? '' }}">
+                    <div id="selected_museums_container"></div>
                     <button type="submit" class="btn-primary">Siguiente</button>
                 </form>
             </div>
@@ -119,10 +119,6 @@
                     </div>
 
                     <div class="hotel-footer">
-                        <div class="hotel-rating">
-                            ${museo.rating ? `<span class="rating-stars">⭐ ${museo.rating}/5.0</span>` : ''}
-                            ${museo.reviews_count > 0 ? `<span class="reviews-count">(${museo.reviews_count} reseñas)</span>` : ''}
-                        </div>
                         <button class="btn-small btn-select-museum" data-museum-id="${museo.id}">Seleccionar</button>
                     </div>
                 </div>
@@ -138,29 +134,50 @@
                 const museumId = this.getAttribute('data-museum-id');
                 const card = this.closest('.museum-card');
                 
-                document.querySelectorAll('.museum-card.selected').forEach(c => {
-                    c.classList.remove('selected');
-                    c.querySelector('.btn-select-museum').textContent = 'Seleccionar';
-                    c.querySelector('.btn-select-museum').classList.remove('btn-selected');
-                });
+                // Toggle selección
+                if (card.classList.contains('selected')) {
+                    card.classList.remove('selected');
+                    this.textContent = 'Seleccionar';
+                    this.classList.remove('btn-selected');
+                } else {
+                    card.classList.add('selected');
+                    this.textContent = '✓ Seleccionado';
+                    this.classList.add('btn-selected');
+                }
                 
-                card.classList.add('selected');
-                this.textContent = '✓ Seleccionado';
-                this.classList.add('btn-selected');
-                
-                document.getElementById('selected_museum_id').value = museumId;
+                // Actualizar inputs hidden
+                updateSelectedMuseums();
             });
+        });
+    }
+
+    function updateSelectedMuseums() {
+        const selectedIds = [];
+        document.querySelectorAll('.museum-card.selected').forEach(card => {
+            const btn = card.querySelector('.btn-select-museum');
+            const museumId = btn.getAttribute('data-museum-id');
+            selectedIds.push(museumId);
+        });
+        
+        const container = document.getElementById('selected_museums_container');
+        container.innerHTML = '';
+        selectedIds.forEach(id => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'museo_ids[]';
+            input.value = id;
+            container.appendChild(input);
         });
     }
 
     document.addEventListener('DOMContentLoaded', function() {
         mostrarMuseos(todosMuseos);
 
-        @if(isset($draft['museo']) && $draft['museo']['id'])
+        @if(isset($draft['museos']) && is_array($draft['museos']) && count($draft['museos']) > 0)
             setTimeout(() => {
-                const id = {{ $draft['museo']['id'] }};
+                const selectedIds = {!! json_encode(array_column($draft['museos'], 'id')) !!};
                 document.querySelectorAll('.btn-select-museum').forEach((btn) => {
-                    if (btn.getAttribute('data-museum-id') == id) {
+                    if (selectedIds.includes(parseInt(btn.getAttribute('data-museum-id')))) {
                         btn.click();
                     }
                 });

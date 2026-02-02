@@ -13,25 +13,60 @@ class MuseumsController extends Controller
     {
         // Obtener todas las provincias
         $provinces = PublicMuseum::getProvinces();
-        
+
         // Obtener todas las localidades agrupadas por nombre
         $localities = PublicMuseum::getLocalitiesWithCount();
-        
+
         // Obtener parámetro de provincia si existe
         $selectedProvince = request()->get('provincia');
-        
+
+        // Función para normalizar strings
+        $normalizeString = function($str) {
+            if (mb_detect_encoding($str, 'UTF-8', true) === false) {
+                $str = utf8_encode($str);
+            }
+
+            $str = strtolower($str);
+            // Primero reemplazar ? por espacio vacío para manejar casos como "le?n"
+            $str = str_replace('?', '', $str);
+            $str = str_replace(['á', 'é', 'í', 'ó', 'ú', 'ñ', 'ü', 'à', 'è', 'ì', 'ò', 'ù'],
+                              ['a', 'e', 'i', 'o', 'u', 'n', 'u', 'a', 'e', 'i', 'o', 'u'], $str);
+            $str = preg_replace('/[^a-z0-9\s\-]/', '', $str);
+            return trim($str);
+        };
+
         // Obtener todos los museos activos
-        $query = PublicMuseum::where('is_active', true);
-        
-        // Filtrar por provincia si se proporciona
+        $allMuseums = PublicMuseum::where('is_active', true)->get();
+
+        // Filtrar por locality basado en la provincia seleccionada
         if ($selectedProvince) {
-            $query->where('province', $selectedProvince);
+            $provinciaNormalizada = $normalizeString($selectedProvince);
+            
+            $museums = $allMuseums->filter(function($museum) use ($provinciaNormalizada, $normalizeString) {
+                $museumLocality = $normalizeString($museum->locality);
+                
+                // Comparación exacta o por similitud (para manejar casos como le?n vs leon)
+                if ($museumLocality === $provinciaNormalizada) {
+                    return true;
+                }
+                
+                // Si las primeras 2-3 letras coinciden y la longitud es similar, considerar match
+                $len1 = strlen($museumLocality);
+                $len2 = strlen($provinciaNormalizada);
+                
+                if (abs($len1 - $len2) <= 1 && $len1 >= 3) {
+                    $prefix1 = substr($museumLocality, 0, 2);
+                    $prefix2 = substr($provinciaNormalizada, 0, 2);
+                    if ($prefix1 === $prefix2) {
+                        return true;
+                    }
+                }
+                
+                return false;
+            })->sortBy('name')->values();
+        } else {
+            $museums = $allMuseums->sortBy('locality')->sortBy('name')->values();
         }
-        
-        $museums = $query->orderBy('province')
-            ->orderBy('locality')
-            ->orderBy('name')
-            ->get();
 
         return view('museos', [
             'provinces' => $provinces,

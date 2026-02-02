@@ -52,7 +52,7 @@
                 <a class="btn-secondary" href="{{ route('planes') }}">Atrás</a>
                 <form method="POST" action="{{ route('plan.wizard.hoteles.save') }}" id="selectHotelForm" style="display:inline;">
                     @csrf
-                    <input type="hidden" name="hotel_id" id="selected_hotel_id" value="{{ $draft['hotel']['id'] ?? '' }}">
+                    <div id="selected_hotels_container"></div>
                     <button type="submit" class="btn-primary">Siguiente</button>
                 </form>
             </div>
@@ -209,10 +209,6 @@
                     </div>
 
                     <div class="hotel-footer">
-                        <div class="hotel-rating">
-                            ${hotel.rating ? `<span class="rating-stars">⭐ ${hotel.rating}/5.0</span>` : ''}
-                            ${hotel.reviews_count > 0 ? `<span class="reviews-count">(${hotel.reviews_count} reseñas)</span>` : ''}
-                        </div>
                         <button class="btn-small btn-select-hotel" data-hotel-id="${hotel.id}">Seleccionar</button>
                     </div>
                 </div>
@@ -224,30 +220,44 @@
         // After rendering, attach click handlers to select buttons
         document.querySelectorAll('.btn-select-hotel').forEach((btn) => {
             btn.addEventListener('click', function(e) {
-                e.stopPropagation(); // Evitar que se dispare el click en la tarjeta
+                e.stopPropagation();
                 
                 const hotelId = this.getAttribute('data-hotel-id');
                 const card = this.closest('.hotel-card');
                 
-                // Limpiar selecciones previas
-                document.querySelectorAll('.hotel-card.selected').forEach(c => {
-                    c.classList.remove('selected');
-                    c.querySelector('.btn-select-hotel').textContent = 'Seleccionar';
-                    c.querySelector('.btn-select-hotel').classList.remove('btn-selected');
-                });
+                // Toggle selección
+                if (card.classList.contains('selected')) {
+                    card.classList.remove('selected');
+                    this.textContent = 'Seleccionar';
+                    this.classList.remove('btn-selected');
+                } else {
+                    card.classList.add('selected');
+                    this.textContent = '✓ Seleccionado';
+                    this.classList.add('btn-selected');
+                }
                 
-                // Marcar como seleccionado
-                card.classList.add('selected');
-                this.textContent = '✓ Seleccionado';
-                this.classList.add('btn-selected');
-                
-                // Guardar ID en el input hidden
-                document.getElementById('selected_hotel_id').value = hotelId;
-                
-                // El botón ya está visible, solo scroll si es necesario
-                const nextBtn = document.querySelector('#selectHotelForm button[type="submit"]');
-                nextBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                // Actualizar inputs hidden
+                updateSelectedHotels();
             });
+        });
+    }
+
+    function updateSelectedHotels() {
+        const selectedIds = [];
+        document.querySelectorAll('.hotel-card.selected').forEach(card => {
+            const btn = card.querySelector('.btn-select-hotel');
+            const hotelId = btn.getAttribute('data-hotel-id');
+            selectedIds.push(hotelId);
+        });
+        
+        const container = document.getElementById('selected_hotels_container');
+        container.innerHTML = '';
+        selectedIds.forEach(id => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'hotel_ids[]';
+            input.value = id;
+            container.appendChild(input);
         });
     }
 
@@ -256,14 +266,13 @@
         // Mostrar los hoteles ya filtrados por el servidor
         mostrarHoteles(todosHoteles);
 
-        // Si hay hotel seleccionado en draft, marcarlo
-        @if(isset($draft['hotel']) && $draft['hotel']['id'])
+        // Si hay hoteles seleccionados en draft, marcarlos
+        @if(isset($draft['hotels']) && is_array($draft['hotels']) && count($draft['hotels']) > 0)
             setTimeout(() => {
-                const id = {{ $draft['hotel']['id'] }};
-                document.querySelectorAll('.hotel-card').forEach((card, idx) => {
-                    if (todosHoteles[idx].id == id) {
-                        card.classList.add('selected');
-                        document.getElementById('selected_hotel_id').value = id;
+                const selectedIds = {!! json_encode(array_column($draft['hotels'], 'id')) !!};
+                document.querySelectorAll('.btn-select-hotel').forEach((btn) => {
+                    if (selectedIds.includes(parseInt(btn.getAttribute('data-hotel-id')))) {
+                        btn.click();
                     }
                 });
             }, 200);

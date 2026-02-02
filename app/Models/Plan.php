@@ -11,7 +11,7 @@ class Plan extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 'id_user', 'provincia', 'municipio', 'start_date', 'end_date', 'days', 'items', 'status'
+        'user_id', 'id_user', 'name', 'provincia', 'municipio', 'start_date', 'end_date', 'days', 'items', 'status'
     ];
 
     protected $casts = [

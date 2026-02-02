@@ -53,7 +53,7 @@
                 @else
                     @foreach($plans as $p)
                         <div class="plan-card" data-status="{{ $p->status ?? 'planificando' }}">
-                            <h3>{{ $p->provincia }} — {{ $p->municipio }}</h3>
+                            <h3>{{ $p->name ?? ($p->provincia . ' — ' . $p->municipio) }}</h3>
                             <div class="plan-details">
                                 <p>📍 {{ $p->provincia }}, {{ $p->municipio }}</p>
                                 <p>📅 {{ $p->start_date->format('Y-m-d') }} → {{ $p->end_date->format('Y-m-d') }}</p>

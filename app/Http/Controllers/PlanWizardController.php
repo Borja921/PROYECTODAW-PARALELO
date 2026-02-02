@@ -128,17 +128,18 @@ class PlanWizardController extends Controller
     public function saveHotel(Request $request)
     {
         $data = $request->validate([
-            'hotel_id' => 'nullable|exists:public_hotels,id',
+            'hotel_ids' => 'nullable|array',
+            'hotel_ids.*' => 'exists:public_hotels,id',
         ]);
 
         $draft = Session::get('draft_plan', []);
-        if (!empty($data['hotel_id'])) {
-            $hotel = PublicHotel::find($data['hotel_id']);
-            if ($hotel) {
-                $draft['hotel'] = ['id' => $hotel->id, 'name' => $hotel->name];
-            }
+        if (!empty($data['hotel_ids'])) {
+            $hotels = PublicHotel::whereIn('id', $data['hotel_ids'])->get();
+            $draft['hotels'] = $hotels->map(function($hotel) {
+                return ['id' => $hotel->id, 'name' => $hotel->name];
+            })->toArray();
         } else {
-            unset($draft['hotel']);
+            unset($draft['hotels']);
         }
 
         Session::put('draft_plan', $draft);
@@ -204,17 +205,18 @@ class PlanWizardController extends Controller
     public function saveRestaurante(Request $request)
     {
         $data = $request->validate([
-            'restaurante_id' => 'nullable|exists:public_restaurants,id',
+            'restaurante_ids' => 'nullable|array',
+            'restaurante_ids.*' => 'exists:public_restaurants,id',
         ]);
 
         $draft = Session::get('draft_plan', []);
-        if (!empty($data['restaurante_id'])) {
-            $restaurant = \App\Models\PublicRestaurant::find($data['restaurante_id']);
-            if ($restaurant) {
-                $draft['restaurante'] = ['id' => $restaurant->id, 'name' => $restaurant->name];
-            }
+        if (!empty($data['restaurante_ids'])) {
+            $restaurants = \App\Models\PublicRestaurant::whereIn('id', $data['restaurante_ids'])->get();
+            $draft['restaurantes'] = $restaurants->map(function($restaurant) {
+                return ['id' => $restaurant->id, 'name' => $restaurant->name];
+            })->toArray();
         } else {
-            unset($draft['restaurante']);
+            unset($draft['restaurantes']);
         }
         Session::put('draft_plan', $draft);
 
@@ -264,17 +266,18 @@ class PlanWizardController extends Controller
     public function saveMuseo(Request $request)
     {
         $data = $request->validate([
-            'museo_id' => 'nullable|exists:public_museums,id',
+            'museo_ids' => 'nullable|array',
+            'museo_ids.*' => 'exists:public_museums,id',
         ]);
 
         $draft = Session::get('draft_plan', []);
-        if (!empty($data['museo_id'])) {
-            $m = \App\Models\PublicMuseum::find($data['museo_id']);
-            if ($m) {
-                $draft['museo'] = ['id' => $m->id, 'name' => $m->name];
-            }
+        if (!empty($data['museo_ids'])) {
+            $museums = \App\Models\PublicMuseum::whereIn('id', $data['museo_ids'])->get();
+            $draft['museos'] = $museums->map(function($m) {
+                return ['id' => $m->id, 'name' => $m->name];
+            })->toArray();
         } else {
-            unset($draft['museo']);
+            unset($draft['museos']);
         }
         Session::put('draft_plan', $draft);
 
@@ -300,17 +303,18 @@ class PlanWizardController extends Controller
     public function saveFiesta(Request $request)
     {
         $data = $request->validate([
-            'fiesta_id' => 'nullable|exists:public_festivals,id',
+            'fiesta_ids' => 'nullable|array',
+            'fiesta_ids.*' => 'exists:public_festivals,id',
         ]);
 
         $draft = Session::get('draft_plan', []);
-        if (!empty($data['fiesta_id'])) {
-            $f = \App\Models\PublicFestival::find($data['fiesta_id']);
-            if ($f) {
-                $draft['fiesta'] = ['id' => $f->id, 'name' => $f->name, 'date' => $f->start_date];
-            }
+        if (!empty($data['fiesta_ids'])) {
+            $festivals = \App\Models\PublicFestival::whereIn('id', $data['fiesta_ids'])->get();
+            $draft['fiestas'] = $festivals->map(function($f) {
+                return ['id' => $f->id, 'name' => $f->name, 'date' => $f->start_date];
+            })->toArray();
         } else {
-            unset($draft['fiesta']);
+            unset($draft['fiestas']);
         }
         Session::put('draft_plan', $draft);
 
@@ -329,10 +333,20 @@ class PlanWizardController extends Controller
 
     public function finalize(Request $request)
     {
+        $data = $request->validate([
+            'plan_name' => 'nullable|string|max:255',
+        ]);
+
         $draft = Session::get('draft_plan');
         if (!$draft) {
             return redirect()->route('planes')->with('error', 'No hay un plan en progreso.');
         }
+
+        // Guardar nombre en draft
+        if (!empty($data['plan_name'])) {
+            $draft['plan_name'] = $data['plan_name'];
+        }
+        Session::put('draft_plan', $draft);
 
         $draftHash = md5(json_encode($draft));
         if (Session::get('plan_saved_hash') === $draftHash) {
@@ -346,16 +360,17 @@ class PlanWizardController extends Controller
 
         $userColumn = \App\Models\Plan::userColumn();
         $planData = [
+            'name' => $draft['plan_name'] ?? 'Plan sin nombre',
             'provincia' => $draft['provincia'],
             'municipio' => $draft['municipio'],
             'start_date' => $draft['start_date'],
             'end_date' => $draft['end_date'],
             'days' => $days,
             'items' => [
-                'hotel' => $draft['hotel'] ?? null,
-                'restaurante' => $draft['restaurante'] ?? null,
-                'museo' => $draft['museo'] ?? null,
-                'fiesta' => $draft['fiesta'] ?? null,
+                'hotels' => $draft['hotels'] ?? [],
+                'restaurantes' => $draft['restaurantes'] ?? [],
+                'museos' => $draft['museos'] ?? [],
+                'fiestas' => $draft['fiestas'] ?? [],
             ],
         ];
         $userId = auth()->id();
@@ -371,6 +386,28 @@ class PlanWizardController extends Controller
         Session::put('plan_saved_hash', $draftHash);
 
         return redirect()->route('plan.wizard.summary')->with('success', 'Plan guardado correctamente.');
+    }
+
+    public function removeItem(Request $request)
+    {
+        $data = $request->validate([
+            'category' => 'required|in:hotels,restaurantes,museos,fiestas',
+            'index' => 'required|integer|min:0',
+        ]);
+
+        $draft = Session::get('draft_plan', []);
+        $category = $data['category'];
+        $index = $data['index'];
+
+        if (isset($draft[$category]) && is_array($draft[$category]) && isset($draft[$category][$index])) {
+            unset($draft[$category][$index]);
+            // Reindexar el array para mantener índices continuos
+            $draft[$category] = array_values($draft[$category]);
+        }
+
+        Session::put('draft_plan', $draft);
+
+        return redirect()->route('plan.wizard.summary');
     }
 
     // métodos para museos, fiestas, summary se añadirán en siguientes pasos

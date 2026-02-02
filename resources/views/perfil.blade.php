@@ -213,6 +213,15 @@
                     </div>
                 </div>
 
+                <div class="profile-section-box" style="text-align: center; margin-top: 2rem;">
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="btn-secondary" style="background-color: #dc3545; border-color: #dc3545; color: white; padding: 0.75rem 2rem; font-size: 1rem;">
+                            🚪 Cerrar Sesión
+                        </button>
+                    </form>
+                </div>
+
             </div>
         </div>
     </section>

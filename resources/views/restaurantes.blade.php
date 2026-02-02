@@ -113,17 +113,6 @@
                             </div>
 
                             <div class="hotel-footer">
-                                <div class="hotel-rating">
-                                    @if($restaurant->rating)
-                                        <span class="rating-stars">⭐ {{ $restaurant->rating }}/5.0</span>
-                                    @endif
-                                    @if($restaurant->reviews_count > 0)
-                                        <span class="reviews-count">({{ $restaurant->reviews_count }} reseñas)</span>
-                                    @endif
-                                </div>
-                                <a href="{{ $restaurant->website ?? '#' }}" class="btn-small" target="_blank">
-                                    🍽️ Reservar
-                                </a>
                             </div>
                         </div>
                     @endforeach
@@ -266,14 +255,6 @@
                             </div>
 
                             ${restaurant.description ? `<p class="hotel-description">${restaurant.description}</p>` : ''}
-                        </div>
-
-                        <div class="hotel-footer">
-                            <div class="hotel-rating">
-                                ${restaurant.rating ? `<span class="rating-stars">⭐ ${restaurant.rating}/5.0</span>` : ''}
-                                ${restaurant.reviews_count > 0 ? `<span class="reviews-count">(${restaurant.reviews_count} reseñas)</span>` : ''}
-                            </div>
-                            ${restaurant.website ? `<a href="${restaurant.website}" class="btn-small" target="_blank">🍽️ Más info</a>` : `<button class="btn-small" disabled>Sin datos</button>`}
                         </div>
                     </div>
                 `;

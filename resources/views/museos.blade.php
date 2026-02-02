@@ -101,17 +101,6 @@
                             </div>
 
                             <div class="hotel-footer">
-                                <div class="hotel-rating">
-                                    @if($museum->rating)
-                                        <span class="rating-stars">⭐ {{ $museum->rating }}/5.0</span>
-                                    @endif
-                                    @if($museum->reviews_count > 0)
-                                        <span class="reviews-count">({{ $museum->reviews_count }} reseñas)</span>
-                                    @endif
-                                </div>
-                                <a href="{{ $museum->website ?? '#' }}" class="btn-small" target="_blank">
-                                    📅 Más info
-                                </a>
                             </div>
                         </div>
                     @endforeach
@@ -155,17 +144,6 @@
             mostrarMuseos(museosFiltrados);
         }
 
-        function mostrarTodos() {
-            const museumsGrid = document.getElementById('museums-grid');
-            
-            if (todosMuseos.length === 0) {
-                museumsGrid.innerHTML = '<div class="placeholder-container"><p class="placeholder-text">No hay museos disponibles</p></div>';
-                return;
-            }
-
-            mostrarMuseos(todosMuseos);
-        }
-
         function mostrarMuseos(museos) {
             const museumsGrid = document.getElementById('museums-grid');
             const noResults = document.getElementById('no-results');
@@ -206,19 +184,25 @@
 
                             ${museum.description ? `<p class="hotel-description">${museum.description}</p>` : ''}
                         </div>
-
-                        <div class="hotel-footer">
-                            <div class="hotel-rating">
-                                ${museum.rating ? `<span class="rating-stars">⭐ ${museum.rating}/5.0</span>` : ''}
-                                ${museum.reviews_count > 0 ? `<span class="reviews-count">(${museum.reviews_count} reseñas)</span>` : ''}
-                            </div>
-                            ${museum.website ? `<a href="${museum.website}" class="btn-small" target="_blank">📅 Más info</a>` : `<button class="btn-small" disabled>Sin datos</button>`}
-                        </div>
                     </div>
                 `;
             });
 
             museumsGrid.innerHTML = html;
+        }
+
+        function mostrarTodos() {
+            const museumsGrid = document.getElementById('museums-grid');
+            const noResults = document.getElementById('no-results');
+            
+            if (todosMuseos.length === 0) {
+                museumsGrid.innerHTML = '<div class="placeholder-container"><p class="placeholder-text">No hay museos disponibles</p></div>';
+                noResults.style.display = 'none';
+                return;
+            }
+
+            noResults.style.display = 'none';
+            mostrarMuseos(todosMuseos);
         }
 
         // Inicializar en carga

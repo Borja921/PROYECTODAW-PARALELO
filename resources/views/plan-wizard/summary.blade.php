@@ -133,6 +133,62 @@
         border: none;
         cursor: pointer;
     }
+
+    .btn-remove {
+        background: none;
+        border: none;
+        color: #dc3545;
+        cursor: pointer;
+        font-size: 18px;
+        padding: 4px 8px;
+        transition: color 0.2s ease;
+    }
+
+    .btn-remove:hover {
+        color: #c82333;
+    }
+
+    .item-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #f8f6f3;
+        padding: 10px 12px;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        border-left: 3px solid #8b7b7b;
+    }
+
+    .plan-name-section {
+        background: linear-gradient(135deg, #f9f6f2 0%, #ffffff 100%);
+        border: 1px solid #e7e1db;
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .plan-name-section label {
+        display: block;
+        font-weight: 600;
+        color: #4b3f37;
+        margin-bottom: 8px;
+    }
+
+    .plan-name-section input {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid #eddccf;
+        border-radius: 8px;
+        font-size: 14px;
+        font-family: inherit;
+        box-sizing: border-box;
+    }
+
+    .plan-name-section input:focus {
+        outline: none;
+        border-color: #8b7b7b;
+        box-shadow: 0 0 0 3px rgba(139, 123, 123, 0.1);
+    }
 </style>
 
 <div class="hotels-section">
@@ -148,8 +204,9 @@
             @endif
 
             <div style="margin-top:20px;display:flex;gap:8px;flex-wrap:wrap;">
-                <form method="POST" action="{{ route('plan.wizard.finalize') }}" style="display:inline;">
+                <form method="POST" action="{{ route('plan.wizard.finalize') }}" style="display:inline;" id="finalizeForm">
                     @csrf
+                    <input type="hidden" name="plan_name" id="plan_name_input" value="{{ $draft['plan_name'] ?? '' }}">
                     <button type="submit" class="btn-primary">Guardar Plan</button>
                 </form>
                 <a class="btn-secondary" href="{{ route('planes') }}">Crear otro plan</a>
@@ -157,6 +214,11 @@
         </div>
 
         <div class="summary-card" style="margin-top:20px;">
+            <div class="plan-name-section">
+                <label for="plan_name">Nombre de tu plan</label>
+                <input type="text" id="plan_name" placeholder="Ej: Fin de semana en Granada" value="{{ $draft['plan_name'] ?? '' }}" onchange="updatePlanName(this.value)">
+            </div>
+
             <div class="summary-header">
                 <div class="summary-title">🧭 Resumen visual de tu viaje</div>
                 <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
@@ -166,44 +228,119 @@
             </div>
 
             <div class="summary-grid">
-                <div class="summary-item">
+                <!-- HOTELES -->
+                <div class="summary-item" style="grid-column: 1/-1;">
                     <span class="item-icon">🏨</span>
-                    <strong>Hotel</strong>
-                    <div class="item-name">{{ $draft['hotel']['name'] ?? 'Sin selección' }}</div>
-                    <div class="item-sub">Tu descanso con estilo</div>
-                    @if(empty($draft['hotel']['name']))
-                        <span class="badge-empty">No seleccionado</span>
+                    <strong>Hoteles Seleccionados</strong>
+                    @if(isset($draft['hotels']) && count($draft['hotels']) > 0)
+                        <div style="margin-top: 12px;">
+                            @foreach($draft['hotels'] as $index => $hotel)
+                                <div class="item-container">
+                                    <div class="item-name" style="margin-top: 0; flex-grow: 1;">{{ $hotel['name'] }}</div>
+                                    <button type="button" class="btn-remove" onclick="removeItem('hotels', {{ $index }})">✕</button>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <span class="badge-empty">No seleccionados</span>
                     @endif
                 </div>
-                <div class="summary-item">
+
+                <!-- RESTAURANTES -->
+                <div class="summary-item" style="grid-column: 1/-1;">
                     <span class="item-icon">🍽️</span>
-                    <strong>Restaurante</strong>
-                    <div class="item-name">{{ $draft['restaurante']['name'] ?? 'Sin selección' }}</div>
-                    <div class="item-sub">Sabores locales para ti</div>
-                    @if(empty($draft['restaurante']['name']))
-                        <span class="badge-empty">No seleccionado</span>
+                    <strong>Restaurantes Seleccionados</strong>
+                    @if(isset($draft['restaurantes']) && count($draft['restaurantes']) > 0)
+                        <div style="margin-top: 12px;">
+                            @foreach($draft['restaurantes'] as $index => $restaurante)
+                                <div class="item-container">
+                                    <div class="item-name" style="margin-top: 0; flex-grow: 1;">{{ $restaurante['name'] }}</div>
+                                    <button type="button" class="btn-remove" onclick="removeItem('restaurantes', {{ $index }})">✕</button>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <span class="badge-empty">No seleccionados</span>
                     @endif
                 </div>
-                <div class="summary-item">
+
+                <!-- MUSEOS -->
+                <div class="summary-item" style="grid-column: 1/-1;">
                     <span class="item-icon">🎨</span>
-                    <strong>Museo</strong>
-                    <div class="item-name">{{ $draft['museo']['name'] ?? 'Sin selección' }}</div>
-                    <div class="item-sub">Cultura y patrimonio</div>
-                    @if(empty($draft['museo']['name']))
-                        <span class="badge-empty">No seleccionado</span>
+                    <strong>Museos Seleccionados</strong>
+                    @if(isset($draft['museos']) && count($draft['museos']) > 0)
+                        <div style="margin-top: 12px;">
+                            @foreach($draft['museos'] as $index => $museo)
+                                <div class="item-container">
+                                    <div class="item-name" style="margin-top: 0; flex-grow: 1;">{{ $museo['name'] }}</div>
+                                    <button type="button" class="btn-remove" onclick="removeItem('museos', {{ $index }})">✕</button>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <span class="badge-empty">No seleccionados</span>
                     @endif
                 </div>
-                <div class="summary-item">
+
+                <!-- FIESTAS -->
+                <div class="summary-item" style="grid-column: 1/-1;">
                     <span class="item-icon">🎉</span>
-                    <strong>Fiesta</strong>
-                    <div class="item-name">{{ $draft['fiesta']['name'] ?? 'Sin selección' }}</div>
-                    <div class="item-sub">Tradición y alegría</div>
-                    @if(empty($draft['fiesta']['name']))
-                        <span class="badge-empty">No seleccionado</span>
+                    <strong>Fiestas Seleccionadas</strong>
+                    @if(isset($draft['fiestas']) && count($draft['fiestas']) > 0)
+                        <div style="margin-top: 12px;">
+                            @foreach($draft['fiestas'] as $index => $fiesta)
+                                <div class="item-container">
+                                    <div>
+                                        <div class="item-name" style="margin-top: 0;">{{ $fiesta['name'] }}</div>
+                                        @if(isset($fiesta['date']))
+                                            <div class="item-sub" style="margin-top: 4px;">{{ \Carbon\Carbon::parse($fiesta['date'])->format('d/m/Y') }}</div>
+                                        @endif
+                                    </div>
+                                    <button type="button" class="btn-remove" onclick="removeItem('fiestas', {{ $index }})">✕</button>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <span class="badge-empty">No seleccionadas</span>
                     @endif
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    function removeItem(category, index) {
+        // Crear formulario temporal para enviar al servidor
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{{ route("plan.wizard.remove-item") }}';
+        form.style.display = 'none';
+        
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = '_token';
+        csrfInput.value = '{{ csrf_token() }}';
+        
+        const categoryInput = document.createElement('input');
+        categoryInput.type = 'hidden';
+        categoryInput.name = 'category';
+        categoryInput.value = category;
+        
+        const indexInput = document.createElement('input');
+        indexInput.type = 'hidden';
+        indexInput.name = 'index';
+        indexInput.value = index;
+        
+        form.appendChild(csrfInput);
+        form.appendChild(categoryInput);
+        form.appendChild(indexInput);
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+    function updatePlanName(name) {
+        document.getElementById('plan_name_input').value = name;
+    }
+</script>
 @endsection
