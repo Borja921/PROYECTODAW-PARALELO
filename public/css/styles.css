@@ -2,15 +2,21 @@
    VARIABLES Y PALETA MINIMALISTA QUEBRADA
    ============================================ */
 :root {
-    --primary: #8B7B7B;
-    --secondary: #A89B9B;
-    --accent: #9D8B7E;
-    --light: #D4CCC4;
-    --lighter: #E8E3DE;
-    --white: #F5F3F0;
-    --light-gray: #F9F8F6;
-    --dark-gray: #6B6B6B;
-    --text-dark: #3D3D3D;
+    --primary: #1A2942;         /* Azul marino elegante */
+    --secondary: #F5B041;       /* Dorado cordial */
+    --accent: #4A6073;          /* Azul grisáceo */
+    --light: #F4F6FA;           /* Gris muy claro */
+    --lighter: #FFFFFF;         /* Blanco puro */
+    --white: #FFFFFF;           /* Blanco puro */
+    --light-gray: #D6DBDF;      /* Gris claro */
+    --dark-gray: #283142;       /* Azul gris oscuro */
+    --text-dark: #23272F;       /* Gris azulado oscuro para texto */
+    --text-light: #4A6073;      /* Azul grisáceo para secundarios */
+    --text-accent: #F5B041;     /* Dorado para acentos */
+    --text-contrast: #1A2942;   /* Azul marino para contraste */
+    --danger: #C0392B;          /* Rojo formal */
+    --warning: #F5B041;         /* Dorado cordial */
+    --success: #27AE60;         /* Verde éxito */
 }
 
 /* ============================================
@@ -26,20 +32,28 @@ html, body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.6;
     color: var(--text-dark);
-    background-color: var(--light-gray);
+    background-color: var(--light);
+    background-image: linear-gradient(135deg, var(--light) 0%, var(--dark-gray) 100%);
+    font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+    font-size: 18px;
+    letter-spacing: 0.5px;
+    min-height: 100vh;
+    background-attachment: fixed;
 }
 
 /* ============================================
    NAVBAR
    ============================================ */
 .navbar {
-    background: var(--white);
-    padding: 1rem 0;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    background: var(--dark-gray);
+    padding: 1.5rem 0 1rem 0;
+    box-shadow: 0 4px 24px rgba(43,35,32,0.25);
     position: sticky;
     top: 0;
     z-index: 100;
-    border-bottom: 1px solid var(--lighter);
+    border-bottom: 3px solid var(--secondary);
+    border-radius: 0 0 32px 32px;
+    box-shadow: var(--shadow-strong);
 }
 
 .navbar-container {
@@ -54,7 +68,14 @@ html, body {
 .logo {
     font-size: 1.8rem;
     font-weight: bold;
-    color: var(--text-dark);
+    color: var(--secondary);
+    letter-spacing: 4px;
+    font-size: 2.2rem;
+    text-shadow: 2px 2px 8px var(--primary);
+    font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+    font-weight: 900;
+    text-transform: uppercase;
+    filter: drop-shadow(0 2px 8px var(--primary));
 }
 
 .nav-links {
@@ -65,17 +86,28 @@ html, body {
 
 .nav-links a {
     text-decoration: none;
-    color: var(--text-dark);
+    color: var(--secondary);
     font-weight: 500;
     transition: all 0.3s ease;
     padding: 0.5rem 1rem;
     border-radius: 8px;
+    font-size: 1.15rem;
+    font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+    font-weight: 700;
+    text-shadow: 0 1px 8px var(--primary);
 }
 
 .nav-links a:hover,
 .nav-links a.active {
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: var(--primary);
+    color: var(--white);
+    border: 2px solid var(--secondary);
     transform: translateY(-2px);
+    background: var(--glass-bg) !important;
+    border: 2.5px solid var(--glass-border) !important;
+    box-shadow: var(--shadow-strong), var(--shadow-glow) !important;
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
 }
 
 /* Hamburger Menu */
@@ -84,6 +116,15 @@ html, body {
     flex-direction: column;
     cursor: pointer;
     gap: 0.5rem;
+    font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    background: linear-gradient(90deg, var(--text-contrast), var(--text-accent), var(--text-dark));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
+    text-shadow: 0 2px 8px var(--primary);
 }
 
 .hamburger span {
@@ -92,18 +133,30 @@ html, body {
     background-color: var(--text-dark);
     border-radius: 2px;
     transition: all 0.3s ease;
+    border-radius: 32px;
+    font-size: 1.1rem;
+    font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+    font-weight: 800;
+    box-shadow: var(--shadow-glow);
+    transition: transform 0.2s cubic-bezier(.4,2,.6,1), box-shadow 0.2s;
 }
 
 .hamburger.active span:nth-child(1) {
     transform: rotate(45deg) translate(10px, 10px);
+    transform: scale(1.08) translateY(-2px) rotate(-2deg);
+    box-shadow: 0 0 32px 4px var(--text-contrast);
 }
 
 .hamburger.active span:nth-child(2) {
     opacity: 0;
+    background: linear-gradient(120deg, var(--primary) 0%, var(--dark-gray) 100%) !important;
+    min-height: 100vh;
+    padding-bottom: 5vh;
 }
 
 .hamburger.active span:nth-child(3) {
     transform: rotate(-45deg) translate(7px, -7px);
+    text-shadow: 0 2px 12px var(--primary), 0 0 8px var(--text-contrast);
 }
 
 .mobile-menu {
@@ -147,7 +200,7 @@ html, body {
    HERO SECTION
    ============================================ */
 .hero {
-    background: linear-gradient(135deg, #E8E3DE 0%, #D4CCC4 50%, #C0B5AA 100%);
+    background: linear-gradient(135deg, var(--light) 0%, var(--white) 60%, var(--secondary) 100%);
     padding: 8rem 2rem;
     text-align: center;
     min-height: 70vh;
@@ -157,16 +210,27 @@ html, body {
 }
 
 .hero-content h1 {
-    font-size: 3.5rem;
-    color: var(--text-dark);
-    margin-bottom: 1rem;
+    font-size: 3rem;
+    color: var(--primary);
+    margin-bottom: 1.2rem;
+    font-family: 'Segoe UI', 'Montserrat', Arial, sans-serif;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-align: center;
+    line-height: 1.15;
     animation: fadeInDown 0.8s ease;
+    text-shadow: 0 2px 12px var(--light-gray);
 }
 
 .hero-content p {
-    font-size: 1.5rem;
-    color: var(--dark-gray);
-    margin-bottom: 2rem;
+    font-size: 1.25rem;
+    color: var(--text-light);
+    margin-bottom: 2.2rem;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-weight: 400;
+    text-align: center;
+    line-height: 1.5;
+    letter-spacing: 1px;
     animation: fadeInUp 0.8s ease;
 }
 
@@ -210,39 +274,51 @@ html, body {
 }
 
 .btn-primary {
-    background: var(--primary);
+    background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
     color: var(--white);
-    box-shadow: 0 4px 15px rgba(139, 123, 123, 0.2);
+    box-shadow: 0 4px 24px rgba(43,35,32,0.18);
+    border: 2px solid var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
 }
 
 .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(139, 123, 123, 0.3);
-    background: var(--secondary);
+    box-shadow: 0 6px 20px rgba(139, 46, 46, 0.25);
+    background: var(--primary);
+    color: var(--secondary);
+    border: 2px solid var(--secondary);
 }
 
 .btn-secondary {
     background: var(--accent);
-    color: var(--white);
-    box-shadow: 0 4px 15px rgba(157, 139, 126, 0.2);
+    color: var(--primary);
+    box-shadow: 0 4px 15px rgba(191,161,129,0.15);
+    border: 2px solid var(--secondary);
+    text-transform: uppercase;
 }
 
 .btn-secondary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(157, 139, 126, 0.3);
-    background: var(--primary);
+    box-shadow: 0 6px 20px rgba(255, 214, 0, 0.25);
+    background: var(--secondary);
+    color: var(--white);
 }
 
 .btn-danger {
-    background: #dc3545;
+    background: var(--danger);
     color: var(--white);
-    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.2);
+    box-shadow: 0 4px 24px rgba(183, 28, 28, 0.18);
+    border: 2px solid var(--primary);
+    text-transform: uppercase;
 }
 
 .btn-danger:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(220, 53, 69, 0.3);
-    background: #c82333;
+    box-shadow: 0 6px 20px rgba(183, 28, 28, 0.25);
+    background: var(--primary);
+    color: var(--secondary);
+    border: 2px solid var(--secondary);
 }
 
 /* ============================================
@@ -254,16 +330,17 @@ html, body {
     max-width: 1200px;
     margin: 3rem auto 5rem;
     padding: 4rem 2rem;
-    background: linear-gradient(135deg, rgba(157, 139, 126, 0.15) 0%, rgba(139, 123, 123, 0.18) 100%);
+    background: linear-gradient(135deg, var(--accent) 0%, var(--lighter) 100%);
     border-radius: 30px;
+    box-shadow: 0 8px 32px rgba(139,46,46,0.10);
 }
 
 .about-container h1 {
     text-align: center;
-    font-size: 2.8rem;
+    font-size: 3rem;
     margin-bottom: 1.5rem;
-    color: var(--text-dark);
-    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    color: var(--primary);
+    background: linear-gradient(90deg, var(--primary) 40%, var(--secondary) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -271,11 +348,14 @@ html, body {
 
 .about-lead {
     text-align: center;
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     line-height: 1.8;
-    color: var(--dark-gray);
+    color: var(--primary);
     max-width: 900px;
     margin: 0 auto 3rem;
+    background: var(--lighter);
+    border-radius: 12px;
+    padding: 1rem 2rem;
 }
 
 .about-highlights {
@@ -286,12 +366,13 @@ html, body {
 }
 
 .highlight-item {
-    background: var(--white);
+    background: linear-gradient(135deg, var(--white) 60%, var(--light-gray) 100%);
     padding: 2rem;
     border-radius: 20px;
     text-align: center;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 24px rgba(139,46,46,0.08);
     transition: all 0.3s ease;
+    border: 2px solid var(--secondary);
 }
 
 .highlight-item:hover {
@@ -306,21 +387,28 @@ html, body {
 }
 
 .highlight-item h3 {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     color: var(--primary);
     margin-bottom: 0.8rem;
+    letter-spacing: 1px;
 }
 
 .highlight-item p {
-    font-size: 1rem;
+    font-size: 1.1rem;
     color: var(--dark-gray);
-    line-height: 1.6;
+    line-height: 1.7;
+    background: var(--light);
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
 }
 
 .features {
     max-width: 1200px;
     margin: 5rem auto;
     padding: 2rem;
+    background: var(--lighter);
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(139,46,46,0.08);
 }
 
 .features h2 {
@@ -337,13 +425,13 @@ html, body {
 }
 
 .feature-card {
-    background: var(--white);
+    background: linear-gradient(135deg, var(--white) 60%, var(--light-gray) 100%);
     padding: 2rem;
     border-radius: 20px;
     text-align: center;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 5px 24px rgba(139,46,46,0.08);
     transition: all 0.3s ease;
-    border: 2px solid transparent;
+    border: 2px solid var(--secondary);
 }
 
 .feature-card:nth-child(1) {
@@ -378,30 +466,38 @@ html, body {
 }
 
 .feature-card h3 {
-    font-size: 1.5rem;
+    font-size: 1.6rem;
     margin-bottom: 0.5rem;
-    color: var(--text-dark);
+    color: var(--primary);
+    letter-spacing: 1px;
 }
 
 .feature-card p {
     color: var(--dark-gray);
-    font-size: 0.95rem;
+    font-size: 1.05rem;
+    background: var(--light);
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
 }
 
 /* ============================================
    CTA SECTION
    ============================================ */
 .cta {
-    background: linear-gradient(135deg, #8B7B7B 0%, #9D8B7E 100%);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
     padding: 4rem 2rem;
     text-align: center;
     margin: 3rem 0;
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(139,46,46,0.10);
 }
 
 .cta h2 {
-    font-size: 2.5rem;
-    color: var(--white);
+    font-size: 2.7rem;
+    color: var(--secondary);
     margin-bottom: 2rem;
+    letter-spacing: 2px;
+    text-shadow: 1px 1px 8px rgba(139,46,46,0.10);
 }
 
 /* ============================================
@@ -417,13 +513,14 @@ html, body {
 }
 
 .form-container {
-    background: var(--white);
+    background: linear-gradient(135deg, var(--white) 60%, var(--light-gray) 100%);
     padding: 3rem;
     border-radius: 20px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 40px rgba(139,46,46,0.10);
     width: 100%;
     max-width: 450px;
     animation: slideUp 0.6s ease;
+    border: 2px solid var(--secondary);
 }
 
 @keyframes slideUp {
@@ -472,18 +569,20 @@ html, body {
 .form-group input,
 .form-group select {
     padding: 0.75rem;
-    border: 2px solid #E8E8E8;
+    border: 2px solid var(--accent);
     border-radius: 10px;
     font-size: 1rem;
     transition: all 0.3s ease;
     font-family: inherit;
+    background: var(--light);
+    color: var(--primary);
 }
 
 .form-group input:focus,
 .form-group select:focus {
     outline: none;
     border-color: var(--primary);
-    background-color: rgba(139, 123, 123, 0.02);
+    background-color: var(--lighter);
 }
 
 .form-group.checkbox {
@@ -530,7 +629,9 @@ html, body {
 .planes-section {
     min-height: 80vh;
     padding: 3rem 2rem;
-    background: linear-gradient(135deg, #E8E3DE 0%, #D4CCC4 50%, #C0B5AA 100%);
+    background: linear-gradient(135deg, var(--lighter) 0%, var(--light) 50%, var(--accent) 100%);
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(139,46,46,0.08);
 }
 
 .planes-container {
@@ -596,12 +697,13 @@ html, body {
 }
 
 .resultado-card {
-    background: var(--white);
+    background: linear-gradient(135deg, var(--white) 60%, var(--accent) 100%);
     border-radius: 15px;
     overflow: hidden;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 5px 24px rgba(139,46,46,0.08);
     transition: all 0.3s ease;
     animation: fadeInUp 0.5s ease;
+    border: 2px solid var(--secondary);
 }
 
 .resultado-card:hover {
@@ -611,8 +713,9 @@ html, body {
 
 .resultado-header {
     padding: 1.5rem;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
     color: var(--white);
+    letter-spacing: 1px;
 }
 
 .resultado-tipo {
@@ -623,9 +726,10 @@ html, body {
 }
 
 .resultado-nombre {
-    font-size: 1.5rem;
+    font-size: 1.6rem;
     margin: 0.5rem 0;
-    color: var(--white);
+    color: var(--secondary);
+    text-shadow: 1px 1px 8px rgba(139,46,46,0.10);
 }
 
 .resultado-body {
@@ -670,7 +774,11 @@ html, body {
 .resultado-precio {
     font-size: 1.5rem;
     font-weight: 700;
-    color: var(--primary);
+    color: var(--secondary);
+    text-shadow: 1px 1px 8px rgba(139,46,46,0.10);
+    font-size: 2rem;
+    font-weight: 900;
+    text-shadow: 0 2px 12px var(--secondary), 0 0 8px var(--text-contrast);
 }
 
 .btn-small {
@@ -695,11 +803,18 @@ html, body {
    FOOTER
    ============================================ */
 footer {
-    background: var(--primary);
-    color: var(--white);
+    background: var(--dark-gray);
+    color: var(--secondary);
     text-align: center;
-    padding: 2rem;
+    padding: 2.5rem 2rem 2rem 2rem;
     margin-top: 3rem;
+    letter-spacing: 3px;
+    font-size: 1.2rem;
+    border-top: 4px solid var(--primary);
+    border-radius: 32px 32px 0 0;
+    box-shadow: var(--shadow-strong);
+    font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+    font-size: 1.15rem;
 }
 
 /* ============================================
@@ -991,7 +1106,7 @@ footer {
     top: 1rem;
     right: 1rem;
     padding: 0.4rem 0.8rem;
-    background: #9D8B7E;
+    background: var(--secondary);
     color: var(--white);
     border-radius: 20px;
     font-size: 0.8rem;
@@ -1072,12 +1187,12 @@ footer {
 
 .plan-progress {
     padding: 1.5rem;
-    border-top: 1px solid #E8E3DE;
+    border-top: 1px solid var(--light-gray);
 }
 
 .progress-bar {
     height: 6px;
-    background: #E8E3DE;
+    background: var(--light-gray);
     border-radius: 10px;
     overflow: hidden;
     margin-bottom: 0.5rem;
@@ -1107,7 +1222,7 @@ footer {
 }
 
 .btn-secondary-small {
-    background: #D4CCC4;
+    background: var(--light-gray);
     color: var(--text-dark);
     border: none;
     padding: 0.5rem 1rem;
@@ -2048,7 +2163,7 @@ footer {
 
 .hotels-header .subtitle {
     font-size: 1.1rem;
-    color: var(--secondary);
+    color: var(--text-light);
     font-weight: 300;
 }
 
@@ -2252,7 +2367,7 @@ footer {
 
 .btn-small {
     padding: 0.6rem 1.2rem;
-    background: var(--accent);
+    background: var(--secondary);
     color: var(--white);
     border: none;
     border-radius: 6px;
