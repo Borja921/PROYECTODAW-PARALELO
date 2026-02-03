@@ -16,6 +16,10 @@ class Usuario extends Authenticatable
         'username',
         'email',
         'fecha_nacimiento',
+        'hospedaje_favorito',
+        'tipo_comida',
+        'actividades',
+        'tipo_viaje',
         'password',
     ];
 

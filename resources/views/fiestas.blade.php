@@ -7,26 +7,7 @@
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
 </head>
 <body>
-    <nav class="navbar">
-        <div class="navbar-container">
-            <div class="logo">✈️ TravelPlus</div>
-            <ul class="nav-links">
-                <li><a href="{{ route('index') }}">Inicio</a></li>
-                <li><a href="{{ route('destinos') }}">Destinos</a></li>
-                @auth
-                    <li><a href="{{ route('planes') }}">Crear Plan</a></li>
-                    <li><a href="{{ route('mis-planes') }}">Mis Planes</a></li>
-                    <li><a href="{{ route('perfil') }}">Perfil</a></li>
-                    <li><a href="{{ route('perfil') }}">Hola, {{ Auth::user()->nombre_apellidos }}</a></li>
-                @else
-                    <li><a href="#" onclick="openLoginModal(event)">Crear Plan</a></li>
-                    <li><a href="#" onclick="openLoginModal(event)">Mis Planes</a></li>
-                    <li><a href="#" onclick="openLoginModal(event)">Perfil</a></li>
-                    <li><a href="#" onclick="openLoginModal(event)">Iniciar Sesión</a></li>
-                @endauth
-            </ul>
-        </div>
-    </nav>
+    @include('partials.navbar')
 
     <section class="hotels-section">
         <div class="hotels-container">
@@ -133,6 +114,8 @@
         <p>&copy; 2026 TravelPlus - Todos los derechos reservados</p>
     </footer>
 
+    @include('partials.login-modal')
+
     <script>
         // Almacenar todos los festivales en memoria
         const todosFestivales = @json($festivals);
@@ -186,8 +169,8 @@
                 return;
             }
 
-            const festivalesFiltrados = todosFestivales.filter(festival => 
-                festival.province === provinciaSeleccionada && 
+            const festivalesFiltrados = todosFestivales.filter(festival =>
+                festival.province === provinciaSeleccionada &&
                 festival.locality === localidadSeleccionada
             );
 
@@ -212,7 +195,7 @@
         function mostrarFestivales(festivales) {
             const festivalsGrid = document.getElementById('festivals-grid');
             const noResults = document.getElementById('no-results');
-            
+
             if (festivales.length === 0) {
                 festivalsGrid.innerHTML = '<div class="placeholder-container"><p class="placeholder-text">No hay festivales disponibles para los filtros seleccionados</p></div>';
                 noResults.style.display = 'none';
@@ -226,7 +209,7 @@
                 const phoneLink = festival.phone ? `<p><strong>📞 Teléfono:</strong> <a href="tel:${festival.phone}">${festival.phone}</a></p>` : '';
                 const emailLink = festival.email ? `<p><strong>📧 Email:</strong> <a href="mailto:${festival.email}">${festival.email}</a></p>` : '';
                 const website = festival.website ? `<p><strong>🌐 Sitio Web:</strong> <a href="${festival.website}" target="_blank">Visitar web</a></p>` : '';
-                
+
                 const fechas = festival.start_date ? `<p class="hotel-classification"><strong>📅 Fechas:</strong> ${new Date(festival.start_date).toLocaleDateString('es-ES')} ${festival.end_date ? ' - ' + new Date(festival.end_date).toLocaleDateString('es-ES') : ''}</p>` : '';
                 const time = festival.time ? `<p class="hotel-classification"><strong>⏰ Horario:</strong> ${festival.time}</p>` : '';
                 const price = festival.price ? `<p class="hotel-classification"><strong>💰 Precio:</strong> ${festival.price}</p>` : '';

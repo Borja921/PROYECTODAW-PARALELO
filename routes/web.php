@@ -30,12 +30,19 @@ Route::get('/mis-planes/{id}', [App\Http\Controllers\PlanesController::class, 's
 // Finalizar plan
 Route::post('/mis-planes/{id}/finalizar', [App\Http\Controllers\PlanesController::class, 'finalize'])->name('mis-planes.finalize')->middleware('auth');
 
+// Eliminar plan
+Route::delete('/mis-planes/{id}', [App\Http\Controllers\PlanesController::class, 'destroy'])->name('mis-planes.destroy')->middleware('auth');
+
+// Marcar/desmarcar como favorito
+Route::post('/mis-planes/{id}/toggle-favorite', [App\Http\Controllers\PlanesController::class, 'toggleFavorite'])->name('mis-planes.toggle-favorite')->middleware('auth');
+
 // Legacy route for plan detail (kept for backward compatibility)
 Route::get('/planes/{id}', [App\Http\Controllers\PlanesController::class, 'show'])->name('detalle-plan');
 
 Route::get('/perfil', [App\Http\Controllers\PerfilController::class, 'index'])->name('perfil')->middleware('auth');
 Route::get('/perfil/editar', [App\Http\Controllers\PerfilController::class, 'edit'])->name('perfil.edit')->middleware('auth');
 Route::post('/perfil/actualizar', [App\Http\Controllers\PerfilController::class, 'update'])->name('perfil.update')->middleware('auth');
+Route::delete('/perfil/eliminar', [App\Http\Controllers\PerfilController::class, 'destroy'])->name('perfil.destroy')->middleware('auth');
 
 Route::get('/contacto', function () {
     return view('contacto');
@@ -80,6 +87,9 @@ Route::post('/api/municipios/refresh', [MunicipioController::class, 'refresh'])-
 
 // Wizard: creación paso a paso de un plan (protegido: requiere login)
 Route::middleware('auth')->prefix('plan/wizard')->name('plan.wizard.')->group(function () {
+    // Limpiar sesión anterior (iniciar nuevo plan)
+    Route::post('/reset', [PlanWizardController::class, 'resetDraft'])->name('reset');
+    
     // Paso 1: guardar provincia/municipio/fechas
     Route::post('/step1', [PlanWizardController::class, 'saveStep1'])->name('step1.save');
 
@@ -102,5 +112,6 @@ Route::middleware('auth')->prefix('plan/wizard')->name('plan.wizard.')->group(fu
     // Resumen y finalizar
     Route::get('/summary', [PlanWizardController::class, 'summary'])->name('summary');
     Route::post('/finalize', [PlanWizardController::class, 'finalize'])->name('finalize');
+    Route::get('/clear', [PlanWizardController::class, 'clearDraft'])->name('clear');
     Route::post('/remove-item', [PlanWizardController::class, 'removeItem'])->name('remove-item');
 });

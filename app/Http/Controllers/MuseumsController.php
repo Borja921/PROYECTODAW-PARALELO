@@ -41,19 +41,19 @@ class MuseumsController extends Controller
         // Filtrar por locality basado en la provincia seleccionada
         if ($selectedProvince) {
             $provinciaNormalizada = $normalizeString($selectedProvince);
-            
+
             $museums = $allMuseums->filter(function($museum) use ($provinciaNormalizada, $normalizeString) {
                 $museumLocality = $normalizeString($museum->locality);
-                
+
                 // Comparación exacta o por similitud (para manejar casos como le?n vs leon)
                 if ($museumLocality === $provinciaNormalizada) {
                     return true;
                 }
-                
+
                 // Si las primeras 2-3 letras coinciden y la longitud es similar, considerar match
                 $len1 = strlen($museumLocality);
                 $len2 = strlen($provinciaNormalizada);
-                
+
                 if (abs($len1 - $len2) <= 1 && $len1 >= 3) {
                     $prefix1 = substr($museumLocality, 0, 2);
                     $prefix2 = substr($provinciaNormalizada, 0, 2);
@@ -61,7 +61,7 @@ class MuseumsController extends Controller
                         return true;
                     }
                 }
-                
+
                 return false;
             })->sortBy('name')->values();
         } else {

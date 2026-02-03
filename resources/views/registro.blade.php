@@ -55,6 +55,11 @@
             <input id="password_confirmation" name="password_confirmation" type="password" class="form-control" required>
         </div>
 
+        <div class="form-group">
+            <label>Verificación</label>
+            <altcha-widget test></altcha-widget>
+        </div>
+
         <button type="submit" class="btn btn-primary">Crear Cuenta</button>
     </form>
 </div>

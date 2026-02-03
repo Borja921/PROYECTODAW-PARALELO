@@ -1,4 +1,37 @@
 // ============================================
+// MENU HAMBURGUESA - RESPONSIVE
+// ============================================
+
+function toggleMenu() {
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobileMenu');
+    
+    if (hamburger && mobileMenu) {
+        hamburger.classList.toggle('active');
+        mobileMenu.classList.toggle('active');
+    }
+}
+
+// Cerrar menu cuando se hace click en un enlace de navegación
+document.addEventListener('DOMContentLoaded', function() {
+    const mobileMenuLinks = document.querySelectorAll('.mobile-menu a:not([href="#"])');
+    mobileMenuLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            // Solo cerrar si no es un enlace que abre modal
+            if (!this.getAttribute('onclick') || !this.getAttribute('onclick').includes('openLoginModal')) {
+                const hamburger = document.getElementById('hamburger');
+                const mobileMenu = document.getElementById('mobileMenu');
+                
+                if (hamburger && mobileMenu) {
+                    hamburger.classList.remove('active');
+                    mobileMenu.classList.remove('active');
+                }
+            }
+        });
+    });
+});
+
+// ============================================
 // BASE DE DATOS DE DESTINOS
 // ============================================
 

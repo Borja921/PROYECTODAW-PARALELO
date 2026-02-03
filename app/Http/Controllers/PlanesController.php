@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Municipio;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PlanesController extends Controller
 {
@@ -45,7 +46,7 @@ class PlanesController extends Controller
             'days' => $days,
             'items' => isset($data['items']) ? json_decode($data['items'], true) : null,
         ];
-        $userId = auth()->id();
+        $userId = Auth::id();
         $planData[$userColumn] = $userId;
 
         if ($userColumn === 'id_user' && \Illuminate\Support\Facades\Schema::hasColumn((new \App\Models\Plan())->getTable(), 'user_id')) {
@@ -62,7 +63,7 @@ class PlanesController extends Controller
      */
     public function myPlans()
     {
-        $userId = auth()->id();
+        $userId = Auth::id();
         $userColumn = \App\Models\Plan::userColumn();
         $plans = \App\Models\Plan::where($userColumn, $userId)->orderBy('created_at', 'desc')->get();
 
@@ -70,12 +71,14 @@ class PlanesController extends Controller
         $totalPlans = $plans->count();
         $finalizados = $plans->where('status', 'completado')->count();
         $sinFinalizar = $plans->where('status', '!=', 'completado')->count();
+        $favoritos = $plans->where('is_favorite', true)->count();
 
         return view('mis-planes', [
             'plans' => $plans,
             'totalPlans' => $totalPlans,
             'finalizados' => $finalizados,
-            'sinFinalizar' => $sinFinalizar
+            'sinFinalizar' => $sinFinalizar,
+            'favoritos' => $favoritos
         ]);
     }
 
@@ -88,7 +91,7 @@ class PlanesController extends Controller
         $userColumn = \App\Models\Plan::userColumn();
 
         // Autorizar: solo el propietario puede ver su plan
-        if ($plan->{$userColumn} !== auth()->id()) {
+        if ($plan->{$userColumn} !== Auth::id()) {
             abort(403, 'No tienes permiso para ver este plan.');
         }
 
@@ -133,7 +136,7 @@ class PlanesController extends Controller
         $userColumn = \App\Models\Plan::userColumn();
 
         // Autorizar: solo el propietario puede finalizar su plan
-        if ($plan->{$userColumn} !== auth()->id()) {
+        if ($plan->{$userColumn} !== Auth::id()) {
             abort(403, 'No tienes permiso para finalizar este plan.');
         }
 
@@ -142,5 +145,45 @@ class PlanesController extends Controller
 
         return redirect()->route('mis-planes.show', $plan->id)
             ->with('success', 'Plan finalizado correctamente.');
+    }
+
+    /**
+     * Eliminar un plan
+     */
+    public function destroy($id)
+    {
+        $plan = \App\Models\Plan::findOrFail($id);
+        $userColumn = \App\Models\Plan::userColumn();
+
+        // Autorizar: solo el propietario puede eliminar su plan
+        if ($plan->{$userColumn} !== Auth::id()) {
+            abort(403, 'No tienes permiso para eliminar este plan.');
+        }
+
+        $plan->delete();
+
+        return redirect()->route('mis-planes')
+            ->with('success', 'Plan eliminado correctamente.');
+    }
+
+    public function toggleFavorite($id)
+    {
+        $plan = \App\Models\Plan::findOrFail($id);
+        $userColumn = \App\Models\Plan::userColumn();
+
+        // Autorizar: solo el propietario puede marcar como favorito
+        if ($plan->{$userColumn} !== Auth::id()) {
+            abort(403, 'No tienes permiso para hacer esto.');
+        }
+
+        // Cambiar estado de favorito
+        $plan->is_favorite = !$plan->is_favorite;
+        $plan->save();
+
+        return response()->json([
+            'success' => true,
+            'is_favorite' => $plan->is_favorite,
+            'message' => $plan->is_favorite ? 'Plan agregado a favoritos' : 'Plan removido de favoritos'
+        ]);
     }
 }

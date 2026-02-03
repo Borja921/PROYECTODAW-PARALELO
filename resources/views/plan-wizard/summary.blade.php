@@ -200,6 +200,9 @@
             @if(session('success'))
                 <div class="alert alert-success" style="margin: 12px 0; padding: 10px; border-radius: 6px; background: #d4edda; color: #155724;">
                     {{ session('success') }}
+                    <div style="margin-top:12px;">
+                        <a href="{{ route('plan.wizard.clear') }}" class="btn-primary">Confirmar y continuar</a>
+                    </div>
                 </div>
             @endif
 
@@ -209,7 +212,10 @@
                     <input type="hidden" name="plan_name" id="plan_name_input" value="{{ $draft['plan_name'] ?? '' }}">
                     <button type="submit" class="btn-primary">Guardar Plan</button>
                 </form>
-                <a class="btn-secondary" href="{{ route('planes') }}">Crear otro plan</a>
+                <form method="POST" action="{{ route('plan.wizard.reset') }}" style="display:inline;">
+                    @csrf
+                    <button type="submit" class="btn-secondary">Crear otro plan</button>
+                </form>
             </div>
         </div>
 

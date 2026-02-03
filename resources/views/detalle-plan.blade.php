@@ -122,18 +122,7 @@
     </style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="navbar-container">
-            <div class="logo">✈️ TravelPlus</div>
-            <ul class="nav-links">
-                <li><a href="{{ route('index') }}">Inicio</a></li>
-                <li><a href="{{ route('destinos') }}">Destinos</a></li>
-                <li><a href="{{ route('planes') }}">Crear Plan</a></li>
-                <li><a href="{{ route('mis-planes') }}">Mis Planes</a></li>
-                <li><a href="{{ route('perfil') }}">Perfil</a></li>
-            </ul>
-        </div>
-    </nav>
+    @include('partials.navbar')
 
     <section class="plan-detail-section">
         <div class="plan-detail-container">
@@ -164,6 +153,11 @@
                     @else
                         <span class="badge-completado">✓ Plan Finalizado</span>
                     @endif
+                    <button type="button" class="btn-danger" onclick="showDeleteModal()">🗑️ Eliminar Plan</button>
+                    <form id="deletePlanForm" method="POST" action="{{ route('mis-planes.destroy', $plan->id) }}" style="display: none;">
+                        @csrf
+                        @method('DELETE')
+                    </form>
                 </div>
             </div>
 
@@ -259,7 +253,7 @@
         <p>&copy; 2026 TravelPlus - Todos los derechos reservados</p>
     </footer>
 
-    <!-- Modal de confirmación -->
+    <!-- Modal de confirmación para finalizar -->
     <div id="confirmModal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
@@ -273,6 +267,25 @@
             <div class="modal-footer">
                 <button type="button" class="btn-primary" onclick="closeConfirmModal()">Cancelar</button>
                 <button type="button" class="btn-primary" onclick="confirmFinalize()">Finalizar Plan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación para eliminar -->
+    <div id="deleteModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🗑️ ¿Eliminar Plan?</h2>
+                <button type="button" class="modal-close" onclick="closeDeleteModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="color: #dc3545; font-weight: 600;">⚠️ Esta acción no se puede deshacer.</p>
+                <p>¿Estás seguro de que quieres eliminar este plan permanentemente?</p>
+                <p style="color: #666; font-size: 0.9rem; margin-top: 1rem;">Se perderán todos los datos del plan: hoteles, restaurantes, museos y fiestas seleccionados.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeDeleteModal()">Cancelar</button>
+                <button type="button" class="btn-danger" onclick="confirmDelete()" style="background: #dc3545; border-color: #dc3545;">Eliminar Plan</button>
             </div>
         </div>
     </div>
@@ -294,6 +307,19 @@
                 alert.style.display = 'none';
             }
             document.getElementById('finalizePlanForm').submit();
+        }
+
+        function showDeleteModal() {
+            document.getElementById('deleteModal').classList.add('active');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('active');
+        }
+
+        function confirmDelete() {
+            closeDeleteModal();
+            document.getElementById('deletePlanForm').submit();
         }
 
         window.addEventListener('load', function() {

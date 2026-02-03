@@ -7,26 +7,7 @@
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
 </head>
 <body>
-    <nav class="navbar">
-        <div class="navbar-container">
-            <div class="logo">✈️ TravelPlus</div>
-            <ul class="nav-links">
-                <li><a href="{{ route('index') }}">Inicio</a></li>
-                <li><a href="{{ route('destinos') }}">Destinos</a></li>
-                @auth
-                    <li><a href="{{ route('planes') }}">Crear Plan</a></li>
-                    <li><a href="{{ route('mis-planes') }}">Mis Planes</a></li>
-                    <li><a href="{{ route('perfil') }}">Perfil</a></li>
-                    <li><a href="{{ route('perfil') }}">Hola, {{ Auth::user()->nombre_apellidos }}</a></li>
-                @else
-                    <li><a href="#" onclick="openLoginModal(event)">Crear Plan</a></li>
-                    <li><a href="#" onclick="openLoginModal(event)">Mis Planes</a></li>
-                    <li><a href="#" onclick="openLoginModal(event)">Perfil</a></li>
-                    <li><a href="#" onclick="openLoginModal(event)">Iniciar Sesión</a></li>
-                @endauth
-            </ul>
-        </div>
-    </nav>
+    @include('partials.navbar')
 
     <section class="hotels-section">
         <div class="hotels-container">
@@ -129,6 +110,8 @@
         <p>&copy; 2026 TravelPlus - Todos los derechos reservados</p>
     </footer>
 
+    @include('partials.login-modal')
+
     <script>
         // Almacenar todos los restaurantes en memoria
         const todosRestaurantes = @json($restaurants);
@@ -188,8 +171,8 @@
                 return;
             }
 
-            const restaurantesFiltrados = todosRestaurantes.filter(restaurant => 
-                restaurant.province === provinciaSeleccionada && 
+            const restaurantesFiltrados = todosRestaurantes.filter(restaurant =>
+                restaurant.province === provinciaSeleccionada &&
                 restaurant.locality === localidadSeleccionada
             );
 
@@ -205,7 +188,7 @@
 
         function mostrarTodos() {
             const restaurantsGrid = document.getElementById('restaurants-grid');
-            
+
             if (todosRestaurantes.length === 0) {
                 restaurantsGrid.innerHTML = '<div class="placeholder-container"><p class="placeholder-text">No hay restaurantes disponibles</p></div>';
                 return;
@@ -217,7 +200,7 @@
         function mostrarRestaurantes(restaurantes) {
             const restaurantsGrid = document.getElementById('restaurants-grid');
             const noResults = document.getElementById('no-results');
-            
+
             if (restaurantes.length === 0) {
                 restaurantsGrid.innerHTML = '<div class="placeholder-container"><p class="placeholder-text">No hay restaurantes disponibles para los filtros seleccionados</p></div>';
                 noResults.style.display = 'none';

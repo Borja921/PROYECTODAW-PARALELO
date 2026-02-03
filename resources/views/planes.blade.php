@@ -10,26 +10,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="navbar-container">
-            <div class="logo">✈️ TravelPlus</div>
-            <ul class="nav-links">
-                <li><a href="{{ route('index') }}">Inicio</a></li>
-                <li><a href="{{ route('destinos') }}">Destinos</a></li>
-                @auth
-                    <li><a href="{{ route('planes') }}" class="active">Crear Plan</a></li>
-                    <li><a href="{{ route('mis-planes') }}">Mis Planes</a></li>
-                    <li><a href="{{ route('perfil') }}">Perfil</a></li>
-                    <li><a href="{{ route('perfil') }}">Hola, {{ Auth::user()->nombre_apellidos }}</a></li>
-                @else
-                    <li><a href="#" onclick="openLoginModal(event)">Crear Plan</a></li>
-                    <li><a href="#" onclick="openLoginModal(event)">Mis Planes</a></li>
-                    <li><a href="#" onclick="openLoginModal(event)">Perfil</a></li>
-                    <li><a href="#" onclick="openLoginModal(event)">Iniciar Sesión</a></li>
-                @endauth
-            </ul>
-        </div>
-    </nav>
+    @include('partials.navbar')
 
     <section class="planes-section">
         <div class="planes-container">
@@ -41,6 +22,17 @@
             @if(session('error'))
                 <div class="alert alert-danger" style="margin-bottom:12px;padding:10px;border-radius:6px;background:#f8d7da;color:#721c24;">{{ session('error') }}</div>
             @endif
+
+            <script>
+                // Limpiar la sesión del plan anterior al cargar esta página
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Resetear los campos del formulario
+                    document.getElementById('provincia').value = '';
+                    document.getElementById('municipio').value = '';
+                    document.getElementById('start_date').value = '';
+                    document.getElementById('end_date').value = '';
+                });
+            </script>
 
             <div class="filters-box">
                 <!-- Primera fila: Todos los selectores -->

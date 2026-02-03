@@ -5,20 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar Sesión - TravelPlus</title>
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
+    <script async defer src="https://cdn.jsdelivr.net/npm/altcha/dist/altcha.min.js" type="module"></script>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="navbar-container">
-            <div class="logo">✈️ TravelPlus</div>
-            <ul class="nav-links">
-                <li><a href="{{ route('index') }}">Inicio</a></li>
-                <li><a href="{{ route('destinos') }}">Destinos</a></li>
-                <li><a href="{{ route('planes') }}">Crear Plan</a></li>
-                <li><a href="{{ route('mis-planes') }}">Mis Planes</a></li>
-                <li><a href="{{ route('perfil') }}">Perfil</a></li>
-            </ul>
-        </div>
-    </nav>
+    @include('partials.navbar')
 
     <section class="auth-section">
         <div class="auth-container">
@@ -51,6 +41,11 @@
 
                     <div class="form-group checkbox">
                         <label><input type="checkbox" name="remember" {{ old('remember') ? 'checked' : '' }}> Recuérdame</label>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Verificación</label>
+                        <altcha-widget test></altcha-widget>
                     </div>
 
                     <button type="submit" class="btn-primary">Iniciar Sesión</button>

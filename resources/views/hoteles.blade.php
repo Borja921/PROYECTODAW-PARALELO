@@ -7,26 +7,7 @@
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
 </head>
 <body>
-    <nav class="navbar">
-        <div class="navbar-container">
-            <div class="logo">✈️ TravelPlus</div>
-            <ul class="nav-links">
-                <li><a href="{{ route('index') }}">Inicio</a></li>
-                <li><a href="{{ route('destinos') }}">Destinos</a></li>
-                @auth
-                    <li><a href="{{ route('planes') }}">Crear Plan</a></li>
-                    <li><a href="{{ route('mis-planes') }}">Mis Planes</a></li>
-                    <li><a href="{{ route('perfil') }}">Perfil</a></li>
-                    <li><a href="{{ route('perfil') }}">Hola, {{ Auth::user()->nombre_apellidos }}</a></li>
-                @else
-                    <li><a href="#" onclick="openLoginModal(event)">Crear Plan</a></li>
-                    <li><a href="#" onclick="openLoginModal(event)">Mis Planes</a></li>
-                    <li><a href="#" onclick="openLoginModal(event)">Perfil</a></li>
-                    <li><a href="#" onclick="openLoginModal(event)">Iniciar Sesión</a></li>
-                @endauth
-            </ul>
-        </div>
-    </nav>
+    @include('partials.navbar')
 
     <section class="hotels-section">
         <div class="hotels-container">
@@ -123,6 +104,8 @@
         <p>&copy; 2026 TravelPlus - Todos los derechos reservados</p>
     </footer>
 
+    @include('partials.login-modal')
+
     <script>
         // Almacenar todos los hoteles en memoria
         const todosHoteles = @json($hotels);
@@ -186,8 +169,8 @@
             }
 
             // Filtrar por provincia Y localidad
-            const hotelesFiltrados = todosHoteles.filter(hotel => 
-                hotel.province === provinciaSeleccionada && 
+            const hotelesFiltrados = todosHoteles.filter(hotel =>
+                hotel.province === provinciaSeleccionada &&
                 hotel.locality === localidadSeleccionada
             );
 
@@ -205,7 +188,7 @@
         function mostrarTodos() {
             const hotelsGrid = document.getElementById('hotels-grid');
             const noResults = document.getElementById('no-results');
-            
+
             if (todosHoteles.length === 0) {
                 hotelsGrid.innerHTML = '<div class="placeholder-container"><p class="placeholder-text">No hay hoteles disponibles</p></div>';
                 noResults.style.display = 'none';
@@ -219,7 +202,7 @@
         function mostrarHoteles(hoteles) {
             const hotelsGrid = document.getElementById('hotels-grid');
             const noResults = document.getElementById('no-results');
-            
+
             if (hoteles.length === 0) {
                 hotelsGrid.innerHTML = '<div class="placeholder-container"><p class="placeholder-text">No hay hoteles disponibles para los filtros seleccionados</p></div>';
                 noResults.style.display = 'none';

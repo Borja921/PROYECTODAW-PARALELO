@@ -7,26 +7,7 @@
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
 </head>
 <body>
-    <nav class="navbar">
-        <div class="navbar-container">
-            <div class="logo">✈️ TravelPlus</div>
-            <ul class="nav-links">
-                <li><a href="{{ route('index') }}">Inicio</a></li>
-                <li><a href="{{ route('destinos') }}">Destinos</a></li>
-                @auth
-                    <li><a href="{{ route('planes') }}">Crear Plan</a></li>
-                    <li><a href="{{ route('mis-planes') }}">Mis Planes</a></li>
-                    <li><a href="{{ route('perfil') }}">Perfil</a></li>
-                    <li><a href="{{ route('perfil') }}">Hola, {{ Auth::user()->nombre_apellidos }}</a></li>
-                @else
-                    <li><a href="#" onclick="openLoginModal(event)">Crear Plan</a></li>
-                    <li><a href="#" onclick="openLoginModal(event)">Mis Planes</a></li>
-                    <li><a href="#" onclick="openLoginModal(event)">Perfil</a></li>
-                    <li><a href="#" onclick="openLoginModal(event)">Iniciar Sesión</a></li>
-                @endauth
-            </ul>
-        </div>
-    </nav>
+    @include('partials.navbar')
 
     <section class="hotels-section">
         <div class="hotels-container">
@@ -117,6 +98,8 @@
         <p>&copy; 2026 TravelPlus - Todos los derechos reservados</p>
     </footer>
 
+    @include('partials.login-modal')
+
     <script>
         // Almacenar todos los museos en memoria
         const todosMuseos = @json($museums);
@@ -130,7 +113,7 @@
                 return;
             }
 
-            const museosFiltrados = todosMuseos.filter(museum => 
+            const museosFiltrados = todosMuseos.filter(museum =>
                 museum.locality === localidadSeleccionada
             );
 
@@ -147,7 +130,7 @@
         function mostrarMuseos(museos) {
             const museumsGrid = document.getElementById('museums-grid');
             const noResults = document.getElementById('no-results');
-            
+
             if (museos.length === 0) {
                 museumsGrid.innerHTML = '<div class="placeholder-container"><p class="placeholder-text">No hay museos disponibles para los filtros seleccionados</p></div>';
                 noResults.style.display = 'none';
@@ -194,7 +177,7 @@
         function mostrarTodos() {
             const museumsGrid = document.getElementById('museums-grid');
             const noResults = document.getElementById('no-results');
-            
+
             if (todosMuseos.length === 0) {
                 museumsGrid.innerHTML = '<div class="placeholder-container"><p class="placeholder-text">No hay museos disponibles</p></div>';
                 noResults.style.display = 'none';

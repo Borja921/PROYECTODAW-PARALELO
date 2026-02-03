@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Auth;
 use App\Models\PublicHotel;
 
 class PlanWizardController extends Controller
@@ -12,6 +13,15 @@ class PlanWizardController extends Controller
     {
         // Requiere que el usuario esté autenticado para usar el wizard
         $this->middleware('auth');
+    }
+
+    /**
+     * Limpiar la sesión anterior (para iniciar un nuevo plan)
+     */
+    public function resetDraft()
+    {
+        Session::forget('draft_plan');
+        return redirect()->route('planes')->with('success', 'Nuevo plan iniciado. Por favor completa los detalles.');
     }
 
     /**
@@ -373,7 +383,7 @@ class PlanWizardController extends Controller
                 'fiestas' => $draft['fiestas'] ?? [],
             ],
         ];
-        $userId = auth()->id();
+        $userId = Auth::id();
         $planData[$userColumn] = $userId;
 
         if ($userColumn === 'id_user' && \Illuminate\Support\Facades\Schema::hasColumn((new \App\Models\Plan())->getTable(), 'user_id')) {
@@ -386,6 +396,16 @@ class PlanWizardController extends Controller
         Session::put('plan_saved_hash', $draftHash);
 
         return redirect()->route('plan.wizard.summary')->with('success', 'Plan guardado correctamente.');
+    }
+
+    /**
+     * Limpiar la sesión del plan después de completar el flujo
+     */
+    public function clearDraft()
+    {
+        Session::forget('draft_plan');
+        Session::forget('plan_saved_hash');
+        return redirect()->route('mis-planes')->with('success', 'Plan creado exitosamente. Puedes ver tus planes guardados en tu perfil.');
     }
 
     public function removeItem(Request $request)
