@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\File;
 use Illuminate\Validation\Rule;
 use App\Models\Plan;
 
@@ -85,6 +87,7 @@ class PerfilController extends Controller
             'actividades' => 'nullable|string|max:255',
             'tipo_viaje' => 'nullable|string|max:255',
             'password' => 'nullable|min:6|confirmed',
+            'profile_photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
         $user->nombre_apellidos = $request->nombre_apellidos;
@@ -101,7 +104,28 @@ class PerfilController extends Controller
         $user->tipo_viaje = $request->tipo_viaje;
 
         if ($request->password) {
-            $user->password = bcrypt($request->password);
+            $user->password = Hash::make($request->password);
+        }
+
+        if ($request->hasFile('profile_photo')) {
+            $file = $request->file('profile_photo');
+            $fileName = 'user_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $destination = public_path('img/profiles');
+
+            if (!File::exists($destination)) {
+                File::makeDirectory($destination, 0755, true);
+            }
+
+            $file->move($destination, $fileName);
+
+            if ($user->profile_photo && str_starts_with($user->profile_photo, 'img/profiles/')) {
+                $oldPath = public_path($user->profile_photo);
+                if (File::exists($oldPath)) {
+                    File::delete($oldPath);
+                }
+            }
+
+            $user->profile_photo = 'img/profiles/' . $fileName;
         }
 
         $user->save();
@@ -115,6 +139,9 @@ class PerfilController extends Controller
     public function destroy(Request $request)
     {
         $user = Auth::user();
+        $userColumn = Plan::userColumn();
+
+        Plan::where($userColumn, $user->id)->delete();
 
         Auth::logout();
 

@@ -1,20 +1,17 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar Sesión - TravelPlus</title>
-    <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
-    <script async defer src="https://cdn.jsdelivr.net/npm/altcha/dist/altcha.min.js" type="module"></script>
-</head>
-<body>
-    @include('partials.navbar')
+@extends('layouts.app')
 
-    <section class="auth-section">
+@section('title', 'Iniciar Sesión - MateCyL')
+
+@push('styles')
+<script async defer src="https://cdn.jsdelivr.net/npm/altcha/dist/altcha.min.js" type="module"></script>
+@endpush
+
+@section('content')
+<section class="auth-section">
         <div class="auth-container">
             <div class="auth-card">
                 <h1>Iniciar Sesión</h1>
-                <p class="auth-subtitle">Accede a tu cuenta TravelPlus</p>
+                <p class="auth-subtitle">Accede a tu cuenta MateCyL</p>
 
                 @if ($errors->any())
                     <div class="alert-danger">
@@ -57,11 +54,4 @@
             </div>
         </div>
     </section>
-
-    <footer>
-        <p>&copy; 2026 TravelPlus - Todos los derechos reservados</p>
-    </footer>
-
-    <script src="{{ asset('js/script.js') }}"></script>
-</body>
-</html>
+@endsection

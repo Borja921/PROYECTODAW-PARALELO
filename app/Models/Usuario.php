@@ -20,6 +20,7 @@ class Usuario extends Authenticatable
         'tipo_comida',
         'actividades',
         'tipo_viaje',
+        'profile_photo',
         'password',
     ];
 

@@ -1,6 +1,6 @@
 <nav class="navbar">
     <div class="navbar-container">
-        <div class="logo">✈️ TravelPlus</div>
+        <div class="logo">✈️ MateCyL</div>
         <div class="hamburger" id="hamburger" onclick="toggleMenu()">
             <span></span>
             <span></span>

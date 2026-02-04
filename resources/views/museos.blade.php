@@ -1,13 +1,8 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Museos - TravelPlus</title>
-    <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
-</head>
-<body>
-    @include('partials.navbar')
+@extends('layouts.app')
+
+@section('title', 'Museos - MateCyL')
+
+@section('content')
 
     <section class="hotels-section">
         <div class="hotels-container">
@@ -93,107 +88,100 @@
             </div>
         </div>
     </section>
+@endsection
 
-    <footer>
-        <p>&copy; 2026 TravelPlus - Todos los derechos reservados</p>
-    </footer>
+@push('scripts')
+<script>
+    // Almacenar todos los museos en memoria
+    const todosMuseos = @json($museums);
 
-    @include('partials.login-modal')
+    function filtrarPorLocalidad() {
+        const localitySelect = document.getElementById('locality-select');
+        const localidadSeleccionada = localitySelect.value;
 
-    <script>
-        // Almacenar todos los museos en memoria
-        const todosMuseos = @json($museums);
-
-        function filtrarPorLocalidad() {
-            const localitySelect = document.getElementById('locality-select');
-            const localidadSeleccionada = localitySelect.value;
-
-            if (!localidadSeleccionada) {
-                mostrarTodos();
-                return;
-            }
-
-            const museosFiltrados = todosMuseos.filter(museum =>
-                museum.locality === localidadSeleccionada
-            );
-
-            if (museosFiltrados.length === 0) {
-                document.getElementById('museums-grid').innerHTML = '';
-                document.getElementById('no-results').style.display = 'block';
-                return;
-            }
-
-            document.getElementById('no-results').style.display = 'none';
-            mostrarMuseos(museosFiltrados);
+        if (!localidadSeleccionada) {
+            mostrarTodos();
+            return;
         }
 
-        function mostrarMuseos(museos) {
-            const museumsGrid = document.getElementById('museums-grid');
-            const noResults = document.getElementById('no-results');
+        const museosFiltrados = todosMuseos.filter(museum =>
+            museum.locality === localidadSeleccionada
+        );
 
-            if (museos.length === 0) {
-                museumsGrid.innerHTML = '<div class="placeholder-container"><p class="placeholder-text">No hay museos disponibles para los filtros seleccionados</p></div>';
-                noResults.style.display = 'none';
-                return;
-            }
+        if (museosFiltrados.length === 0) {
+            document.getElementById('museums-grid').innerHTML = '';
+            document.getElementById('no-results').style.display = 'block';
+            return;
+        }
 
+        document.getElementById('no-results').style.display = 'none';
+        mostrarMuseos(museosFiltrados);
+    }
+
+    function mostrarMuseos(museos) {
+        const museumsGrid = document.getElementById('museums-grid');
+        const noResults = document.getElementById('no-results');
+
+        if (museos.length === 0) {
+            museumsGrid.innerHTML = '<div class="placeholder-container"><p class="placeholder-text">No hay museos disponibles para los filtros seleccionados</p></div>';
             noResults.style.display = 'none';
-            let html = '';
+            return;
+        }
 
-            museos.forEach(museum => {
-                const phoneLink = museum.phone ? `<p><strong>📞 Teléfono:</strong> <a href="tel:${museum.phone}">${museum.phone}</a></p>` : '';
-                const emailLink = museum.email ? `<p><strong>📧 Email:</strong> <a href="mailto:${museum.email}">${museum.email}</a></p>` : '';
-                const website = museum.website ? `<p><strong>🌐 Sitio Web:</strong> <a href="${museum.website}" target="_blank">Visitar web</a></p>` : '';
+        noResults.style.display = 'none';
+        let html = '';
 
-                html += `
-                    <div class="hotel-card">
-                        <div class="hotel-header">
-                            <div class="hotel-title">
-                                <h3>${museum.name}</h3>
-                                <p class="hotel-location">📍 ${museum.locality}, ${museum.province}</p>
-                            </div>
-                        </div>
+        museos.forEach(museum => {
+            const phoneLink = museum.phone ? `<p><strong>📞 Teléfono:</strong> <a href="tel:${museum.phone}">${museum.phone}</a></p>` : '';
+            const emailLink = museum.email ? `<p><strong>📧 Email:</strong> <a href="mailto:${museum.email}">${museum.email}</a></p>` : '';
+            const website = museum.website ? `<p><strong>🌐 Sitio Web:</strong> <a href="${museum.website}" target="_blank">Visitar web</a></p>` : '';
 
-                        <div class="hotel-body">
-                            ${museum.museum_type ? `<p class="hotel-classification"><strong>Tipo:</strong> ${museum.museum_type}</p>` : ''}
-                            ${museum.address ? `<p class="hotel-address"><strong>Dirección:</strong> ${museum.address}</p>` : ''}
-                            ${museum.postal_code ? `<p class="hotel-postal"><strong>Código Postal:</strong> ${museum.postal_code}</p>` : ''}
-
-                            <div class="hotel-contact">
-                                ${phoneLink}
-                                ${emailLink}
-                                ${website}
-                            </div>
-
-                            ${museum.description ? `<p class="hotel-description">${museum.description}</p>` : ''}
+            html += `
+                <div class="hotel-card">
+                    <div class="hotel-header">
+                        <div class="hotel-title">
+                            <h3>${museum.name}</h3>
+                            <p class="hotel-location">📍 ${museum.locality}, ${museum.province}</p>
                         </div>
                     </div>
-                `;
-            });
 
-            museumsGrid.innerHTML = html;
-        }
+                    <div class="hotel-body">
+                        ${museum.museum_type ? `<p class="hotel-classification"><strong>Tipo:</strong> ${museum.museum_type}</p>` : ''}
+                        ${museum.address ? `<p class="hotel-address"><strong>Dirección:</strong> ${museum.address}</p>` : ''}
+                        ${museum.postal_code ? `<p class="hotel-postal"><strong>Código Postal:</strong> ${museum.postal_code}</p>` : ''}
 
-        function mostrarTodos() {
-            const museumsGrid = document.getElementById('museums-grid');
-            const noResults = document.getElementById('no-results');
+                        <div class="hotel-contact">
+                            ${phoneLink}
+                            ${emailLink}
+                            ${website}
+                        </div>
 
-            if (todosMuseos.length === 0) {
-                museumsGrid.innerHTML = '<div class="placeholder-container"><p class="placeholder-text">No hay museos disponibles</p></div>';
-                noResults.style.display = 'none';
-                return;
-            }
-
-            noResults.style.display = 'none';
-            mostrarMuseos(todosMuseos);
-        }
-
-        // Inicializar en carga
-        document.addEventListener('DOMContentLoaded', function() {
-            mostrarTodos();
+                        ${museum.description ? `<p class="hotel-description">${museum.description}</p>` : ''}
+                    </div>
+                </div>
+            `;
         });
-    </script>
 
-    <script src="{{ asset('js/script.js') }}"></script>
-</body>
-</html>
+        museumsGrid.innerHTML = html;
+    }
+
+    function mostrarTodos() {
+        const museumsGrid = document.getElementById('museums-grid');
+        const noResults = document.getElementById('no-results');
+
+        if (todosMuseos.length === 0) {
+            museumsGrid.innerHTML = '<div class="placeholder-container"><p class="placeholder-text">No hay museos disponibles</p></div>';
+            noResults.style.display = 'none';
+            return;
+        }
+
+        noResults.style.display = 'none';
+        mostrarMuseos(todosMuseos);
+    }
+
+    // Inicializar en carga
+    document.addEventListener('DOMContentLoaded', function() {
+        mostrarTodos();
+    });
+</script>
+@endpush

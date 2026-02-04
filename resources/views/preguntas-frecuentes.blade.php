@@ -1,15 +1,9 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Preguntas Frecuentes - TravelPlus</title>
-    <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
-</head>
-<body>
-    @include('partials.navbar')
+@extends('layouts.app')
 
-    @include('partials.login-modal')
+@section('title', 'Preguntas Frecuentes - MateCyL')
+
+@section('content')
+<!--¡NO SE HACE USO!-->
 
     <section class="faq-section">
         <div class="faq-container">
@@ -32,7 +26,7 @@
 
                     <div class="faq-item">
                         <div class="faq-question" onclick="toggleFaq(this)">
-                            <span>¿Es necesario registrarse para usar TravelPlus?</span>
+                            <span>¿Es necesario registrarse para usar MateCyL?</span>
                             <span class="faq-toggle">+</span>
                         </div>
                         <div class="faq-answer">
@@ -110,11 +104,11 @@
 
                     <div class="faq-item">
                         <div class="faq-question" onclick="toggleFaq(this)">
-                            <span>¿TravelPlus realiza las reservas por mí?</span>
+                            <span>¿MateCyL realiza las reservas por mí?</span>
                             <span class="faq-toggle">+</span>
                         </div>
                         <div class="faq-answer">
-                            <p>No, TravelPlus es una plataforma de planificación. Te mostramos opciones y puedes reservar directamente en los sitios o contactar los establecimientos.</p>
+                            <p>No, MateCyL es una plataforma de planificación. Te mostramos opciones y puedes reservar directamente en los sitios o contactar los establecimientos.</p>
                         </div>
                     </div>
 
@@ -195,11 +189,4 @@
             </div>
         </div>
     </section>
-
-    <footer>
-        <p>&copy; 2026 TravelPlus - Todos los derechos reservados</p>
-    </footer>
-
-    <script src="{{ asset('js/script.js') }}"></script>
-</body>
-</html>
+@endsection

@@ -1,15 +1,8 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Explorar Destinos - TravelPlus</title>
-    <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
-</head>
-<body>
-    @include('partials.navbar')
+@extends('layouts.app')
 
-    @include('partials.login-modal')
+@section('title', 'Explorar Destinos - MateCyL')
+
+@section('content')
 
     <section class="explore-section">
         <div class="explore-header">
@@ -23,7 +16,7 @@
             <!-- Ávila -->
             <div class="destination-card">
                 <div class="destination-image" style="background: linear-gradient(135deg, #A89B9B, #9D8B7E);">
-                    🏰
+                    <img src="{{ asset('img/avila_imagen.jpg') }}" alt="Ávila" class="destination-photo">
                 </div>
                 <div class="destination-content">
                     <h3>Ávila</h3>
@@ -41,7 +34,7 @@
             <!-- Burgos -->
             <div class="destination-card">
                 <div class="destination-image" style="background: linear-gradient(135deg, #9D8B7E, #8B7B7B);">
-                    ⛪
+                    <img src="{{ asset('img/burgos_imagen.jpg') }}" alt="Burgos" class="destination-photo">
                 </div>
                 <div class="destination-content">
                     <h3>Burgos</h3>
@@ -59,7 +52,7 @@
             <!-- León -->
             <div class="destination-card">
                 <div class="destination-image" style="background: linear-gradient(135deg, #C0B5AA, #A89B9B);">
-                    👑
+                    <img src="{{ asset('img/leon_imagen.jpg') }}" alt="León" class="destination-photo">
                 </div>
                 <div class="destination-content">
                     <h3>León</h3>
@@ -77,7 +70,7 @@
             <!-- Palencia -->
             <div class="destination-card">
                 <div class="destination-image" style="background: linear-gradient(135deg, #8B7B7B, #D4CCC4);">
-                    🌾
+                    <img src="{{ asset('img/palencia_imagen.jpg') }}" alt="Palencia" class="destination-photo">
                 </div>
                 <div class="destination-content">
                     <h3>Palencia</h3>
@@ -95,7 +88,7 @@
             <!-- Segovia -->
             <div class="destination-card">
                 <div class="destination-image" style="background: linear-gradient(135deg, #A89B9B, #C0B5AA);">
-                    👸
+                    <img src="{{ asset('img/segovia_imagen.jpg') }}" alt="Segovia" class="destination-photo">
                 </div>
                 <div class="destination-content">
                     <h3>Segovia</h3>
@@ -113,7 +106,7 @@
             <!-- Soria -->
             <div class="destination-card">
                 <div class="destination-image" style="background: linear-gradient(135deg, #9D8B7E, #A89B9B);">
-                    🏞️
+                    <img src="{{ asset('img/soria_imagen.jpg') }}" alt="Soria" class="destination-photo">
                 </div>
                 <div class="destination-content">
                     <h3>Soria</h3>
@@ -131,7 +124,7 @@
             <!-- Valladolid -->
             <div class="destination-card">
                 <div class="destination-image" style="background: linear-gradient(135deg, #C0B5AA, #9D8B7E);">
-                    🎪
+                    <img src="{{ asset('img/valladolid_imagen.jpg') }}" alt="Valladolid" class="destination-photo">
                 </div>
                 <div class="destination-content">
                     <h3>Valladolid</h3>
@@ -149,7 +142,7 @@
             <!-- Zamora -->
             <div class="destination-card">
                 <div class="destination-image" style="background: linear-gradient(135deg, #8B7B7B, #A89B9B);">
-                    🏛️
+                    <img src="{{ asset('img/zamora_imagen.jpg') }}" alt="Zamora" class="destination-photo">
                 </div>
                 <div class="destination-content">
                     <h3>Zamora</h3>
@@ -167,7 +160,7 @@
             <!-- Salamanca -->
             <div class="destination-card">
                 <div class="destination-image" style="background: linear-gradient(135deg, #D4CCC4, #A89B9B);">
-                    🎓
+                    <img src="{{ asset('img/salamanca_imagen.jpg') }}" alt="Salamanca" class="destination-photo">
                 </div>
                 <div class="destination-content">
                     <h3>Salamanca</h3>
@@ -185,11 +178,4 @@
 
 
     </section>
-
-    <footer>
-        <p>&copy; 2026 TravelPlus - Todos los derechos reservados</p>
-    </footer>
-
-    <script src="{{ asset('js/script.js') }}"></script>
-</body>
-</html>
+@endsection

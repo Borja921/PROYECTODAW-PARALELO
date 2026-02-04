@@ -1,16 +1,13 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planear Viaje - TravelPlus</title>
-    <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-</head>
-<body>
-    @include('partials.navbar')
+@extends('layouts.app')
+
+@section('title', 'Planear Viaje - MateCyL')
+
+@push('styles')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+@endpush
+
+@section('content')
 
     <section class="planes-section">
         <div class="planes-container">
@@ -117,12 +114,12 @@
             </div>
         </div>
     </section>
+@endsection
 
-    <footer>
-        <p>&copy; 2026 TravelPlus - Todos los derechos reservados</p>
-    </footer>
-
-    <script src="{{ asset('js/script.js') }}"></script>
-    <script src="{{ asset('js/planes-municipios.js') }}" defer></script>
-</body>
-</html>
+@push('scripts')
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="{{ asset('js/planes-dates.js') }}" defer></script>
+<script src="{{ asset('js/planes-map-weather.js') }}" defer></script>
+<script src="{{ asset('js/planes-municipios.js') }}" defer></script>
+@endpush

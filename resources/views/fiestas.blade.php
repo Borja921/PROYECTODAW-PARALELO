@@ -1,13 +1,8 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fiestas y Festivales - TravelPlus</title>
-    <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
-</head>
-<body>
-    @include('partials.navbar')
+@extends('layouts.app')
+
+@section('title', 'Fiestas y Festivales - MateCyL')
+
+@section('content')
 
     <section class="hotels-section">
         <div class="hotels-container">
@@ -109,147 +104,140 @@
             </div>
         </div>
     </section>
+@endsection
 
-    <footer>
-        <p>&copy; 2026 TravelPlus - Todos los derechos reservados</p>
-    </footer>
+@push('scripts')
+<script>
+    // Almacenar todos los festivales en memoria
+    const todosFestivales = @json($festivals);
 
-    @include('partials.login-modal')
+    function filtrarPorProvincia() {
+        const provinceSelect = document.getElementById('province-select');
+        const localitySelect = document.getElementById('locality-select');
+        const provinciaSeleccionada = provinceSelect.value;
 
-    <script>
-        // Almacenar todos los festivales en memoria
-        const todosFestivales = @json($festivals);
+        localitySelect.innerHTML = '<option value="">-- Todas las localidades --</option>';
+        localitySelect.disabled = !provinciaSeleccionada;
 
-        function filtrarPorProvincia() {
-            const provinceSelect = document.getElementById('province-select');
-            const localitySelect = document.getElementById('locality-select');
-            const provinciaSeleccionada = provinceSelect.value;
+        if (!provinciaSeleccionada) {
+            mostrarTodos();
+            return;
+        }
 
-            localitySelect.innerHTML = '<option value="">-- Todas las localidades --</option>';
-            localitySelect.disabled = !provinciaSeleccionada;
-
-            if (!provinciaSeleccionada) {
-                mostrarTodos();
-                return;
-            }
-
-            const localidadesUnicas = {};
-            todosFestivales.forEach(festival => {
-                if (festival.province === provinciaSeleccionada && festival.locality) {
-                    if (!localidadesUnicas[festival.locality]) {
-                        localidadesUnicas[festival.locality] = 0;
-                    }
-                    localidadesUnicas[festival.locality]++;
+        const localidadesUnicas = {};
+        todosFestivales.forEach(festival => {
+            if (festival.province === provinciaSeleccionada && festival.locality) {
+                if (!localidadesUnicas[festival.locality]) {
+                    localidadesUnicas[festival.locality] = 0;
                 }
-            });
+                localidadesUnicas[festival.locality]++;
+            }
+        });
 
-            const localidadesOrdenadas = Object.keys(localidadesUnicas).sort();
-            localidadesOrdenadas.forEach(localidad => {
-                const option = document.createElement('option');
-                option.value = localidad;
-                option.textContent = `${localidad} (${localidadesUnicas[localidad]} festivales)`;
-                localitySelect.appendChild(option);
-            });
+        const localidadesOrdenadas = Object.keys(localidadesUnicas).sort();
+        localidadesOrdenadas.forEach(localidad => {
+            const option = document.createElement('option');
+            option.value = localidad;
+            option.textContent = `${localidad} (${localidadesUnicas[localidad]} festivales)`;
+            localitySelect.appendChild(option);
+        });
 
+        const festivalesProvincia = todosFestivales.filter(festival => festival.province === provinciaSeleccionada);
+        mostrarFestivales(festivalesProvincia);
+    }
+
+    function filtrarPorLocalidad() {
+        const provinceSelect = document.getElementById('province-select');
+        const localitySelect = document.getElementById('locality-select');
+        const provinciaSeleccionada = provinceSelect.value;
+        const localidadSeleccionada = localitySelect.value;
+
+        if (!provinciaSeleccionada) return;
+
+        if (!localidadSeleccionada) {
             const festivalesProvincia = todosFestivales.filter(festival => festival.province === provinciaSeleccionada);
             mostrarFestivales(festivalesProvincia);
+            return;
         }
 
-        function filtrarPorLocalidad() {
-            const provinceSelect = document.getElementById('province-select');
-            const localitySelect = document.getElementById('locality-select');
-            const provinciaSeleccionada = provinceSelect.value;
-            const localidadSeleccionada = localitySelect.value;
+        const festivalesFiltrados = todosFestivales.filter(festival =>
+            festival.province === provinciaSeleccionada &&
+            festival.locality === localidadSeleccionada
+        );
 
-            if (!provinciaSeleccionada) return;
-
-            if (!localidadSeleccionada) {
-                const festivalesProvincia = todosFestivales.filter(festival => festival.province === provinciaSeleccionada);
-                mostrarFestivales(festivalesProvincia);
-                return;
-            }
-
-            const festivalesFiltrados = todosFestivales.filter(festival =>
-                festival.province === provinciaSeleccionada &&
-                festival.locality === localidadSeleccionada
-            );
-
-            if (festivalesFiltrados.length === 0) {
-                document.getElementById('festivals-grid').innerHTML = '';
-                document.getElementById('no-results').style.display = 'block';
-                return;
-            }
-
-            document.getElementById('no-results').style.display = 'none';
-            mostrarFestivales(festivalesFiltrados);
+        if (festivalesFiltrados.length === 0) {
+            document.getElementById('festivals-grid').innerHTML = '';
+            document.getElementById('no-results').style.display = 'block';
+            return;
         }
 
-        function mostrarTodos() {
-            if (todosFestivales.length === 0) {
-                document.getElementById('festivals-grid').innerHTML = '<div class="placeholder-container"><p class="placeholder-text">No hay festivales disponibles</p></div>';
-                return;
-            }
-            mostrarFestivales(todosFestivales);
+        document.getElementById('no-results').style.display = 'none';
+        mostrarFestivales(festivalesFiltrados);
+    }
+
+    function mostrarTodos() {
+        if (todosFestivales.length === 0) {
+            document.getElementById('festivals-grid').innerHTML = '<div class="placeholder-container"><p class="placeholder-text">No hay festivales disponibles</p></div>';
+            return;
         }
+        mostrarFestivales(todosFestivales);
+    }
 
-        function mostrarFestivales(festivales) {
-            const festivalsGrid = document.getElementById('festivals-grid');
-            const noResults = document.getElementById('no-results');
+    function mostrarFestivales(festivales) {
+        const festivalsGrid = document.getElementById('festivals-grid');
+        const noResults = document.getElementById('no-results');
 
-            if (festivales.length === 0) {
-                festivalsGrid.innerHTML = '<div class="placeholder-container"><p class="placeholder-text">No hay festivales disponibles para los filtros seleccionados</p></div>';
-                noResults.style.display = 'none';
-                return;
-            }
-
+        if (festivales.length === 0) {
+            festivalsGrid.innerHTML = '<div class="placeholder-container"><p class="placeholder-text">No hay festivales disponibles para los filtros seleccionados</p></div>';
             noResults.style.display = 'none';
-            let html = '';
+            return;
+        }
 
-            festivales.forEach(festival => {
-                const phoneLink = festival.phone ? `<p><strong>📞 Teléfono:</strong> <a href="tel:${festival.phone}">${festival.phone}</a></p>` : '';
-                const emailLink = festival.email ? `<p><strong>📧 Email:</strong> <a href="mailto:${festival.email}">${festival.email}</a></p>` : '';
-                const website = festival.website ? `<p><strong>🌐 Sitio Web:</strong> <a href="${festival.website}" target="_blank">Visitar web</a></p>` : '';
+        noResults.style.display = 'none';
+        let html = '';
 
-                const fechas = festival.start_date ? `<p class="hotel-classification"><strong>📅 Fechas:</strong> ${new Date(festival.start_date).toLocaleDateString('es-ES')} ${festival.end_date ? ' - ' + new Date(festival.end_date).toLocaleDateString('es-ES') : ''}</p>` : '';
-                const time = festival.time ? `<p class="hotel-classification"><strong>⏰ Horario:</strong> ${festival.time}</p>` : '';
-                const price = festival.price ? `<p class="hotel-classification"><strong>💰 Precio:</strong> ${festival.price}</p>` : '';
+        festivales.forEach(festival => {
+            const phoneLink = festival.phone ? `<p><strong>📞 Teléfono:</strong> <a href="tel:${festival.phone}">${festival.phone}</a></p>` : '';
+            const emailLink = festival.email ? `<p><strong>📧 Email:</strong> <a href="mailto:${festival.email}">${festival.email}</a></p>` : '';
+            const website = festival.website ? `<p><strong>🌐 Sitio Web:</strong> <a href="${festival.website}" target="_blank">Visitar web</a></p>` : '';
 
-                html += `
-                    <div class="hotel-card">
-                        <div class="hotel-header">
-                            <div class="hotel-title">
-                                <h3>${festival.name}</h3>
-                                <p class="hotel-location">📍 ${festival.locality}, ${festival.province}</p>
-                            </div>
-                        </div>
+            const fechas = festival.start_date ? `<p class="hotel-classification"><strong>📅 Fechas:</strong> ${new Date(festival.start_date).toLocaleDateString('es-ES')} ${festival.end_date ? ' - ' + new Date(festival.end_date).toLocaleDateString('es-ES') : ''}</p>` : '';
+            const time = festival.time ? `<p class="hotel-classification"><strong>⏰ Horario:</strong> ${festival.time}</p>` : '';
+            const price = festival.price ? `<p class="hotel-classification"><strong>💰 Precio:</strong> ${festival.price}</p>` : '';
 
-                        <div class="hotel-body">
-                            ${festival.festival_type ? `<p class="hotel-classification"><strong>Tipo:</strong> ${festival.festival_type}</p>` : ''}
-                            ${fechas}
-                            ${time}
-                            ${price}
-                            ${festival.address ? `<p class="hotel-address"><strong>Dirección:</strong> ${festival.address}</p>` : ''}
-
-                            <div class="hotel-contact">
-                                ${phoneLink}
-                                ${emailLink}
-                                ${website}
-                            </div>
-
-                            ${festival.description ? `<p class="hotel-description">${festival.description}</p>` : ''}
+            html += `
+                <div class="hotel-card">
+                    <div class="hotel-header">
+                        <div class="hotel-title">
+                            <h3>${festival.name}</h3>
+                            <p class="hotel-location">📍 ${festival.locality}, ${festival.province}</p>
                         </div>
                     </div>
-                `;
-            });
 
-            festivalsGrid.innerHTML = html;
-        }
+                    <div class="hotel-body">
+                        ${festival.festival_type ? `<p class="hotel-classification"><strong>Tipo:</strong> ${festival.festival_type}</p>` : ''}
+                        ${fechas}
+                        ${time}
+                        ${price}
+                        ${festival.address ? `<p class="hotel-address"><strong>Dirección:</strong> ${festival.address}</p>` : ''}
 
-        document.addEventListener('DOMContentLoaded', function() {
-            mostrarTodos();
+                        <div class="hotel-contact">
+                            ${phoneLink}
+                            ${emailLink}
+                            ${website}
+                        </div>
+
+                        ${festival.description ? `<p class="hotel-description">${festival.description}</p>` : ''}
+                    </div>
+                </div>
+            `;
         });
-    </script>
 
-    <script src="{{ asset('js/script.js') }}"></script>
-</body>
-</html>
+        festivalsGrid.innerHTML = html;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        mostrarTodos();
+    });
+</script>
+@endpush

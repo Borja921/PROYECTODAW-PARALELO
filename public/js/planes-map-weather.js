@@ -49,7 +49,7 @@ async function getCoordinatesForMunicipio(municipio, provincia) {
         
         const response = await fetch(url, {
             headers: {
-                'User-Agent': 'TravelPlus App'
+                'User-Agent': 'MateCyL App'
             }
         });
         

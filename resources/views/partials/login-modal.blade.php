@@ -14,7 +14,7 @@
         <!-- Formulario de Login -->
         <div id="loginForm" class="auth-tab-content active">
             <h2>Bienvenido</h2>
-            <p class="auth-subtitle">Accede a tu cuenta TravelPlus</p>
+            <p class="auth-subtitle">Accede a tu cuenta MateCyL</p>
 
             @if ($errors->any())
                 <div class="alert">
@@ -55,7 +55,7 @@
         <!-- Formulario de Registro -->
         <div id="registroForm" class="auth-tab-content">
             <h2>Crear Cuenta</h2>
-            <p class="auth-subtitle">Únete a TravelPlus</p>
+            <p class="auth-subtitle">Únete a MateCyL</p>
 
             <form method="POST" action="{{ route('registro.store') }}" class="auth-form">
                 @csrf

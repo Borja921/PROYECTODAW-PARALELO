@@ -1,8 +1,8 @@
-# TravelPlus - Guía de Configuración e Importación de Datos
+# MateCyL - Guía de Configuración e Importación de Datos
 
 ## Descripción del Proyecto
 
-TravelPlus es una aplicación web de planificación de viajes construida con Laravel, que permite a los usuarios explorar destinos, crear planes de viaje personalizados y consultar información de alojamientos hoteleros reales de la comunidad autónoma de Castilla y León.
+MateCyL es una aplicación web de planificación de viajes construida con Laravel, que permite a los usuarios explorar destinos, crear planes de viaje personalizados y consultar información de alojamientos hoteleros reales de la comunidad autónoma de Castilla y León.
 
 ## Estructura del Proyecto
 

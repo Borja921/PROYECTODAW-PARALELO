@@ -1,20 +1,19 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Perfil - TravelPlus</title>
-    <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
-</head>
-<body>
-    @include('partials.navbar')
+@extends('layouts.app')
 
-    @include('partials.login-modal')
+@section('title', 'Mi Perfil - MateCyL')
+
+@section('content')
 
     <section class="profile-section">
         <div class="profile-container">
             <div class="profile-header">
-                <div class="profile-avatar">👤</div>
+                <div class="profile-avatar">
+                    @if($user->profile_photo)
+                        <img src="{{ asset($user->profile_photo) }}" alt="Foto de perfil">
+                    @else
+                        👤
+                    @endif
+                </div>
                 <div class="profile-info">
                     <h1>{{ $user->nombre_apellidos }}</h1>
                     <p class="profile-email">{{ $user->email }}</p>
@@ -142,10 +141,6 @@
         </div>
     </section>
 
-    <footer>
-        <p>&copy; 2026 TravelPlus - Todos los derechos reservados</p>
-    </footer>
-
     <!-- Modal de edición de perfil -->
     <div id="editProfileModal" class="modal-overlay">
         <div class="modal-content" style="max-width: 520px;">
@@ -155,7 +150,7 @@
                 <h2 style="margin-bottom: 0.5rem;">Editar Perfil</h2>
                 <p style="color: #666; margin-bottom: 1.5rem;">Actualiza tu información personal</p>
 
-                <form method="POST" action="{{ route('perfil.update') }}" class="edit-profile-form">
+                <form method="POST" action="{{ route('perfil.update') }}" class="edit-profile-form" enctype="multipart/form-data">
                     @csrf
 
                     <div class="form-group">
@@ -212,6 +207,14 @@
                             value="{{ old('fecha_nacimiento', $user->fecha_nacimiento) }}"
                         >
                         @error('fecha_nacimiento')
+                            <span class="text-danger">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label for="modal_profile_photo">Foto de Perfil</label>
+                        <input id="modal_profile_photo" name="profile_photo" type="file" accept="image/*">
+                        @error('profile_photo')
                             <span class="text-danger">{{ $message }}</span>
                         @enderror
                     </div>
@@ -313,22 +316,22 @@
             </div>
         </div>
     </div>
+@endsection
 
-    <script src="{{ asset('js/script.js') }}"></script>
-    <script>
-        function openEditProfileModal() {
-            document.getElementById('editProfileModal').classList.add('active');
-        }
+@push('scripts')
+<script>
+    function openEditProfileModal() {
+        document.getElementById('editProfileModal').classList.add('active');
+    }
 
-        function closeEditProfileModal() {
-            document.getElementById('editProfileModal').classList.remove('active');
-        }
+    function closeEditProfileModal() {
+        document.getElementById('editProfileModal').classList.remove('active');
+    }
 
-        window.addEventListener('load', function() {
-            @if ($errors->any())
-                openEditProfileModal();
-            @endif
-        });
-    </script>
-</body>
-</html>
+    window.addEventListener('load', function() {
+        @if ($errors->any())
+            openEditProfileModal();
+        @endif
+    });
+</script>
+@endpush

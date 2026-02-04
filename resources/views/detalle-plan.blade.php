@@ -1,128 +1,126 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalle del Plan - TravelPlus</title>
-    <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
-    <style>
-        .summary-card {
-            background: linear-gradient(135deg, #ffffff 0%, #f9f6f2 100%);
-            border: 1px solid #e7e1db;
-            border-radius: 22px;
-            padding: 24px;
-            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.10);
-            position: relative;
-            overflow: hidden;
-            margin-top: 20px;
-        }
+@extends('layouts.app')
 
-        .summary-card::before {
-            content: "";
-            position: absolute;
-            top: -60px;
-            right: -60px;
-            width: 160px;
-            height: 160px;
-            background: radial-gradient(circle, rgba(139, 123, 123, 0.18) 0%, rgba(139, 123, 123, 0) 70%);
-            pointer-events: none;
-        }
+@section('title', 'Detalle del Plan - MateCyL')
 
-        .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 14px;
-            margin-top: 18px;
-        }
+@push('styles')
+<style>
+    .summary-card {
+        background: linear-gradient(135deg, #ffffff 0%, #f9f6f2 100%);
+        border: 1px solid #e7e1db;
+        border-radius: 22px;
+        padding: 24px;
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.10);
+        position: relative;
+        overflow: hidden;
+        margin-top: 20px;
+    }
 
-        .summary-item {
-            background: #ffffff;
-            border: 1px solid #eee6de;
-            border-radius: 14px;
-            padding: 14px;
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
-            position: relative;
-        }
+    .summary-card::before {
+        content: "";
+        position: absolute;
+        top: -60px;
+        right: -60px;
+        width: 160px;
+        height: 160px;
+        background: radial-gradient(circle, rgba(139, 123, 123, 0.18) 0%, rgba(139, 123, 123, 0) 70%);
+        pointer-events: none;
+    }
 
-        .summary-item strong {
-            display: block;
-            color: #333;
-            margin-bottom: 12px;
-            font-size: 1.1rem;
-        }
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 14px;
+        margin-top: 18px;
+    }
 
-        .summary-item .item-icon {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            font-size: 1.3rem;
-            opacity: 0.7;
-        }
+    .summary-item {
+        background: #ffffff;
+        border: 1px solid #eee6de;
+        border-radius: 14px;
+        padding: 14px;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+        position: relative;
+    }
 
-        .item-container {
-            background: #f8f6f3;
-            padding: 12px 14px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            border-left: 3px solid #8b7b7b;
-        }
+    .summary-item strong {
+        display: block;
+        color: #333;
+        margin-bottom: 12px;
+        font-size: 1.1rem;
+    }
 
-        .item-container h4 {
-            margin: 0 0 8px 0;
-            font-size: 1.05rem;
-            color: #2f2a26;
-        }
+    .summary-item .item-icon {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        font-size: 1.3rem;
+        opacity: 0.7;
+    }
 
-        .item-container p {
-            margin: 4px 0;
-            font-size: 0.9rem;
-            color: #5b4f48;
-        }
+    .item-container {
+        background: #f8f6f3;
+        padding: 12px 14px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        border-left: 3px solid #8b7b7b;
+    }
 
-        .badge-empty {
-            display: inline-block;
-            background: #fff1f1;
-            color: #b15a5a;
-            font-size: 12px;
-            padding: 4px 10px;
-            border-radius: 999px;
-            border: 1px dashed #e7b3b3;
-            margin-top: 6px;
-        }
+    .item-container h4 {
+        margin: 0 0 8px 0;
+        font-size: 1.05rem;
+        color: #2f2a26;
+    }
 
-        .summary-header {
-            background: linear-gradient(135deg, rgba(139, 123, 123, 0.12), rgba(192, 181, 170, 0.12));
-            border: 1px solid #f0e3d9;
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 20px;
-        }
+    .item-container p {
+        margin: 4px 0;
+        font-size: 0.9rem;
+        color: #5b4f48;
+    }
 
-        .summary-title {
-            font-weight: 700;
-            color: #4b3f37;
-            font-size: 1.05rem;
-            margin-bottom: 12px;
-        }
+    .badge-empty {
+        display: inline-block;
+        background: #fff1f1;
+        color: #b15a5a;
+        font-size: 12px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        border: 1px dashed #e7b3b3;
+        margin-top: 6px;
+    }
 
-        .summary-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 12px;
-            border-radius: 999px;
-            background: #ffffff;
-            border: 1px solid #eddccf;
-            font-weight: 600;
-            color: #5b4f48;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
-            margin-right: 8px;
-            margin-bottom: 8px;
-        }
-    </style>
-</head>
-<body>
-    @include('partials.navbar')
+    .summary-header {
+        background: linear-gradient(135deg, rgba(139, 123, 123, 0.12), rgba(192, 181, 170, 0.12));
+        border: 1px solid #f0e3d9;
+        border-radius: 16px;
+        padding: 16px;
+        margin-bottom: 20px;
+    }
+
+    .summary-title {
+        font-weight: 700;
+        color: #4b3f37;
+        font-size: 1.05rem;
+        margin-bottom: 12px;
+    }
+
+    .summary-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: #ffffff;
+        border: 1px solid #eddccf;
+        font-weight: 600;
+        color: #5b4f48;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+        margin-right: 8px;
+        margin-bottom: 8px;
+    }
+</style>
+@endpush
+
+@section('content')
 
     <section class="plan-detail-section">
         <div class="plan-detail-container">
@@ -249,10 +247,6 @@
         </div>
     </section>
 
-    <footer>
-        <p>&copy; 2026 TravelPlus - Todos los derechos reservados</p>
-    </footer>
-
     <!-- Modal de confirmación para finalizar -->
     <div id="confirmModal" class="modal-overlay">
         <div class="modal-content">
@@ -289,47 +283,47 @@
             </div>
         </div>
     </div>
+@endsection
 
-    <script src="{{ asset('js/script.js') }}"></script>
-    <script>
-        function showConfirmModal() {
-            document.getElementById('confirmModal').classList.add('active');
+@push('scripts')
+<script>
+    function showConfirmModal() {
+        document.getElementById('confirmModal').classList.add('active');
+    }
+
+    function closeConfirmModal() {
+        document.getElementById('confirmModal').classList.remove('active');
+    }
+
+    function confirmFinalize() {
+        closeConfirmModal();
+        const alert = document.getElementById('successAlert');
+        if (alert) {
+            alert.style.display = 'none';
         }
+        document.getElementById('finalizePlanForm').submit();
+    }
 
-        function closeConfirmModal() {
-            document.getElementById('confirmModal').classList.remove('active');
+    function showDeleteModal() {
+        document.getElementById('deleteModal').classList.add('active');
+    }
+
+    function closeDeleteModal() {
+        document.getElementById('deleteModal').classList.remove('active');
+    }
+
+    function confirmDelete() {
+        closeDeleteModal();
+        document.getElementById('deletePlanForm').submit();
+    }
+
+    window.addEventListener('load', function() {
+        const alert = document.getElementById('successAlert');
+        if (alert) {
+            setTimeout(function() {
+                alert.classList.add('show');
+            }, 100);
         }
-
-        function confirmFinalize() {
-            closeConfirmModal();
-            const alert = document.getElementById('successAlert');
-            if (alert) {
-                alert.style.display = 'none';
-            }
-            document.getElementById('finalizePlanForm').submit();
-        }
-
-        function showDeleteModal() {
-            document.getElementById('deleteModal').classList.add('active');
-        }
-
-        function closeDeleteModal() {
-            document.getElementById('deleteModal').classList.remove('active');
-        }
-
-        function confirmDelete() {
-            closeDeleteModal();
-            document.getElementById('deletePlanForm').submit();
-        }
-
-        window.addEventListener('load', function() {
-            const alert = document.getElementById('successAlert');
-            if (alert) {
-                setTimeout(function() {
-                    alert.classList.add('show');
-                }, 100);
-            }
-        });
-    </script>
-</body>
-</html>
+    });
+</script>
+@endpush

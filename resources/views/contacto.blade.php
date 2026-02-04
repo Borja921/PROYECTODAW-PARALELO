@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contacto - TravelPlus</title>
+    <title>Contacto - MateCyL</title>
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
 </head>
 <body>
@@ -66,7 +66,7 @@
 
                     <div class="contact-info-box">
                         <h3>📧 Email</h3>
-                        <p>soporte@travelplus.com</p>
+                        <p>soporte@matecyl.com</p>
                         <small>Responderemos en 24 horas</small>
                     </div>
 
@@ -115,7 +115,7 @@
     </section>
 
     <footer>
-        <p>&copy; 2026 TravelPlus - Todos los derechos reservados</p>
+        <p>&copy; 2026 MateCyL - Todos los derechos reservados</p>
     </footer>
 
     <script src="{{ asset('js/script.js') }}"></script>

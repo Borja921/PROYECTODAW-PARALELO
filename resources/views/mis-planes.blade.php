@@ -1,14 +1,12 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Mis Planes - TravelPlus</title>
-    <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
-</head>
-<body>
-    @include('partials.navbar')
+@extends('layouts.app')
+
+@section('title', 'Mis Planes - MateCyL')
+
+@push('styles')
+<meta name="csrf-token" content="{{ csrf_token() }}">
+@endpush
+
+@section('content')
 
     <section class="planes-list-section">
         <div class="planes-list-container">
@@ -59,67 +57,63 @@
             </div>
         </div>
     </section>
+@endsection
 
-    <footer>
-        <p>&copy; 2026 TravelPlus - Todos los derechos reservados</p>
-    </footer>
+@push('scripts')
+<script>
+    function toggleFavorite(planId, button) {
+        fetch(`/mis-planes/${planId}/toggle-favorite`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]') ? document.querySelector('meta[name="csrf-token"]').getAttribute('content') : document.querySelector('input[name="_token"]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const icon = button.querySelector('.favorite-icon');
+                icon.textContent = data.is_favorite ? '★' : '☆';
+                button.title = data.is_favorite ? 'Remover de favoritos' : 'Agregar a favoritos';
+                
+                // Actualizar el atributo data-favorite en la tarjeta
+                const card = button.closest('.plan-card');
+                card.setAttribute('data-favorite', data.is_favorite ? 'true' : 'false');
+                
+                // Animar el botón
+                button.classList.add('favorite-animate');
+                setTimeout(() => button.classList.remove('favorite-animate'), 300);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
 
-    <script src="{{ asset('js/script.js') }}"></script>
-    <script>
-        function toggleFavorite(planId, button) {
-            fetch(`/PROYECTODAW-PARALELO/public/mis-planes/${planId}/toggle-favorite`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]') ? document.querySelector('meta[name="csrf-token"]').getAttribute('content') : document.querySelector('input[name="_token"]').value
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const icon = button.querySelector('.favorite-icon');
-                    icon.textContent = data.is_favorite ? '★' : '☆';
-                    button.title = data.is_favorite ? 'Remover de favoritos' : 'Agregar a favoritos';
-                    
-                    // Actualizar el atributo data-favorite en la tarjeta
-                    const card = button.closest('.plan-card');
-                    card.setAttribute('data-favorite', data.is_favorite ? 'true' : 'false');
-                    
-                    // Animar el botón
-                    button.classList.add('favorite-animate');
-                    setTimeout(() => button.classList.remove('favorite-animate'), 300);
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        }
+    function filtrarPorEstado(estado) {
+        const cards = document.querySelectorAll('.plan-card');
+        const buttons = document.querySelectorAll('.tab-button');
 
-        function filtrarPorEstado(estado) {
-            const cards = document.querySelectorAll('.plan-card');
-            const buttons = document.querySelectorAll('.tab-button');
+        // Actualizar botón activo
+        buttons.forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
 
-            // Actualizar botón activo
-            buttons.forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
+        // Filtrar cards
+        cards.forEach(card => {
+            const cardStatus = card.getAttribute('data-status');
+            const isFavorite = card.getAttribute('data-favorite') === 'true';
+            let mostrar = false;
 
-            // Filtrar cards
-            cards.forEach(card => {
-                const cardStatus = card.getAttribute('data-status');
-                const isFavorite = card.getAttribute('data-favorite') === 'true';
-                let mostrar = false;
+            if (estado === 'todos') {
+                mostrar = true;
+            } else if (estado === 'favoritos') {
+                mostrar = isFavorite;
+            } else if (estado === 'finalizados') {
+                mostrar = cardStatus === 'completado';
+            } else if (estado === 'sinFinalizar') {
+                mostrar = cardStatus !== 'completado';
+            }
 
-                if (estado === 'todos') {
-                    mostrar = true;
-                } else if (estado === 'favoritos') {
-                    mostrar = isFavorite;
-                } else if (estado === 'finalizados') {
-                    mostrar = cardStatus === 'completado';
-                } else if (estado === 'sinFinalizar') {
-                    mostrar = cardStatus !== 'completado';
-                }
-
-                card.style.display = mostrar ? 'block' : 'none';
-            });
-        }
-    </script>
-</body>
-</html>
+            card.style.display = mostrar ? 'block' : 'none';
+        });
+    }
+</script>
+@endpush
