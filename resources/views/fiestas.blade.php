@@ -3,17 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Fiestas y festivales en Castilla y León - Eventos y celebraciones">
     <title>Fiestas y Festivales - TravelPlus</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
 </head>
 <body>
     @include('partials.navbar')
 
-    <section class="hotels-section">
+    <!-- HERO FIESTAS -->
+    <section class="hero-festivals">
+        <div class="hero-festivals-content">
+            <span class="hero-label">CELEBRACIONES</span>
+            <h1>VIVE LAS<br>FIESTAS</h1>
+            <p>Únete a celebraciones tradicionales y eventos únicos todo el año</p>
+        </div>
+    </section>
+
+    <!-- CONTENEDOR FIESTAS -->
+    <section class="hotels-section hotels-modern">
         <div class="hotels-container">
             <div class="hotels-header">
-                <h1>Fiestas y Festivales</h1>
-                <p class="subtitle">Descubre las mejores celebraciones y eventos culturales de la región</p>
+                <h2>EVENTOS Y FESTIVALES</h2>
+                <p>Descubre las mejores celebraciones tradicionales y eventos modernos</p>
             </div>
 
             <div class="hotels-filters">
@@ -111,7 +125,9 @@
     </section>
 
     <footer>
-        <p>&copy; 2026 TravelPlus - Todos los derechos reservados</p>
+        <div class="footer-content">
+            <p>&copy; 2026 TravelPlus - Celebrando Castilla y León</p>
+        </div>
     </footer>
 
     @include('partials.login-modal')

@@ -3,17 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Alojamientos en Castilla y León - Hoteles, hostales y hospedajes">
     <title>Alojamientos Hoteleros - TravelPlus</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
 </head>
 <body>
     @include('partials.navbar')
 
-    <section class="hotels-section">
+    <!-- HERO HOTELES -->
+    <section class="hero-hotels">
+        <div class="hero-hotels-content">
+            <span class="hero-label">ALOJAMIENTOS</span>
+            <h1>TU HOGAR EN<br>CASTILLA Y LEÓN</h1>
+            <p>Descubre hospedajes selectos en cada rincón de la región</p>
+        </div>
+    </section>
+
+    <!-- CONTENEDOR HOTELES MODERNO -->
+    <section class="hotels-section hotels-modern">
         <div class="hotels-container">
             <div class="hotels-header">
-                <h1>Alojamientos Hoteleros</h1>
-                <p class="subtitle">Explora los mejores hoteles disponibles en la región</p>
+                <h2>ALOJAMIENTOS DISPONIBLES</h2>
+                <p>Filtra por provincia y localidad para encontrar tu hospedaje perfecto</p>
             </div>
 
             <div class="hotels-filters">
@@ -101,7 +115,9 @@
     </section>
 
     <footer>
-        <p>&copy; 2026 TravelPlus - Todos los derechos reservados</p>
+        <div class="footer-content">
+            <p>&copy; 2026 TravelPlus - Tu compañero en Castilla y León</p>
+        </div>
     </footer>
 
     @include('partials.login-modal')

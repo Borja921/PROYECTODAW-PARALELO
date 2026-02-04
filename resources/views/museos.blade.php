@@ -3,17 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Museos en Castilla y León - Explora la cultura y el arte">
     <title>Museos - TravelPlus</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
 </head>
 <body>
     @include('partials.navbar')
 
-    <section class="hotels-section">
+    <!-- HERO MUSEOS -->
+    <section class="hero-museums">
+        <div class="hero-museums-content">
+            <span class="hero-label">CULTURA</span>
+            <h1>EXPLORA EL<br>PATRIMONIO</h1>
+            <p>Sumérgete en el arte, historia y tradición de Castilla y León</p>
+        </div>
+    </section>
+
+    <!-- CONTENEDOR MUSEOS -->
+    <section class="hotels-section hotels-modern">
         <div class="hotels-container">
             <div class="hotels-header">
-                <h1>Museos y Galerías</h1>
-                <p class="subtitle">Explora los mejores museos y espacios culturales disponibles</p>
+                <h2>MUSEOS Y ESPACIOS CULTURALES</h2>
+                <p>Descubre colecciones únicas y experiencias artísticas inmersivas</p>
             </div>
 
             <div class="hotels-filters">
@@ -95,7 +109,9 @@
     </section>
 
     <footer>
-        <p>&copy; 2026 TravelPlus - Todos los derechos reservados</p>
+        <div class="footer-content">
+            <p>&copy; 2026 TravelPlus - Patrimonio de Castilla y León</p>
+        </div>
     </footer>
 
     @include('partials.login-modal')

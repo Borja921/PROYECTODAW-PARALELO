@@ -3,81 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="TravelPlus - Planifica tus viajes por Castilla y León">
     <title>TravelPlus - Planifica tus viajes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
 </head>
 <body>
     @include('partials.navbar')
-
     @include('partials.login-modal')
 
-    <!-- Sección: Qué es TravelPlus -->
-    <section class="about-section">
-        <div class="about-container">
-            <h1>Descubre Castilla y León como nunca antes</h1>
-            <p class="about-lead">
-                TravelPlus es tu compañero perfecto para explorar los rincones más fascinantes de Castilla y León. 
-                Creamos itinerarios personalizados que te conectan con el patrimonio histórico, la gastronomía excepcional 
-                y las experiencias únicas que solo esta tierra milenaria puede ofrecer.
-            </p>
-            <div class="about-highlights">
-                <div class="highlight-item">
-                    <span class="highlight-icon">🏰</span>
-                    <h3>Patrimonio Mundial</h3>
-                    <p>Castillos, catedrales y monumentos declarados Patrimonio de la Humanidad te esperan en cada provincia</p>
-                </div>
-                <div class="highlight-item">
-                    <span class="highlight-icon">🍷</span>
-                    <h3>Gastronomía de Excelencia</h3>
-                    <p>Degusta los mejores vinos de Ribera del Duero, el lechazo asado y productos con Denominación de Origen</p>
-                </div>
-                <div class="highlight-item">
-                    <span class="highlight-icon">🌄</span>
-                    <h3>Naturaleza Virgen</h3>
-                    <p>Desde los Picos de Europa hasta las Hoces del Duratón, paisajes que te dejarán sin aliento</p>
+    <!-- HERO ÉPICO -->
+    <section class="hero-epic">
+        <div class="hero-epic-content">
+            <div class="hero-epic-text">
+                <span class="hero-label">BIENVENIDO A</span>
+                <h1 class="hero-title">Castilla y León</h1>
+                <p class="hero-subtitle">Descubre, planifica y vive experiencias inolvidables en la región más rica en patrimonio</p>
+                <div class="hero-cta">
+                    <a href="{{ route('destinos') }}" class="btn-primary btn-lg">EXPLORAR DESTINOS</a>
+                    <a href="#features" class="btn-secondary btn-lg">CONOCER MÁS</a>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Sección: Por qué usar TravelPlus -->
-    <section class="features">
-        <h2>¿Por qué usar TravelPlus?</h2>
-        <div class="features-grid">
-            <div class="feature-card">
-                <span class="feature-icon">🏨</span>
-                <h3>Hoteles</h3>
-                <p>Encuentra los mejores hospedajes en cualquier destino</p>
+    <!-- FEATURES EDITORIALES -->
+    <section class="features-editorial" id="features">
+        <div class="features-container">
+            <div class="features-header">
+                <h2>¿POR QUÉ TRAVELPLUS?</h2>
+                <p>Tu compañero perfecto para explorar Castilla y León</p>
             </div>
-            <div class="feature-card">
-                <span class="feature-icon">🍽️</span>
-                <h3>Restaurantes</h3>
-                <p>Descubre la gastronomía local de cada región</p>
-            </div>
-            <div class="feature-card">
-                <span class="feature-icon">🎨</span>
-                <h3>Museos</h3>
-                <p>Explora la cultura y arte de cada lugar</p>
-            </div>
-            <div class="feature-card">
-                <span class="feature-icon">🎪</span>
-                <h3>Atracciones</h3>
-                <p>Actividades y entretenimiento para todos</p>
+
+            <div class="features-grid-4">
+                <article class="feature-editorial">
+                    <div class="feature-icon-box">🏨</div>
+                    <h3>ALOJAMIENTOS</h3>
+                    <p>Encuentra los mejores hospedajes seleccionados en cada destino</p>
+                </article>
+
+                <article class="feature-editorial">
+                    <div class="feature-icon-box">🍽️</div>
+                    <h3>GASTRONOMÍA</h3>
+                    <p>Descubre restaurantes con sabor auténtico de Castilla y León</p>
+                </article>
+
+                <article class="feature-editorial">
+                    <div class="feature-icon-box">🎨</div>
+                    <h3>CULTURA</h3>
+                    <p>Explora museos y espacios dedicados al arte e historia</p>
+                </article>
+
+                <article class="feature-editorial">
+                    <div class="feature-icon-box">🎉</div>
+                    <h3>EXPERIENCIAS</h3>
+                    <p>Participa en fiestas, ferias y eventos locales únicos</p>
+                </article>
             </div>
         </div>
     </section>
 
-    <!-- Sección: Descubre tu próximo destino -->
-    <section class="hero">
-        <div class="hero-content">
-            <h1>Descubre tu próximo destino</h1>
-            <p>Planifica viajes inolvidables por Castilla y León en minutos</p>
-            <a href="{{ route('destinos') }}" class="btn-primary">Explorar Destinos</a>
+    <!-- HIGHLIGHTS MODERNOS -->
+    <section class="highlights-section">
+        <div class="highlights-container">
+            <h2>EL CORAZÓN DE CASTILLA Y LEÓN</h2>
+            
+            <div class="highlights-grid">
+                <article class="highlight-card">
+                    <div class="highlight-number">01</div>
+                    <h3>Patrimonio de la Humanidad</h3>
+                    <p>Castillos, catedrales y monumentos históricos reconocidos internacionalmente esperan tu visita</p>
+                </article>
+
+                <article class="highlight-card">
+                    <div class="highlight-number">02</div>
+                    <h3>Excelencia Gastronómica</h3>
+                    <p>Degusta Denominaciones de Origen, Ribera del Duero y las especialidades más codiciadas</p>
+                </article>
+
+                <article class="highlight-card">
+                    <div class="highlight-number">03</div>
+                    <h3>Paisajes Singulares</h3>
+                    <p>De los Picos de Europa a las Hoces del Duratón, naturaleza que te deja sin aliento</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA FINAL -->
+    <section class="cta-final">
+        <div class="cta-content">
+            <h2>COMIENZA TU AVENTURA AHORA</h2>
+            <p>Crea planes personalizados y descubre todo lo que Castilla y León tiene para ofrecerte</p>
+            <a href="{{ route('destinos') }}" class="btn-primary btn-xl">EMPEZAR AHORA</a>
         </div>
     </section>
 
     <footer>
-        <p>&copy; 2026 TravelPlus - Todos los derechos reservados</p>
+        <div class="footer-content">
+            <p>&copy; 2026 TravelPlus - Planificando experiencias en Castilla y León</p>
+        </div>
     </footer>
 
     <script src="{{ asset('js/script.js') }}"></script>

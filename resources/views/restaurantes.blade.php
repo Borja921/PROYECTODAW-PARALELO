@@ -3,17 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Restaurantes en Castilla y León - Descubre la mejor gastronomía">
     <title>Restaurantes - TravelPlus</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
 </head>
 <body>
     @include('partials.navbar')
 
-    <section class="hotels-section">
+    <!-- HERO RESTAURANTES -->
+    <section class="hero-restaurants">
+        <div class="hero-restaurants-content">
+            <span class="hero-label">GASTRONOMÍA</span>
+            <h1>SABOREA<br>CASTILLA Y LEÓN</h1>
+            <p>Experimenta la excelencia culinaria en cada provincia</p>
+        </div>
+    </section>
+
+    <!-- CONTENEDOR RESTAURANTES -->
+    <section class="hotels-section hotels-modern">
         <div class="hotels-container">
             <div class="hotels-header">
-                <h1>Restaurantes</h1>
-                <p class="subtitle">Descubre los mejores restaurantes y establecimientos gastronómicos disponibles</p>
+                <h2>DESCUBRE NUESTROS RESTAURANTES</h2>
+                <p>Desde cocina tradicional hasta propuestas innovadoras, aquí está todo</p>
             </div>
 
             <div class="hotels-filters">
@@ -107,7 +121,9 @@
     </section>
 
     <footer>
-        <p>&copy; 2026 TravelPlus - Todos los derechos reservados</p>
+        <div class="footer-content">
+            <p>&copy; 2026 TravelPlus - Degustando Castilla y León</p>
+        </div>
     </footer>
 
     @include('partials.login-modal')

@@ -3,19 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Explora todos los destinos de Castilla y León">
     <title>Explorar Destinos - TravelPlus</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
 </head>
 <body>
     @include('partials.navbar')
-
     @include('partials.login-modal')
 
-    <section class="explore-section">
-        <div class="explore-header">
-            <h1>Explora Nuestros Destinos</h1>
-            <p>Descubre lugares increíbles para tus próximas vacaciones</p>
+    <!-- HERO DESTINOS -->
+    <section class="hero-destinations">
+        <div class="hero-destinations-content">
+            <span class="hero-label">CASTILLA Y LEÓN</span>
+            <h1>9 PROVINCIAS,<br>INFINITAS HISTORIAS</h1>
+            <p>Cada rincón cuenta una historia única esperando ser descubierta</p>
         </div>
+    </section>
+
+    <!-- GRID DESTINOS EDITORIAL -->
+    <section class="explore-section">
+        <div class="destinations-container">
 
 
 
@@ -182,12 +192,12 @@
                 </div>
             </div>
         </div>
-
-
     </section>
 
     <footer>
-        <p>&copy; 2026 TravelPlus - Todos los derechos reservados</p>
+        <div class="footer-content">
+            <p>&copy; 2026 TravelPlus - Descubriendo Castilla y León</p>
+        </div>
     </footer>
 
     <script src="{{ asset('js/script.js') }}"></script>
