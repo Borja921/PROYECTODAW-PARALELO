@@ -9,11 +9,12 @@
     @stack('styles')
 </head>
 <body>
+    <a href="#main-content" class="skip-to-content">Saltar al contenido</a>
     @include('partials.navbar')
 
     @include('partials.login-modal')
 
-    <main>
+    <main id="main-content" role="main">
         @yield('content')
     </main>
 

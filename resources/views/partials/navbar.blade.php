@@ -1,4 +1,4 @@
-<nav class="navbar">
+<nav class="navbar" role="navigation" aria-label="Main navigation">
     <div class="navbar-container">
         <div class="logo">✈️ MateCyL</div>
         <div class="hamburger" id="hamburger" onclick="toggleMenu()">
