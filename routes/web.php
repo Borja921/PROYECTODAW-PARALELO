@@ -82,8 +82,8 @@ Route::get('/fiestas/filtrar/{locality}', [FestivalsController::class, 'filterBy
 
 // API: municipios (usa cache en el servidor)
 Route::get('/api/municipios', [MunicipioController::class, 'index'])->name('api.municipios');
-// Forzar refresco/import (POST) - recomendable proteger con middleware auth en producción
-Route::post('/api/municipios/refresh', [MunicipioController::class, 'refresh'])->name('api.municipios.refresh');
+// Forzar refresco/import (POST) - protegido con auth
+Route::post('/api/municipios/refresh', [MunicipioController::class, 'refresh'])->middleware('auth')->name('api.municipios.refresh');
 
 // Wizard: creación paso a paso de un plan (protegido: requiere login)
 Route::middleware('auth')->prefix('plan/wizard')->name('plan.wizard.')->group(function () {

@@ -6,8 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\File;
-use Illuminate\Validation\Rule;
 use App\Models\Plan;
+use App\Http\Requests\UpdatePerfilRequest;
 
 class PerfilController extends Controller
 {
@@ -63,48 +63,26 @@ class PerfilController extends Controller
     /**
      * Actualizar el perfil del usuario
      */
-    public function update(Request $request)
+    public function update(UpdatePerfilRequest $request)
     {
         $user = Auth::user();
+        $validated = $request->validated();
 
-        $request->validate([
-            'nombre_apellidos' => 'required|string|max:255',
-            'username' => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('usuario', 'username')->ignore($user->id),
-            ],
-            'email' => [
-                'required',
-                'email',
-                'max:255',
-                Rule::unique('usuario', 'email')->ignore($user->id),
-            ],
-            'fecha_nacimiento' => 'nullable|date',
-            'hospedaje_favorito' => 'nullable|string|max:255',
-            'tipo_comida' => 'nullable|string|max:255',
-            'actividades' => 'nullable|string|max:255',
-            'tipo_viaje' => 'nullable|string|max:255',
-            'password' => 'nullable|min:6|confirmed',
-            'profile_photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-        ]);
-
-        $user->nombre_apellidos = $request->nombre_apellidos;
-        $user->username = $request->username;
-        $user->email = $request->email;
+        $user->nombre_apellidos = $validated['nombre_apellidos'];
+        $user->username = $validated['username'];
+        $user->email = $validated['email'];
         
-        if ($request->fecha_nacimiento) {
-            $user->fecha_nacimiento = $request->fecha_nacimiento;
+        if ($validated['fecha_nacimiento'] ?? null) {
+            $user->fecha_nacimiento = $validated['fecha_nacimiento'];
         }
 
-        $user->hospedaje_favorito = $request->hospedaje_favorito;
-        $user->tipo_comida = $request->tipo_comida;
-        $user->actividades = $request->actividades;
-        $user->tipo_viaje = $request->tipo_viaje;
+        $user->hospedaje_favorito = $validated['hospedaje_favorito'] ?? null;
+        $user->tipo_comida = $validated['tipo_comida'] ?? null;
+        $user->actividades = $validated['actividades'] ?? null;
+        $user->tipo_viaje = $validated['tipo_viaje'] ?? null;
 
-        if ($request->password) {
-            $user->password = Hash::make($request->password);
+        if ($validated['password'] ?? null) {
+            $user->password = Hash::make($validated['password']);
         }
 
         if ($request->hasFile('profile_photo')) {

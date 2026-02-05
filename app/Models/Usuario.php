@@ -28,4 +28,12 @@ class Usuario extends Authenticatable
         'password',
         'remember_token',
     ];
+
+    /**
+     * Relación: Un usuario tiene muchos planes
+     */
+    public function planes()
+    {
+        return $this->hasMany(Plan::class, 'user_id');
+    }
 }

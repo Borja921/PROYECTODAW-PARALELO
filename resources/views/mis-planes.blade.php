@@ -62,6 +62,10 @@
 @push('scripts')
 <script>
     function toggleFavorite(planId, button) {
+        // Guardar estado original por si hay error
+        const originalIcon = button.querySelector('.favorite-icon').textContent;
+        const originalTitle = button.title;
+        
         fetch(`/mis-planes/${planId}/toggle-favorite`, {
             method: 'POST',
             headers: {
@@ -69,8 +73,15 @@
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]') ? document.querySelector('meta[name="csrf-token"]').getAttribute('content') : document.querySelector('input[name="_token"]').value
             }
         })
-        .then(response => response.json())
+        .then(response => {
+            // ✅ Verificar que la respuesta HTTP fue exitosa
+            if (!response.ok) {
+                throw new Error(`Error HTTP ${response.status}: ${response.statusText}`);
+            }
+            return response.json();
+        })
         .then(data => {
+            // ✅ Verificar que el servidor devolvió success = true
             if (data.success) {
                 const icon = button.querySelector('.favorite-icon');
                 icon.textContent = data.is_favorite ? '★' : '☆';
@@ -83,9 +94,24 @@
                 // Animar el botón
                 button.classList.add('favorite-animate');
                 setTimeout(() => button.classList.remove('favorite-animate'), 300);
+            } else {
+                // ✅ El servidor rechazó la operación
+                alert('No se pudo guardar los cambios: ' + (data.message || 'Error desconocido'));
+                // Revertir estado visual
+                button.classList.remove('favorite-animate');
             }
         })
-        .catch(error => console.error('Error:', error));
+        .catch(error => {
+            // ✅ Mostrar error al usuario
+            console.error('Error en toggleFavorite:', error);
+            alert('Error al guardar: ' + error.message);
+            
+            // Revertir estado visual
+            const icon = button.querySelector('.favorite-icon');
+            icon.textContent = originalIcon;
+            button.title = originalTitle;
+            button.classList.remove('favorite-animate');
+        });
     }
 
     function filtrarPorEstado(estado) {

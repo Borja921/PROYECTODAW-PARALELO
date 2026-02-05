@@ -28,7 +28,7 @@
                         </div>
                     @endif
 
-                    <form method="POST" action="{{ route('perfil.update') }}" class="edit-profile-form" enctype="multipart/form-data">
+                    <form id="editProfileForm" method="POST" action="{{ route('perfil.update') }}" class="edit-profile-form" enctype="multipart/form-data" novalidate>
                         @csrf
 
                         <div class="form-group">
@@ -40,7 +40,10 @@
                                 required 
                                 value="{{ old('nombre_apellidos', $user->nombre_apellidos) }}"
                                 placeholder="Juan García López"
+                                minlength="3"
+                                maxlength="100"
                             >
+                            <div id="nombreError" style="display:none;color:#dc3545;font-size:0.9rem;margin-top:0.3rem;"></div>
                             @error('nombre_apellidos')
                                 <span class="text-danger" style="color: #721c24; font-size: 0.875rem;">{{ $message }}</span>
                             @enderror
@@ -55,7 +58,12 @@
                                 required 
                                 value="{{ old('username', $user->username) }}"
                                 placeholder="juangarcia"
+                                minlength="3"
+                                maxlength="20"
+                                pattern="[a-zA-Z0-9_-]+"
+                                title="Solo letras, números, guiones y guiones bajos"
                             >
+                            <div id="usernameError" style="display:none;color:#dc3545;font-size:0.9rem;margin-top:0.3rem;"></div>
                             @error('username')
                                 <span class="text-danger" style="color: #721c24; font-size: 0.875rem;">{{ $message }}</span>
                             @enderror
@@ -71,6 +79,7 @@
                                 value="{{ old('email', $user->email) }}"
                                 placeholder="juan@ejemplo.com"
                             >
+                            <div id="emailError" style="display:none;color:#dc3545;font-size:0.9rem;margin-top:0.3rem;"></div>
                             @error('email')
                                 <span class="text-danger" style="color: #721c24; font-size: 0.875rem;">{{ $message }}</span>
                             @enderror
@@ -91,7 +100,9 @@
 
                         <div class="form-group">
                             <label for="profile_photo">Foto de Perfil</label>
-                            <input id="profile_photo" name="profile_photo" type="file" accept="image/*">
+                            <input id="profile_photo" name="profile_photo" type="file" accept="image/*" data-max-size="2097152">
+                            <div id="photoError" style="display:none;color:#dc3545;font-size:0.9rem;margin-top:0.3rem;"></div>
+                            <small style="display: block; margin-top: 0.5rem; color: #666;">Máximo 2MB. Formatos: JPG, PNG, GIF</small>
                             @error('profile_photo')
                                 <span class="text-danger" style="color: #721c24; font-size: 0.875rem;">{{ $message }}</span>
                             @enderror
@@ -187,7 +198,7 @@
                         </div>
 
                         <div style="margin-top: 2rem; display: flex; gap: 1rem; flex-wrap: wrap;">
-                            <button type="submit" class="btn-primary">Guardar Cambios</button>
+                            <button id="submitBtn" type="submit" class="btn-primary">Guardar Cambios</button>
                             <button type="submit" class="btn-danger" form="deleteAccountForm">Eliminar Cuenta</button>
                             <a href="{{ route('perfil') }}" class="btn-secondary">Cancelar</a>
                         </div>
@@ -201,3 +212,139 @@
         </div>
     </section>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('editProfileForm');
+    const nombreInput = document.getElementById('nombre_apellidos');
+    const usernameInput = document.getElementById('username');
+    const emailInput = document.getElementById('email');
+    const photoInput = document.getElementById('profile_photo');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    const nombreError = document.getElementById('nombreError');
+    const usernameError = document.getElementById('usernameError');
+    const emailError = document.getElementById('emailError');
+    const photoError = document.getElementById('photoError');
+
+    // Limpiar errores cuando el usuario escribe
+    nombreInput.addEventListener('input', () => {
+        nombreError.style.display = 'none';
+        nombreError.textContent = '';
+    });
+    usernameInput.addEventListener('input', () => {
+        usernameError.style.display = 'none';
+        usernameError.textContent = '';
+    });
+    emailInput.addEventListener('input', () => {
+        emailError.style.display = 'none';
+        emailError.textContent = '';
+    });
+    photoInput.addEventListener('change', () => {
+        photoError.style.display = 'none';
+        photoError.textContent = '';
+    });
+
+    // Validación de archivo al cambiar
+    photoInput.addEventListener('change', function() {
+        const file = this.files[0];
+        if (!file) return;
+
+        const maxSize = parseInt(this.dataset.maxSize);
+        const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+
+        // Validar tamaño
+        if (file.size > maxSize) {
+            photoError.textContent = 'El archivo es demasiado grande. Máximo 2MB.';
+            photoError.style.display = 'block';
+            this.value = '';
+            return;
+        }
+
+        // Validar tipo MIME
+        if (!validTypes.includes(file.type)) {
+            photoError.textContent = 'Formato de imagen no permitido. Usa JPG, PNG, GIF o WebP.';
+            photoError.style.display = 'block';
+            this.value = '';
+            return;
+        }
+
+        // Validar que sea realmente una imagen usando FileReader
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                // Es una imagen válida
+                photoError.style.display = 'none';
+                photoError.textContent = '';
+            };
+            img.onerror = function() {
+                photoError.textContent = 'El archivo no es una imagen válida.';
+                photoError.style.display = 'block';
+                photoInput.value = '';
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    });
+
+    // Validación al enviar
+    form.addEventListener('submit', function(e) {
+        let hasError = false;
+
+        // Validar nombre completo
+        const nombre = nombreInput.value.trim();
+        if (!nombre || nombre.length < 3) {
+            nombreError.textContent = 'El nombre debe tener al menos 3 caracteres.';
+            nombreError.style.display = 'block';
+            hasError = true;
+        } else if (nombre.length > 100) {
+            nombreError.textContent = 'El nombre no puede exceder 100 caracteres.';
+            nombreError.style.display = 'block';
+            hasError = true;
+        }
+
+        // Validar username
+        const username = usernameInput.value.trim();
+        const usernameRegex = /^[a-zA-Z0-9_-]+$/;
+        if (!username || username.length < 3) {
+            usernameError.textContent = 'El usuario debe tener al menos 3 caracteres.';
+            usernameError.style.display = 'block';
+            hasError = true;
+        } else if (username.length > 20) {
+            usernameError.textContent = 'El usuario no puede exceder 20 caracteres.';
+            usernameError.style.display = 'block';
+            hasError = true;
+        } else if (!usernameRegex.test(username)) {
+            usernameError.textContent = 'El usuario solo puede contener letras, números, guiones y guiones bajos.';
+            usernameError.style.display = 'block';
+            hasError = true;
+        }
+
+        // Validar email
+        const email = emailInput.value.trim();
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email) {
+            emailError.textContent = 'El correo electrónico es requerido.';
+            emailError.style.display = 'block';
+            hasError = true;
+        } else if (!emailRegex.test(email)) {
+            emailError.textContent = 'Formato de correo electrónico inválido.';
+            emailError.style.display = 'block';
+            hasError = true;
+        }
+
+        if (hasError) {
+            e.preventDefault();
+            nombreInput.focus();
+            return false;
+        }
+
+        // Si pasa validación, deshabilitar botón
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Guardando...';
+    });
+});
+</script>
+@endpush
