@@ -7,3 +7,4 @@
 !public/img/
 !public/img/profiles/
 !public/img/profiles/*   # <- incluye todos los archivos dentro
+!public/img/profiles/**/*   # incluye recursivamente todo dentro
