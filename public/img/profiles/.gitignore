@@ -1,7 +1,9 @@
+# Ignorar todo
 *
-!.gitignore
 
+# Excepciones
+!.gitignore
 !public/
 !public/img/
 !public/img/profiles/
-!public/img/profiles/**
+!public/img/profiles/*   # <- incluye todos los archivos dentro
