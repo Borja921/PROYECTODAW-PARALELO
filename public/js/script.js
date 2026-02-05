@@ -548,7 +548,7 @@ function filtrarDestinos() {
     const destinosSeleccionados = destinos[provincia];
 
     if (!destinosSeleccionados) {
-        resultados.innerHTML = '<p class="placeholder-text">No hay destinos disponibles para esta provincia</p>';
+        resultados.innerHTML = '';
         return;
     }
 

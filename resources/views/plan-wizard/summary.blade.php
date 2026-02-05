@@ -222,7 +222,7 @@
         <div class="summary-card" style="margin-top:20px;">
             <div class="plan-name-section">
                 <label for="plan_name">Nombre de tu plan</label>
-                <input type="text" id="plan_name" placeholder="Ej: Fin de semana en Granada" value="{{ $draft['plan_name'] ?? '' }}" onchange="updatePlanName(this.value)">
+                <input type="text" id="plan_name" placeholder="Ej: Viaje a Valladolid" value="{{ $draft['plan_name'] ?? '' }}" onchange="updatePlanName(this.value)">
             </div>
 
             <div class="summary-header">
@@ -322,22 +322,22 @@
         form.method = 'POST';
         form.action = '{{ route("plan.wizard.remove-item") }}';
         form.style.display = 'none';
-        
+
         const csrfInput = document.createElement('input');
         csrfInput.type = 'hidden';
         csrfInput.name = '_token';
         csrfInput.value = '{{ csrf_token() }}';
-        
+
         const categoryInput = document.createElement('input');
         categoryInput.type = 'hidden';
         categoryInput.name = 'category';
         categoryInput.value = category;
-        
+
         const indexInput = document.createElement('input');
         indexInput.type = 'hidden';
         indexInput.name = 'index';
         indexInput.value = index;
-        
+
         form.appendChild(csrfInput);
         form.appendChild(categoryInput);
         form.appendChild(indexInput);

@@ -22,6 +22,10 @@ class RegistroController extends Controller
             'username' => 'required|string|max:255|unique:usuario,username',
             'email' => 'required|email|max:255|unique:usuario,email',
             'fecha_nacimiento' => 'required|date',
+            'hospedaje_favorito' => 'nullable|string|max:255|in:hotel,apartamento,hostal',
+            'tipo_comida' => 'nullable|string|max:255|in:tradicional,internacional,vegetariana',
+            'actividades' => 'nullable|string|max:255|in:museos,naturaleza,aventura',
+            'tipo_viaje' => 'nullable|string|max:255|in:pareja,familia,amigos',
             'password' => 'required|string|min:8|confirmed',
         ];
 
@@ -58,6 +62,10 @@ class RegistroController extends Controller
             'username' => $data['username'],
             'email' => $data['email'],
             'fecha_nacimiento' => $data['fecha_nacimiento'],
+            'hospedaje_favorito' => $data['hospedaje_favorito'] ?? null,
+            'tipo_comida' => $data['tipo_comida'] ?? null,
+            'actividades' => $data['actividades'] ?? null,
+            'tipo_viaje' => $data['tipo_viaje'] ?? null,
             'password' => Hash::make($data['password']),
         ]);
 
