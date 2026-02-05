@@ -1,2 +1,7 @@
 *
 !.gitignore
+
+!public/
+!public/img/
+!public/img/profiles/
+!public/img/profiles/**
